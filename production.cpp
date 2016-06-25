@@ -52,15 +52,15 @@ Production::Production(int it, int maxamt)
 
 void Production::Writeout(Aoutfile *f)
 {
-	if (itemtype != -1) f->PutStr(ItemDefs[itemtype].abr);
-	else f->PutStr("NO_ITEM");
-	f->PutInt(amount);
-	f->PutInt(baseamount);
+	if (itemtype != -1) f->PutStr(ItemDefs[itemtype].abr, "\t//Production.itemtype");
+	else f->PutStr("NO_ITEM", "\t//Production.itemtype");
+	f->PutInt(amount, "\t//Production.amount");
+	f->PutInt(baseamount, "\t//Production.baseamount");
 	if (itemtype == I_SILVER) {
-		if (skill != -1) f->PutStr(SkillDefs[skill].abbr);
-		else f->PutStr("NO_SKILL");
+		if (skill != -1) f->PutStr(SkillDefs[skill].abbr, "\t//Production.skill");
+		else f->PutStr("NO_SKILL", "\t//Production.skill");
 	}
-	f->PutInt(productivity);
+	f->PutInt(productivity, "\t//Production.productivity");
 }
 
 void Production::Readin(Ainfile *f)
@@ -90,7 +90,7 @@ AString Production::WriteReport()
 
 void ProductionList::Writeout(Aoutfile *f)
 {
-	f->PutInt(Num());
+	f->PutInt(Num(), "\t//ProductionList.num");
 	forlist(this) ((Production *) elem)->Writeout(f);
 }
 

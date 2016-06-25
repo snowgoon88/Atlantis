@@ -133,66 +133,66 @@ void QuestList::WriteQuests(Aoutfile *f)
 	Item *i;
 	set<string>::iterator it;
 
-        f->PutInt(quests.Num());
+        f->PutInt(quests.Num(), "\t//QuestsList.Num");
 	forlist(this) {
 		q = (Quest *) elem;
-		f->PutInt(q->type);
+		f->PutInt(q->type, "\t//Quest.type");
 		switch(q->type) {
 			case Quest::SLAY:
-				f->PutInt(q->target);
+				f->PutInt(q->target, "\t//Quest<SLAY>.target");
 				break;
 			case Quest::HARVEST:
 				q->objective.Writeout(f);
-				f->PutInt(q->regionnum);
+				f->PutInt(q->regionnum, "\t//Quest<HARVEST>.regionnum");
 				break;
 			case Quest::BUILD:
 				if (q->building != -1)
-					f->PutStr(ObjectDefs[q->building].name);
+					f->PutStr(ObjectDefs[q->building].name, "\t//Quest<BUILD>.name");
 				else
-					f->PutStr("NO_OBJECT");
-				f->PutStr(q->regionname);
+					f->PutStr("NO_OBJECT", "\t//Quest<BUILD>.name");
+				f->PutStr(q->regionname, "\t//Quest<BUILD>.regioname");
 				break;
 			case Quest::VISIT:
 				if (q->building != -1)
-					f->PutStr(ObjectDefs[q->building].name);
+					f->PutStr(ObjectDefs[q->building].name, "\t//Quest<VISIT>.name");
 				else
-					f->PutStr("NO_OBJECT");
-				f->PutInt(q->destinations.size());
+					f->PutStr("NO_OBJECT", "\t//Quest<VISIT>.name");
+				f->PutInt(q->destinations.size(), "\t//Quest<VISIT>.deestination.size");
 				for (it = q->destinations.begin();
 						it != q->destinations.end();
 						it++) {
-					f->PutStr(it->c_str());
+					f->PutStr(it->c_str(), "\t//Quest<VISIT>.destination");
 				}
 				break;
 			case Quest::DEMOLISH:
-				f->PutInt(q->target);
-				f->PutInt(q->regionnum);
+				f->PutInt(q->target, "\t//Quest<DEMOLISH>.target");
+				f->PutInt(q->regionnum, "\t//Quest<DEMOLISH>.regionnum");
 				break;
 			default:
-				f->PutInt(q->target);
+				f->PutInt(q->target, "\t//Quest<default>.target");
 				q->objective.Writeout(f);
 				if (q->building != -1)
-					f->PutStr(ObjectDefs[q->building].name);
+					f->PutStr(ObjectDefs[q->building].name, "\t//Quest<default>.buildname");
 				else
-					f->PutStr("NO_OBJECT");
-				f->PutInt(q->regionnum);
-				f->PutStr(q->regionname);
-				f->PutInt(q->destinations.size());
+					f->PutStr("NO_OBJECT", "\t//Quest<default>.buildname");
+				f->PutInt(q->regionnum, "\t//Quest<default>.regionnum");
+				f->PutStr(q->regionname, "\t//Quest.<default>.regionname");
+				f->PutInt(q->destinations.size(), "\t//Quest<default>.destination.size()");
 				for (it = q->destinations.begin();
 						it != q->destinations.end();
 						it++) {
-					f->PutStr(it->c_str());
+					f->PutStr(it->c_str(), "\t//Quest<default>.destination");
 				}
 				break;
 		}
-		f->PutInt(q->rewards.Num());
+		f->PutInt(q->rewards.Num(), "\t//Quest.rewards.Num");
 		forlist(&q->rewards) {
 			i = (Item *) elem;
 			i->Writeout(f);
 		}
 	}
 
-	f->PutInt(0);
+	f->PutInt(0, "\t//Quest.endQuest 0");
 
         return;
 }

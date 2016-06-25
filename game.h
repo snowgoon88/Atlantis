@@ -63,14 +63,14 @@ public:
 	~Game();
 
 	int NewGame();
-	int OpenGame();
+    int OpenGame( const std::string& filename = "game.in");
 	void DummyGame();
 
 	void DefaultWorkOrder();
 
 	int RunGame();
 	int EditGame(int *pSaveGame);
-	int SaveGame();
+	int SaveGame( bool verb=false );
 	int WritePlayers();
 	int ReadPlayers();
 	int ReadPlayersLine(AString *pToken, AString *pLine, Faction *pFac,
@@ -118,7 +118,8 @@ public:
 	// Functions to allow enabling/disabling parts of the data tables
 	void ModifyTablesPerRuleset(void);
 
-private:
+//ALAINprivate:
+
 	//
 	// Game editing functions.
 	//
@@ -303,7 +304,8 @@ private:
 	int guardfaction;
 	int monfaction;
 	int doExtraInit;
-	
+
+private:
 	//
 	// Parsing functions
 	//
@@ -380,6 +382,7 @@ private:
 
 	void RemoveInactiveFactions();
 
+private:
 	//
 	// Game running functions
 	//

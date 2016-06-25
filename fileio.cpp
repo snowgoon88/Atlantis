@@ -38,6 +38,7 @@ static char buf[1024];
 Aoutfile::Aoutfile()
 {
 	file = new ofstream;
+	_verb = false;
 }
 
 Aoutfile::~Aoutfile()
@@ -189,20 +190,25 @@ int Ainfile::GetInt()
 	return x;
 }
 
-void Aoutfile::PutInt(int x)
+void Aoutfile::PutInt(int x, char const* comment)
 {
 	*file << x;
+	if( _verb ) *file << "\t" << comment;
 	*file << F_ENDLINE;
 }
 
-void Aoutfile::PutStr(char const *s)
+void Aoutfile::PutStr(char const *s, char const* comment)
 {
-	*file << s << F_ENDLINE;
+  *file << s;
+  if( _verb ) *file << "\t" << comment;
+  *file << F_ENDLINE;
 }
 
-void Aoutfile::PutStr(const AString &s)
+void Aoutfile::PutStr(const AString &s, char const* comment)
 {
-	*file << s << F_ENDLINE;
+  *file << s;
+  if( _verb ) *file << "\t" << comment;
+  *file << F_ENDLINE;
 }
 
 void Aorders::Open(const AString &s)

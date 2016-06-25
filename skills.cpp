@@ -267,7 +267,7 @@ void Skill::Writeout(Aoutfile *f)
 			temp = AString("NO_SKILL 0");
 		}
 	}
-	f->PutStr(temp);
+	f->PutStr(temp, "\t//Skill");
 }
 
 Skill *Skill::Split(int total, int leave)
@@ -442,6 +442,6 @@ void SkillList::Readin(Ainfile *f)
 
 void SkillList::Writeout(Aoutfile *f)
 {
-	f->PutInt(Num());
+	f->PutInt(Num(), "\t//SkillList.Num");
 	forlist(this) ((Skill *) elem)->Writeout(f);
 }

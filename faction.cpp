@@ -171,24 +171,24 @@ Faction::~Faction()
 
 void Faction::Writeout(Aoutfile *f)
 {
-	f->PutInt(num);
+  f->PutInt(num, "\t//FAC.num");
 
-	for (int i=0; i<NFACTYPES; i++) f->PutInt(type[i]);
+	for (int i=0; i<NFACTYPES; i++) f->PutInt(type[i], "\t//FAC.type[i]");
 
-	f->PutInt(lastchange);
-	f->PutInt(lastorders);
-	f->PutInt(unclaimed);
-	f->PutStr(*name);
-	f->PutStr(*address);
-	f->PutStr(*password);
-	f->PutInt(times);
-	f->PutInt(showunitattitudes);
-	f->PutInt(temformat);
+    f->PutInt(lastchange, "\t//FAC.lastchange");
+    f->PutInt(lastorders, "\t//FAC.lastorders");
+	f->PutInt(unclaimed, "\t//FAC.unclaimed");
+	f->PutStr(*name, "\t//FAC.name");
+	f->PutStr(*address, "\t//FAC.mail");
+	f->PutStr(*password, "\t//FAC.passwd");
+	f->PutInt(times, "\t//FAC.times");
+	f->PutInt(showunitattitudes, "\t//FAC.showunitattitudes");
+	f->PutInt(temformat, "\t//FAC.temformat");
 
 	skills.Writeout(f);
 	items.Writeout(f);
-	f->PutInt(defaultattitude);
-	f->PutInt(attitudes.Num());
+	f->PutInt(defaultattitude, "\t//FAC.defaultattitude");
+	f->PutInt(attitudes.Num(), "\t//FAC.attitude.NUM");
 	forlist((&attitudes)) ((Attitude *) elem)->Writeout(f);
 }
 

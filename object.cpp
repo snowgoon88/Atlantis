@@ -100,24 +100,24 @@ Object::~Object()
 
 void Object::Writeout(Aoutfile *f)
 {
-	f->PutInt(num);
-	if (IsFleet()) f->PutStr(ObjectDefs[O_FLEET].name);
-	else if (type != -1) f->PutStr(ObjectDefs[type].name);
-	else f->PutStr("NO_OBJECT");
-	f->PutInt(incomplete);
-	f->PutStr(*name);
+	f->PutInt(num, "\t//Object.num");
+	if (IsFleet()) f->PutStr(ObjectDefs[O_FLEET].name, "\t//Object.isfleet->type");
+	else if (type != -1) f->PutStr(ObjectDefs[type].name, "\t//Object.type");
+	else f->PutStr("NO_OBJECT", "\t//Object.type");
+	f->PutInt(incomplete, "\t//Object.incomplete");
+	f->PutStr(*name, "\t//Object.name");
 	if (describe) {
-		f->PutStr(*describe);
+		f->PutStr(*describe, "\t//Object.describe");
 	} else {
-		f->PutStr("none");
+		f->PutStr("none", "\t//Object.describe");
 	}
-	f->PutInt(inner);
+	f->PutInt(inner, "\t//Object.inner");
 	if (Globals->PREVENT_SAIL_THROUGH && !Globals->ALLOW_TRIVIAL_PORTAGE)
-		f->PutInt(prevdir);
+		f->PutInt(prevdir, "\t//Object.preventSailTrought");
 	else
-		f->PutInt(-1);
-	f->PutInt(runes);
-	f->PutInt(units.Num());
+		f->PutInt(-1, "\t//Object.preventSailthroug");
+	f->PutInt(runes, "\t//Object.runes");
+	f->PutInt(units.Num(), "\t//units.num");
 	forlist ((&units))
 		((Unit *) elem)->Writeout(f);
 	WriteoutFleet(f);
@@ -424,7 +424,7 @@ void Object::WriteoutFleet(Aoutfile *f)
 {
 	if (!IsFleet()) return;
 	int nships = (int) ships.Num();
-	f->PutInt(nships);
+	f->PutInt(nships, "\t//Objecct.Fleet.nbShips");
 	forlist(&ships)
 		((Item *) elem)->Writeout(f);
 }

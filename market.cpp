@@ -94,16 +94,16 @@ void Market::PostTurn(int population, int wages)
 
 void Market::Writeout(Aoutfile *f)
 {
-	f->PutInt(type);
-	if (item != -1) f->PutStr(ItemDefs[item].abr);
-	else f->PutStr("NO_ITEM");
-	f->PutInt(price);
-	f->PutInt(amount);
-	f->PutInt(minpop);
-	f->PutInt(maxpop);
-	f->PutInt(minamt);
-	f->PutInt(maxamt);
-	f->PutInt(baseprice);
+	f->PutInt(type, "\t//Market.type");
+	if (item != -1) f->PutStr(ItemDefs[item].abr, "\t//Market.item");
+	else f->PutStr("NO_ITEM", "\t//Market.item");
+	f->PutInt(price, "\t//Market.prince");
+	f->PutInt(amount, "\t//Market.amount");
+	f->PutInt(minpop, "\t//Market.minpop");
+	f->PutInt(maxpop, "\t//Market.maxpop");
+	f->PutInt(minamt, "\t//Market.minamt");
+	f->PutInt(maxamt, "\t//Market.maxamt");
+	f->PutInt(baseprice, "\t//Market.baseprice");
 }
 
 void Market::Readin(Ainfile *f)
@@ -140,7 +140,7 @@ void MarketList::PostTurn(int population, int wages)
 
 void MarketList::Writeout(Aoutfile *f)
 {
-	f->PutInt(Num());
+	f->PutInt(Num(), "\t//MarketList.Num");
 	forlist (this) ((Market *) elem)->Writeout(f);
 }
 

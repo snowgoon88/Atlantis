@@ -56,11 +56,13 @@ class Aoutfile {
 		int OpenByName(const AString &);
 		void Close();
 
-		void PutStr(char const *);
-		void PutStr(const AString &);
-		void PutInt(int);
+		void PutStr(char const *, char const* comment="");
+		void PutStr(const AString &, char const* comment="");
+		void PutInt(int, char const* comment="");
 
 		ofstream *file;
+
+		bool _verb;
 };
 
 class Aorders {

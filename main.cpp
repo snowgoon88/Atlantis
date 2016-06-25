@@ -73,9 +73,17 @@ int main(int argc, char *argv[])
 				break;
 			}
 
-			if ( !game.SaveGame() ) {
-				Awrite( "Couldn't save the game!" );
-				break;
+			if(argc > 2) {
+			  if ( !game.SaveGame( true ) ) {
+			    Awrite( "Couldn't save the game!" );
+			    break;
+			  }
+			}
+			else {
+			  if ( !game.SaveGame() ) {
+			    Awrite( "Couldn't save the game!" );
+			    break;
+			  }
 			}
 
 			if ( !game.WritePlayers() ) {

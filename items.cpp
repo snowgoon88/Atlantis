@@ -1270,7 +1270,7 @@ void Item::Writeout(Aoutfile *f)
 		temp += ItemDefs[type].abr;
 	}
 	else temp = "-1 NO_ITEM";
-	f->PutStr(temp);
+	f->PutStr(temp, "\t//Item");
 }
 
 void Item::Readin(Ainfile *f)
@@ -1287,7 +1287,7 @@ void Item::Readin(Ainfile *f)
 
 void ItemList::Writeout(Aoutfile *f)
 {
-	f->PutInt(Num());
+	f->PutInt(Num(), "\t//ItemList.Num");
 	forlist (this) ((Item *) elem)->Writeout(f);
 }
 

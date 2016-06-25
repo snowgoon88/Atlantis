@@ -299,13 +299,13 @@ int Game::NewGame()
 	return(1);
 }
 
-int Game::OpenGame()
+int Game::OpenGame( const std::string& filename )
 {
 	//
 	// The order here must match the order in SaveGame
 	//
 	Ainfile f;
-	if (f.OpenByName("game.in") == -1) return(0);
+    if (f.OpenByName(filename.c_str()) == -1) return(0);
 
 	//
 	// Read in Globals
@@ -417,32 +417,33 @@ int Game::OpenGame()
 	return(1);
 }
 
-int Game::SaveGame()
+int Game::SaveGame( bool verb )
 {
 	Aoutfile f;
 	if (f.OpenByName("game.out") == -1) return(0);
-
+	f._verb = verb;
+	
 	//
 	// Write out Globals
 	//
-	f.PutStr("atlantis_game");
-	f.PutInt(CURRENT_ATL_VER);
-	f.PutStr(Globals->RULESET_NAME);
-	f.PutInt(Globals->RULESET_VERSION);
+	f.PutStr("atlantis_game", "\t//START");
+	f.PutInt(CURRENT_ATL_VER, "\t//Version");
+	f.PutStr(Globals->RULESET_NAME, "\t//RuleSetName");
+	f.PutInt(Globals->RULESET_VERSION, "\t//RuleSetVersion");
 
-	f.PutInt(year);
-	f.PutInt(month);
-	f.PutInt(getrandom(10000));
-	f.PutInt(factionseq);
-	f.PutInt(unitseq);
-	f.PutInt(shipseq);
-	f.PutInt(guardfaction);
-	f.PutInt(monfaction);
+	f.PutInt(year, "\t//year");
+	f.PutInt(month, "\t//month");
+	f.PutInt(getrandom(10000), "\t//random");
+	f.PutInt(factionseq, "\t//factionseq");
+	f.PutInt(unitseq, "\t//unitseq");
+	f.PutInt(shipseq, "\t//shipseq");
+	f.PutInt(guardfaction, "\t//guardfaction");
+	f.PutInt(monfaction, "\t//monfaction");
 
 	//
 	// Write out the Factions
 	//
-	f.PutInt(factions.Num());
+	f.PutInt(factions.Num(),"\t//faction.Num");
 
 	forlist(&factions) {
 		((Faction *) elem)->Writeout(&f);

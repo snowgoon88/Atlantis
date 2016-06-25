@@ -172,40 +172,40 @@ void Unit::Writeout(Aoutfile *s)
 {
 	set<string>::iterator it;
 
-	s->PutStr(*name);
+	s->PutStr(*name, "\t//Unit.name");
 	if (describe) {
-		s->PutStr(*describe);
+		s->PutStr(*describe, "\t//Unit.describe");
 	} else {
-		s->PutStr("none");
+		s->PutStr("none", "\t//Unit.describe");
 	}
-	s->PutInt(num);
-	s->PutInt(type);
-	s->PutInt(faction->num);
-	s->PutInt(guard);
-	s->PutInt(reveal);
-	s->PutInt(free);
-	if (readyItem != -1) s->PutStr(ItemDefs[readyItem].abr);
-	else s->PutStr("NO_ITEM");
+	s->PutInt(num, "\t//Unit.num");
+	s->PutInt(type, "\t//Unit.type");
+	s->PutInt(faction->num, "\t//Unit.faction");
+	s->PutInt(guard, "\t//Unit.guard");
+	s->PutInt(reveal, "\t//Unit.reveal");
+	s->PutInt(free, "\t//Unit.free");
+	if (readyItem != -1) s->PutStr(ItemDefs[readyItem].abr, "\t//Unit.itemReady");
+	else s->PutStr("NO_ITEM", "\t//Unit.itemReady");
 	for (int i = 0; i < MAX_READY; ++i) {
 		if (readyWeapon[i] != -1)
-			s->PutStr(ItemDefs[readyWeapon[i]].abr);
-		else s->PutStr("NO_ITEM");
+			s->PutStr(ItemDefs[readyWeapon[i]].abr, "\t//Unit.readyWeapon[i]");
+		else s->PutStr("NO_ITEM", "\t//Unit.readyWeapon[i]");
 		if (readyArmor[i] != -1)
-			s->PutStr(ItemDefs[readyArmor[i]].abr);
-		else s->PutStr("NO_ITEM");
+			s->PutStr(ItemDefs[readyArmor[i]].abr, "\t//Unit.readyArmor[i]");
+		else s->PutStr("NO_ITEM", "\t//Unit.readyArmor[i]");
 	}
-	s->PutInt(flags);
+	s->PutInt(flags, "\t//Unit.flags");
 	items.Writeout(s);
 	skills.Writeout(s);
-	if (combat != -1) s->PutStr(SkillDefs[combat].abbr);
-	else s->PutStr("NO_SKILL");
-	s->PutInt(savedmovement);
-	s->PutInt(savedmovedir);
-	s->PutInt(visited.size());
+	if (combat != -1) s->PutStr(SkillDefs[combat].abbr, "\t//Unit.combatSpell");
+	else s->PutStr("NO_SKILL", "\t//Unit.combatSpell");
+	s->PutInt(savedmovement, "\t//Unit.davedmovement");
+	s->PutInt(savedmovedir, "\t//Unit.savedmovedir");
+	s->PutInt(visited.size(), "\t//Unit.visited.size");
 	for (it = visited.begin();
 			it != visited.end();
 			it++) {
-		s->PutStr(it->c_str());
+		s->PutStr(it->c_str(), "\t//Unit.visitedplace");
 	}
 }
 

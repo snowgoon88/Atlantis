@@ -100,9 +100,9 @@ void TownInfo::Readin(Ainfile *f, ATL_VER &v)
 
 void TownInfo::Writeout(Aoutfile *f)
 {
-	f->PutStr(*name);
-	f->PutInt(pop);
-	f->PutInt(hab);
+	f->PutStr(*name, "\t//TownInfo.name");
+	f->PutInt(pop, "\t//TownInfo.pop");
+	f->PutInt(hab, "\t//TownInfo.hab");
 }
 
 ARegion::ARegion()
@@ -975,46 +975,46 @@ AList *ARegion::PresentFactions()
 
 void ARegion::Writeout(Aoutfile *f)
 {
-	f->PutStr(*name);
-	f->PutInt(num);
-	if (type != -1) f->PutStr(TerrainDefs[type].type);
-	else f->PutStr("NO_TERRAIN");
-	f->PutInt(buildingseq);
-	f->PutInt(gate);
-	if (gate > 0) f->PutInt(gatemonth);
-	if (race != -1) f->PutStr(ItemDefs[race].abr);
-	else f->PutStr("NO_RACE");
-	f->PutInt(population);
-	f->PutInt(basepopulation);
-	f->PutInt(wages);
-	f->PutInt(maxwages);
-	f->PutInt(wealth);
+	f->PutStr(*name, "\t//ARegion.name");
+	f->PutInt(num, "\t//ARegion.num");
+	if (type != -1) f->PutStr(TerrainDefs[type].type, "\t//ARegion.typeterrain");
+	else f->PutStr("NO_TERRAIN", "\t//ARegion.typeterrain");
+	f->PutInt(buildingseq, "\t//ARegion.buildingseq");
+	f->PutInt(gate, "\t//ARegion.gate");
+	if (gate > 0) f->PutInt(gatemonth, "\t//ARegion.gatemonth");
+	if (race != -1) f->PutStr(ItemDefs[race].abr, "\t//ARegion.RaceItemDefs");
+	else f->PutStr("NO_RACE", "\t//ARegion.Race");
+	f->PutInt(population, "\t//ARegion.population");
+	f->PutInt(basepopulation, "\t//ARegion.basepopulation");
+	f->PutInt(wages, "\t//ARegion.wages");
+	f->PutInt(maxwages, "\t//ARegion.maxwages");
+	f->PutInt(wealth, "\t//ARegion.wealth");
 
-	f->PutInt(elevation);
-	f->PutInt(humidity);
-	f->PutInt(temperature);
-	f->PutInt(vegetation);
-	f->PutInt(culture);
+	f->PutInt(elevation, "\t//ARegion.elevation");
+	f->PutInt(humidity, "\t//ARegion.humidity");
+	f->PutInt(temperature, "\t//ARegion.temperature");
+	f->PutInt(vegetation, "\t//ARegion.vegetation");
+	f->PutInt(culture, "\t//ARegion.culture");
 
-	f->PutInt(habitat);
-	f->PutInt(development);
+	f->PutInt(habitat, "\t//ARegion.habitat");
+	f->PutInt(development, "\t//ARegion.development");
 
 	if (town) {
-		f->PutInt(1);
+		f->PutInt(1, "\t//ARegion.town");
 		town->Writeout(f);
 	} else {
-		f->PutInt(0);
+		f->PutInt(0, "\t//ARegion.notown");
 	}
 
-	f->PutInt(xloc);
-	f->PutInt(yloc);
-	f->PutInt(zloc);
-	f->PutInt(visited);
+	f->PutInt(xloc, "\t//ARegion.xloc");
+	f->PutInt(yloc, "\t//ARegion.yloc");
+	f->PutInt(zloc, "\t//ARegion.zloc");
+	f->PutInt(visited, "\t//ARegion.visited");
 
 	products.Writeout(f);
 	markets.Writeout(f);
 
-	f->PutInt(objects.Num());
+	f->PutInt(objects.Num(), "\t//ARegion.Objects.Num");
 	forlist ((&objects)) ((Object *) elem)->Writeout(f);
 }
 
@@ -1994,34 +1994,43 @@ ARegionList::~ARegionList()
 
 void ARegionList::WriteRegions(Aoutfile *f)
 {
-	f->PutInt(Num());
+	f->PutInt(Num(), "\t//ARegionlist.num");
 
-	f->PutInt(numLevels);
+	f->PutInt(numLevels, "\t//ARegionlist.numLevels");
 	int i;
 	for (i = 0; i < numLevels; i++) {
 		ARegionArray *pRegs = pRegionArrays[i];
-		f->PutInt(pRegs->x);
-		f->PutInt(pRegs->y);
+		f->PutInt(pRegs->x, "\t//ARegionArray.x");
+		f->PutInt(pRegs->y, "\t//ARegionArray.y");
 		if (pRegs->strName) {
-			f->PutStr(*pRegs->strName);
+			f->PutStr(*pRegs->strName, "\t//ARegionArray.name");
 		} else {
-			f->PutStr("none");
+			f->PutStr("none", "\t//ARegionArray.name");
 		}
-		f->PutInt(pRegs->levelType);
+		f->PutInt(pRegs->levelType, "\t//ARegionArray.levelType");
 	}
 
-	f->PutInt(numberofgates);
+	f->PutInt(numberofgates, "\t//ARegionList.numberofgates");
 	forlist(this) ((ARegion *) elem)->Writeout(f);
 	{
-		f->PutStr("Neighbors");
+		f->PutStr("Neighbors", "\t//ARegionlist.Neigbors");
 		forlist(this) {
 			ARegion *reg = (ARegion *) elem;
 			for (i = 0; i < NDIRS; i++) {
+			  if( i==0 ) {
 				if (reg->neighbors[i]) {
-					f->PutInt(reg->neighbors[i]->num);
+					f->PutInt(reg->neighbors[i]->num, "\t//ARegionList.Neigbors.dir[i]");
 				} else {
-					f->PutInt(-1);
+					f->PutInt(-1, "\t//ARegionlist.Neighbors.dir[i]");
 				}
+			  }
+			  else {
+			    if (reg->neighbors[i]) {
+			      f->PutInt(reg->neighbors[i]->num);
+			    } else {
+			      f->PutInt(-1);
+			    }
+			  }
 			}
 		}
 	}
