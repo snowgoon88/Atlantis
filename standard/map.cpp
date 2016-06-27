@@ -1040,8 +1040,11 @@ void ARegionList::FinalSetup(ARegionArray *pArr)
 void ARegionList::MakeShaft(ARegion *reg, ARegionArray *pFrom,
 		ARegionArray *pTo)
 {
+  std::cout << "inside MShaft" << std::endl;
+  
 	if (TerrainDefs[reg->type].similar_type == R_OCEAN) return;
-
+	std::cout << "not R_OCEAN" << std::endl;
+	
 	int tempx = reg->xloc * pTo->x / pFrom->x +
 		getrandom(pTo->x / pFrom->x);
 	int tempy = reg->yloc * pTo->y / pFrom->y +
@@ -1052,10 +1055,14 @@ void ARegionList::MakeShaft(ARegion *reg, ARegionArray *pFrom,
 	tempy += (tempx + tempy) % 2;
 
 	ARegion *temp = pTo->GetRegion(tempx, tempy);
-	if (!temp)
-		return;
+	if (!temp) {
+	  std::cout << "temp not exist" << std::endl;
+	  return;
+	}
+	std::cout << "temp=" << temp->num << std::endl;
 	if (TerrainDefs[temp->type].similar_type == R_OCEAN) return;
-
+	std::cout << "temp not R_OCEAN" << std::endl;
+	
 	Object *o = new Object(reg);
 	o->num = reg->buildingseq++;
 	o->name = new AString(AString("Shaft [") + o->num + "]");
@@ -1085,7 +1092,7 @@ void ARegionList::MakeShaftLinks(int levelFrom, int levelTo, int odds)
 			if (!reg) continue;
 
 			if (getrandom(odds) != 0) continue;
-
+			std::cout << "MakShaft " << reg->num << std::endl;
 			MakeShaft(reg, pFrom, pTo);
 		}
 	}

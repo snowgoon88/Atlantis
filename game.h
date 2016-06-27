@@ -58,6 +58,9 @@ I can see what the modify.cpp docs look like.
 class Game
 {
 	friend class Faction;
+	// Alain Hack to access 'regions'
+	friend class MapAccess;
+	
 public:
 	Game();
 	~Game();

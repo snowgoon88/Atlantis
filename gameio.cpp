@@ -68,6 +68,7 @@ int getrandom(int range)
 	i = i % range;
 	if (neg) ret = (int)(i*-1);
 	else ret = (int)i;
+	//std::cout << "rand="<<ret << std::endl;
 	return ret;
 }
 
