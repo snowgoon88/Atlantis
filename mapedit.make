@@ -13,7 +13,7 @@ ENGINE_OBJECTS = alist.o aregion.o army.o astring.o battle.o economy.o \
   edit.o faction.o fileio.o game.o gamedata.o gamedefs.o gameio.o \
   genrules.o i_rand.o items.o market.o modify.o monthorders.o \
   npc.o object.o orders.o parseorders.o production.o quests.o runorders.o \
-  shields.o skills.o skillshows.o specials.o spells.o template.o unit.o
+  shields.o skills.o skillshows.o specials.o spells.o template.o unit.o 
 
 MAPEDITOR_OBJECTS = map_editor.o
 
@@ -21,7 +21,7 @@ OBJECTS = $(patsubst %.o,$(GAME)/obj/%.o,$(RULESET_OBJECTS)) \
   $(patsubst %.o,obj/%.o,$(ENGINE_OBJECTS)) \
   $(patsubst %.o,obj/%.o,$(MAPEDITOR_OBJECTS))
 
-all: objdir $(OBJECTS)
+all: objdir $(OBJECTS) map_access.h
 	$(CPLUS) $(CFLAGS) -o mapedit $(OBJECTS)
 
 clean:

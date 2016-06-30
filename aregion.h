@@ -424,6 +424,9 @@ class GeoMap
 
 class ARegionList : public AList
 {
+  // Alain Hack to access 'regions'
+  friend class MapAccess;
+  
 	public:
 		ARegionList();
 		~ARegionList();

@@ -9,8 +9,9 @@
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
 
 
-// ********************************************************************** main
-int main(int argc, char *argv[])
+
+// ****************************************************************** addlevel
+void addlevel()
 {
   Game game;
   initIO();
@@ -95,6 +96,19 @@ int main(int argc, char *argv[])
   //   ARegion *reg = (ARegion *) elem;
   //   std::cout << mapAccess.str_display( *reg ) << std::endl;
   // }
+  
+}
+// ********************************************************************** main
+int main(int argc, char *argv[])
+{
+  Game game;
+  initIO();
+
+  game.ModifyTablesPerRuleset();
+
+  MapAccess mapAccess = MapAccess( &game );
+
+  mapAccess.createUnderDeep();
   
   return 0;
 }
