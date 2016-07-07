@@ -114,6 +114,235 @@ public:
 
     std::cout << list_regions(_game->regions.pRegionArrays[level]) << std::endl;
   }
+  // ****************************************** MapAccess::AddUnderWorldLevel
+  void createUnderWorld()
+  {
+    // Game Init Game::NewGame() partial
+    _game->factionseq = 1;
+    _game->guardfaction = 0;
+    _game->monfaction = 0;
+    _game->unitseq = 1;
+    _game->SetupUnitNums();
+    _game->shipseq = 100;
+    _game->year = 1;
+    _game->month = -1;
+    //_game->gameStatus = GAME_STATUS_NEW;
+    seedrandomrandom();
+
+    // ARegionList::CreateLevels(int n)
+    _game->regions.CreateLevels( 1 );
+    // Prepare named array... dans world.cpp
+    SetupNames();
+
+    // All the regions point to 0 (null)
+    int xSize = 4;
+    int ySize = 4;
+    int level = 0;
+
+     // ARegionList::MakeRegions(int level, int xSize, int ySize)
+    _game->regions.MakeRegions( 0, xSize, ySize );
+    ARegionArray* aregarr = _game->regions.pRegionArrays[0];
+
+    aregarr->SetName("MyUnderWorld");
+    aregarr->levelType = ARegionArray::LEVEL_UNDERWORLD;
+
+     _game->regions.SetRegTypes( aregarr, R_NUM);
+    std::cout << "__Set Type " << std::endl;
+    std::cout << str_display( aregarr ) << std::endl;
+    std::cout << list_regions( aregarr ) << std::endl;
+
+    SetupAnchorsUnderworld( aregarr );
+    std::cout << "__Set Anchors " << std::endl;
+    std::cout << str_display( aregarr ) << std::endl;
+    std::cout << list_regions( aregarr ) << std::endl;
+
+    GrowTerrainUnderworld( aregarr, 1);
+    std::cout << "__GrowTerrain " << std::endl;
+    std::cout << str_display( aregarr ) << std::endl;
+    std::cout << list_regions( aregarr ) << std::endl;
+
+    RandomTerrainUnderworld( aregarr );
+    std::cout << "__Random Terrain " << std::endl;
+    std::cout << str_display( aregarr ) << std::endl;
+    std::cout << list_regions( aregarr ) << std::endl;
+
+    _game->regions.MakeUWMaze( aregarr );
+    std::cout << "__Make UW Maze " << std::endl;
+    std::cout << str_display( aregarr ) << std::endl;
+    std::cout << list_regions( aregarr ) << std::endl;
+
+    if (Globals->GROW_RACES)
+      _game->regions.GrowRaces( aregarr );
+    _game->regions.FinalSetup( aregarr );
+  }
+  void SetupAnchorsUnderworld(ARegionArray *ta)
+  {
+    // Now, setup the anchors
+    Awrite("Setting up the anchors");
+    int skip = 250;
+    int f = 2;
+    if (Globals->TERRAIN_GRANULARITY) {
+      skip = Globals->TERRAIN_GRANULARITY;
+      while (skip > 5) {
+	f++;
+	skip -= 5;
+	if (skip < 1) skip = 1;
+      }
+      skip = 100 * ((skip+3) * f + 2) / (skip + f - 2);
+    }
+    int dotter = 0;
+    for (int x=0; x<(ta->x)/f; x++) {
+      for (int y=0; y<(ta->y)/(f*2); y++) {
+	if (getrandom(1000) > skip) continue;
+	ARegion *reg = 0;
+	for (int i=0; i<4; i++) {
+	  int tempx = x * f + getrandom(f);
+	  int tempy = y * f * 2 + getrandom(f)*2 + tempx%2;
+	  reg = ta->GetRegion(tempx, tempy);
+	  if (!reg)
+	    continue;
+	  if (reg->type == R_NUM) {
+	    reg->type = GetRegTypeUnderworld(reg, ta->y);
+	    reg->population = 1;
+	    if (TerrainDefs[reg->type].similar_type != R_OCEAN)
+	      reg->wages = AGetName(0, reg);
+	    break;
+	  }
+	}
+	if (dotter++%30 == 0) Adot();
+      }
+    }
+    
+    Awrite("");
+  }
+  void GrowTerrainUnderworld(ARegionArray *pArr, int growOcean)
+  {
+    Awrite("Growing Terrain...");
+    for (int j=0; j<30; j++) {
+      int x, y;
+      for (x = 0; x < pArr->x; x++) {
+	for (y = 0; y < pArr->y; y++) {
+	  ARegion *reg = pArr->GetRegion(x, y);
+	  if (!reg) continue;
+	  reg->population = 1;
+	}
+      }
+      for (x = 0; x < pArr->x; x++) {
+	for (y = 0; y < pArr->y; y++) {
+	  ARegion *reg = pArr->GetRegion(x, y);
+	  if (!reg) continue;
+	  if ((j > 0) && (j < 21) && (getrandom(3) < 2)) continue;
+	  if (reg->type == R_NUM) {
+	    
+	    // Check for Lakes
+	    if (Globals->LAKES &&
+		(getrandom(100) < (Globals->LAKES/10 + 1))) {
+	      reg->type = R_LAKE;
+	      break;
+	    }
+	    // Check for Odd Terrain
+	    if (getrandom(1000) < Globals->ODD_TERRAIN) {
+	      reg->type = GetRegTypeUnderworld(reg, pArr->y);
+	      if (TerrainDefs[reg->type].similar_type != R_OCEAN)
+		reg->wages = AGetName(0, reg);
+	      break;
+	    }
+	    
+	    int init = getrandom(6);
+	    for (int i=0; i<NDIRS; i++) {
+	      ARegion *t = reg->neighbors[(i+init) % NDIRS];
+	      if (t) {
+		if (t->population < 1) continue;
+		if (t->type != R_NUM &&
+		    (TerrainDefs[t->type].similar_type!=R_OCEAN ||
+		     (growOcean && (t->type != R_LAKE)))) {
+		  if (j==0) t->population = 0;
+		  reg->population = 0;
+		  reg->race = t->type;
+		  reg->wages = t->wages;
+		  break;
+		}
+	      }
+	    }
+	  }
+	}
+      }
+      
+      for (x = 0; x < pArr->x; x++) {
+	for (y = 0; y < pArr->y; y++) {
+	  ARegion *reg = pArr->GetRegion(x, y);
+	  if (!reg) continue;
+	  if (reg->type == R_NUM && reg->race != -1)
+	    reg->type = reg->race;
+	}
+      }
+    }
+  }
+  void RandomTerrainUnderworld(ARegionArray *pArr)
+  {
+    int x, y;
+    for (x = 0; x < pArr->x; x++) {
+      for (y = 0; y < pArr->y; y++) {
+	ARegion *reg = pArr->GetRegion(x, y);
+	if (!reg) continue;
+	
+	if (reg->type == R_NUM) {
+	  int adjtype = 0;
+	  int adjname = -1;
+	  for (int d = 0; d < NDIRS; d++) {
+	    ARegion *newregion = reg->neighbors[d];
+	    if (!newregion) continue;
+	    if ((TerrainDefs[newregion->type].similar_type !=
+		 R_OCEAN) && (newregion->type != R_NUM) &&
+		(newregion->wages > 0)) {
+	      adjtype = newregion->type;
+	      adjname = newregion->wages;
+	    }
+	  }
+	  if (adjtype && !Globals->CONQUEST_GAME) {
+	    reg->type = adjtype;
+	    reg->wages = adjname;
+	  } else {
+	    reg->type = GetRegTypeUnderworld(reg, pArr->y);
+	    reg->wages = AGetName(0, reg);
+	  }
+	}
+      }
+    }
+  }
+  int GetRegTypeUnderworld( ARegion *pReg, int yRegionArray )
+  {
+    //
+    // Figure out the distance from the equator, from 0 to 3.
+    //
+    int lat = ( pReg->yloc * 8 ) / ( yRegionArray );
+    if (lat > 3)
+      {
+	lat = (7 - lat);
+      }
+    
+
+    // Underdeep region
+    int r = getrandom(4);
+    switch(r) {
+    case 0:
+      return R_OCEAN;
+    case 1:
+      return R_CAVERN;
+    case 2:
+      return R_UFOREST;
+    case 3:
+      return R_TUNNELS;
+    default:
+      return (0);
+    }
+
+    //
+    // This really shouldn't get called either
+    //
+    return( R_OCEAN );
+  }
+
   // ********************************************** MapAccess::createUnderDeep
   void createUnderDeep()
   {
@@ -345,7 +574,7 @@ public:
 	}
       }
     }
-}
+  }
   int GetRegTypeUnderdeep( ARegion *pReg, int yRegionArray )
   {
     //

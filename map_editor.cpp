@@ -8,8 +8,113 @@
 #include <map_access.h>
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
 
+int _max_underworld = 0;
+int _nb_underdeep = 0;
+int _nb_abyss = 0;
+bool _modified = false;
+bool _saved = false;
 
+// ********************************************************* analyse_situation
+int nb_underworld() { return (_max_underworld - 1); }
+void analyse_situation( Game* game )
+{
 
+  MapAccess mapAccess = MapAccess( game );
+  ARegionList* regions = mapAccess.regions();
+
+  // list all the levels
+  // and count levels
+  for (int i = 0; i < regions->numLevels; i++) {
+    ARegionArray *pArr = regions->pRegionArrays[i];
+    std::cout << mapAccess.str_display( pArr ) << std::endl;
+    std::cout << mapAccess.list_regions( pArr ) << std::endl;
+    if( pArr->levelType == ARegionArray::LEVEL_UNDERWORLD ) {
+      _max_underworld = i;
+    }
+    if( pArr->levelType == ARegionArray::LEVEL_UNDERDEEP ) {
+      _nb_underdeep = i - _max_underworld;
+    }
+    if( pArr->levelType == ARegionArray::LEVEL_NEXUS and i > 0 ) {
+      _nb_abyss = i - (_max_underworld+_nb_underdeep);
+    }
+  }
+
+  std::cout << nb_underworld() << " Underworld level(s) : ";
+  if( nb_underworld() > 0 ) 
+    std::cout << "from 2 to " << _max_underworld;
+  std::cout << std::endl;
+  std::cout << _nb_underdeep << " Underdeep level(s) : ";
+  if( _nb_underdeep > 0) 
+    std::cout << "from " << _max_underworld+1 << " to " << _max_underworld+_nb_underdeep;
+  std::cout << std::endl;
+  std::cout << (_nb_abyss) << " Abyss level(s) : ";
+  if( _nb_abyss > 0 ) {
+    std::cout << "from " << _max_underworld+_nb_underdeep+1;
+    std::cout << " to " << _max_underworld+_nb_underdeep+_nb_abyss;
+  }
+  std::cout << std::endl;
+}
+// ************************************************************** make_choice
+/** 
+ * Return true when finished.
+ */
+void make_choice()
+{
+  bool finished = false;
+  std::string choice = "";
+
+  while( finished == false ) {
+    if( _nb_underdeep == 0 ) {
+      std::cout << "  W) Intercale underWorld at level " << _max_underworld+1;
+      std::cout << std::endl;
+    }
+    std::cout << "  D) Intercale underDeep at level " << _max_underworld+_nb_underdeep+1;
+    std::cout << std::endl;
+
+    std::cout << "  S) Save in game.new" << std::endl;
+    std::cout << "  Q) Quit" << std::endl;
+
+    std::cout << "Quel choix : ";
+    std::cin >> choice;
+
+    if( (choice[0] == 'w' || choice[0] == 'W') && _nb_underdeep == 0 ) {
+      std::cout << "add_underworld( _max_underworld+1 )";
+      std::cout << " [" << _max_underworld+1 << "]" << std::endl;
+      finished = true;
+      _modified = true;
+    }
+    else if( choice[0] == 'd' || choice[0] == 'D' ) {
+      std::cout << "add_underdeep( _max_underworld+_nb_underdeep+1 )";
+      std::cout << " [" << _max_underworld+_nb_underdeep+1 << "]" << std::endl;
+      finished = true;
+      _modified = true;
+    }
+    else if( choice[0] == 's' || choice[0] == 'S' ) {
+      std::cout << "save_game()" << std::endl;
+      finished = true;
+      _saved = true;
+    }
+    else if( choice[0] == 'q' || choice[0] == 'Q' ) {
+
+      bool answered = false;
+      while( answered == false ) {
+	if( _modified == true && _saved == false ) {
+	  std::cout << "Game est modifie mais pas sauve.";
+	}
+	std::cout << " Voulez vous vraiment quitter (o/n) ? " << std::endl;
+	std::cin >> choice;
+
+	if( choice[0] == 'o' || choice[0] == 'O' ) {
+	  std::cout << "Au revoir..." << std::endl;
+	  exit(0);
+	}
+	else if( choice[0] == 'n' || choice[0] == 'N' ) {
+	  answered = true;
+	}
+      }
+    }
+  }
+}
 // ****************************************************************** addlevel
 void addlevel()
 {
@@ -98,8 +203,8 @@ void addlevel()
   // }
   
 }
-// ********************************************************************** main
-int main(int argc, char *argv[])
+// ************************************************************** create_level
+void create_level()
 {
   Game game;
   initIO();
@@ -108,7 +213,26 @@ int main(int argc, char *argv[])
 
   MapAccess mapAccess = MapAccess( &game );
 
-  mapAccess.createUnderDeep();
+  //mapAccess.createUnderDeep();
+  mapAccess.createUnderWorld();
+}
+// ********************************************************************** main
+int main(int argc, char *argv[])
+{
+  Game game;
+  initIO();
+
+  game.ModifyTablesPerRuleset();
+
+  if ( !game.OpenGame() ) {
+    Awrite( "Couldn't open the game file!" );
+    exit(1);
+  }
+
+  analyse_situation( &game );
+  while(true) {
+    make_choice();
+  }
   
   return 0;
 }
