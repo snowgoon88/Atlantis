@@ -16,7 +16,7 @@ OBJECTS := $(patsubst %.o,obj/%.o,$(RULESET_OBJECTS)) \
           $(patsubst %.o,obj/%.o,$(ENGINE_OBJECTS)) \
 	  obj/map_editor.o
 
-CXXFLAGS = -I.
+CXXFLAGS = -g -I.
 
 
 

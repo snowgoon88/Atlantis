@@ -13,6 +13,9 @@
 #include <gamedata.h>
 #include <gameio.h>
 
+#include <algorithm>    // std::random_shuffle
+#include <vector>       // std::vector
+
 void SetupNames();
 
 class MapAccess;
@@ -60,10 +63,91 @@ public:
       ARegion* reg = regarr->regions[i];
       if( reg->gate == -1 ) {
 	reg->gate = _game->regions.numberofgates;
-      }
+      }    
     }
     _game->regions.numLevels += 1;
   }
+  // ******************************************* MapAccess::AddUnderWorldLevel
+  /**
+   * Si underworld_level == 0 => premier niveau de underworld.
+   */
+  void AddUnderWorldLevel( int level, int xSize, int ySize,
+			   int underworld_level )
+  {
+     // Need more room in ARegionArray
+    ARegionArray** tmp_pRegionArray = new ARegionArray *[regions()->numLevels+1];
+    // Copy previous ARegionArray
+    for (int i=0; i < level; i++) {
+      tmp_pRegionArray[i] = _game->regions.pRegionArrays[i];
+    }
+    for (int i=level; i < _game->regions.numLevels; i++) {
+      tmp_pRegionArray[i+1] = _game->regions.pRegionArrays[i];
+      // Change the zloc of the regions
+      for( int j=0; j < tmp_pRegionArray[i+1]->x * tmp_pRegionArray[i+1]->y /2; j++) {
+	ARegion* reg = tmp_pRegionArray[i+1]->regions[j];
+	reg->zloc = reg->zloc+1;
+      }
+    }
+    // Set up the new game pRegionArray
+    _game->regions.pRegionArrays = tmp_pRegionArray;
+    // and Prepare named array... dans world.cpp
+    SetupNames();
+
+    // Create new region
+    // ARegionList::MakeRegions(int level, int xSize, int ySize)
+    _game->regions.MakeRegions( level, xSize, ySize );
+    ARegionArray* aregarr = _game->regions.pRegionArrays[level];
+    aregarr->SetName("underWorld");
+    aregarr->levelType = ARegionArray::LEVEL_UNDERWORLD;
+    // Set terrains
+    _game->regions.SetRegTypes( aregarr, R_NUM);
+    SetupAnchorsUnderworld( aregarr );
+    GrowTerrainUnderworld( aregarr, 1);
+    RandomTerrainUnderworld( aregarr );
+    _game->regions.MakeUWMaze( aregarr );
+    if (Globals->GROW_RACES)
+      _game->regions.GrowRaces( aregarr );
+    _game->regions.FinalSetup( aregarr );
+    // std::cout << "__ END TERRAIN" << std::endl;
+    // std::cout << str_display( aregarr ) << std::endl;
+    // std::cout << list_regions( aregarr ) << std::endl;
+    // std::cout << "__DEBUG WORLD" << std::endl;
+    // for (int i = 0; i < _game->regions.numLevels; i++) {
+    //   ARegionArray *pArr = _game->regions.pRegionArrays[i];
+    //   std::cout << str_display( pArr ) << std::endl;
+    //   std::cout << list_regions( pArr ) << std::endl;
+    // }
+
+
+    // Now create shafts
+    if( underworld_level == 0 ) {
+      // connect as first underworld
+      // shafts from surface to underworld
+      std::cout << "initMakeShafts from" << 2 << " to " << 1 << std::endl;
+      _game->regions.MakeShaftLinks(2, 1, 8);
+    }
+    else {
+      // already some underworld
+      // shafts from surface to this underworld
+      std::cout << "MakeShafts from " << level << " to " << 1 << std::endl;
+      _game->regions.MakeShaftLinks( level, 1, 10*level-10 );
+      // Shafts from underworld to underworld
+      for( int i = 2; i < level; ++i) {
+	// right above ?
+	std::cout << "MakeShafts from" << level << " to " << i << std::endl;
+	if( i == (level-1) ) {
+	  _game->regions.MakeShaftLinks(level, i, 12);
+	}
+	else {
+	  _game->regions.MakeShaftLinks(level, i, 24);
+	}
+      }
+    }
+    // Now add gates
+    _game->regions.InitSetupGates( level );
+    // And update number of levels
+    _game->regions.numLevels += 1;
+  }	  
   // ******************************************** MapAccess::AddUnderDeepLevel
   void AddUnderDeepLevel( int level, int sizex, int sizey,
 			  int underground_lvl )
@@ -113,6 +197,36 @@ public:
     _game->regions.numLevels += 1;
 
     std::cout << list_regions(_game->regions.pRegionArrays[level]) << std::endl;
+  }
+  // ********************************************** MapAccess::reshuffle_gates
+  /** 
+   * Every not set gates (-1) is set to a new index
+   */
+  void reshuffle_gates( int idx_max_init, int nb_new_gates )
+  {
+    // build a vector of indexes
+    std::vector<int> idx_gate;
+    for( unsigned int i = 0; i <= nb_new_gates; ++i) {
+      idx_gate.push_back( i+idx_max_init+1 );
+    }
+
+    // shuffle
+    // using built-in random generator:
+    std::random_shuffle ( idx_gate.begin(), idx_gate.end() );
+
+    // And assign new gates
+     // list all the levels
+    int idx_new = 0;
+    for (int i = 0; i < _game->regions.numLevels; i++) {
+      ARegionArray *pArr = _game->regions.pRegionArrays[i];
+      for( int i=0; i < pArr->x * pArr->y /2; i++) {
+	ARegion* reg = pArr->regions[i];
+	if( reg->gate == -1 ) {
+	  reg->gate = idx_gate[idx_new];
+	  idx_new ++;
+	}
+      }
+    }
   }
   // ****************************************** MapAccess::AddUnderWorldLevel
   void createUnderWorld()
@@ -635,25 +749,59 @@ public:
       reg = regarr->regions[(regarr->x * regarr->y /2)-1];
       disp << "to reg " << reg->num << " (" << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << "),";
     }
-
+    disp << std::endl;
+    disp << str_gates( regarr ) << std::endl;
+    disp << str_shaft( regarr ) << std::endl;
+	
     return disp.str();
   }
-
-  std::string str_display( ARegion* reg)
-    {
-      std::stringstream disp;
-      disp << "Reg " << reg->num;
-      if( reg->type >= 0 and reg->type < R_NUM ) 
-	disp << " : " << TerrainDefs[reg->type].name;
-      else
-	disp << " : " << reg->type;
-      disp << " (" << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << ")";
-      // Any gates ?
+  std::string str_gates( ARegionArray* regarr )
+  {
+    std::stringstream disp;
+    disp << "Gates:";
+    for( int i=0; i < regarr->x * regarr->y /2; i++) {
+      ARegion* reg = regarr->regions[i];
       if( reg->gate > 0 ) {
-        disp << " G_" << reg->gate;
+	disp << " "<< reg->gate << " in " << reg->num << ";";
       }
+      else if( reg->gate == -1 ) {
+	disp << " ?? in " << reg->num << ";";
+      }
+    }
+    return disp.str();
+  }
+  std::string str_shaft( ARegionArray* regarr )
+  {
+    std::stringstream disp;
+    disp << "Shaft:";
+    for( int i=0; i < regarr->x * regarr->y /2; i++) {
+      ARegion* reg = regarr->regions[i];
       // Any Shaft ? (only object with inner != -1)
       forlist (&(reg->objects)) {
+	Object *o = (Object *) elem;
+	if (o->inner != -1) {
+	  disp << " " << reg->num << "->" << o->inner << ";";
+        }
+      }
+    }
+    return disp.str();
+  }
+      
+  std::string str_display( ARegion* reg)
+  {
+    std::stringstream disp;
+    disp << "Reg " << reg->num;
+    if( reg->type >= 0 and reg->type < R_NUM ) 
+      disp << " : " << TerrainDefs[reg->type].name;
+    else
+      disp << " : " << reg->type;
+    disp << " (" << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << ")";
+    // Any gates ?
+    if( reg->gate > 0 ) {
+      disp << " G_" << reg->gate;
+    }
+    // Any Shaft ? (only object with inner != -1)
+    forlist (&(reg->objects)) {
         Object *o = (Object *) elem;
         if (o->inner != -1) {
 	  disp << " S_" << o->inner;
@@ -692,6 +840,22 @@ public:
       if( reg->HasShaft() ) count += 1;
     }
     return count;
+  }
+  // ***************************************************** MapAccess::nb_gates
+  int nb_gate()
+  {
+    int nb_gates = 0;
+    // list all the levels
+    for (int i = 0; i < _game->regions.numLevels; i++) {
+      ARegionArray *pArr = _game->regions.pRegionArrays[i];
+      for( int i=0; i < pArr->x * pArr->y /2; i++) {
+	ARegion* reg = pArr->regions[i];
+	if( reg->gate > 0 ) {
+	  nb_gates ++;
+	}
+      }
+    }
+    return nb_gates;
   }
 };
 #endif // MAP_ACCESS_H
