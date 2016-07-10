@@ -149,7 +149,7 @@ public:
     _game->regions.numLevels += 1;
   }	  
   // ******************************************** MapAccess::AddUnderDeepLevel
-  void AddUnderDeepLevel( int level, int sizex, int sizey,
+  void AddUnderDeepLevel( int level, int xSize, int ySize,
 			  int underground_lvl )
   {
     // Need more room in ARegionArray
@@ -168,35 +168,42 @@ public:
     }
     // Set up the new game pRegionArray
     _game->regions.pRegionArrays = tmp_pRegionArray;
+    // and Prepare named array... dans world.cpp
+    SetupNames();
 
-    // And add an new abyssal level
-    // from Game::CreateWorld()
-    std::cout << "  +CreateUnderdeep" << std::endl;
-    _game->regions.CreateUnderdeepLevel(level, sizex, sizey, "underdeep");
-    int nbShaft = 0;
-    int nbTry = 0;
-    while( nbShaft == 0 and nbTry < 2) {
-    // shaft to underground only if first underdeep
+    // Create new region
+    // ARegionList::MakeRegions(int level, int xSize, int ySize)
+    _game->regions.MakeRegions( level, xSize, ySize );
+    ARegionArray* aregarr = _game->regions.pRegionArrays[level];
+    aregarr->SetName("underdeep");
+    aregarr->levelType = ARegionArray::LEVEL_UNDERDEEP;
+    // Set terrains
+    _game->regions.SetRegTypes( aregarr, R_NUM);
+    SetupAnchorsUnderdeep( aregarr );
+    GrowTerrainUnderdeep( aregarr, 1);
+    RandomTerrainUnderdeep( aregarr );
+    _game->regions.MakeUWMaze( aregarr );
+    if (Globals->GROW_RACES)
+      _game->regions.GrowRaces( aregarr );
+    _game->regions.FinalSetup( aregarr );
+    
+
+    // Now create shafts
     if( level == underground_lvl+1 ) {
-      std::cout << "  +Connect with Underground" << std::endl;
+      // connect as first underdeep
       _game->regions.MakeShaftLinks( level, level-1, 12);
     }
-    // connect to other Underdeep
-    for( int i=underground_lvl+2; i<level; i++ ) {
-      std::cout << "  +Connect with UnderDeep at " << i << std::endl;
-      if( i == level-1 )
-	_game->regions.MakeShaftLinks( level, i, 12);
-      else
-	_game->regions.MakeShaftLinks( level, i, 25);
-    }
-    nbShaft = nb_shaft(_game->regions.pRegionArrays[level]);
-    std::cout << "  +Created " << nb_shaft(_game->regions.pRegionArrays[level])  << " shaft" << std::endl;
-    nbTry++;
+    else {
+      for( int i=underground_lvl+1; i<level; i++ ) {
+	std::cout << "  +Connect with UnderDeep at " << i << std::endl;
+	if( i == (level-1) )
+	  _game->regions.MakeShaftLinks( level, i, 12);
+	else
+	  _game->regions.MakeShaftLinks( level, i, 25);
+      }
     }
     // Underdeep has no gates, only the possible shafts above.
     _game->regions.numLevels += 1;
-
-    std::cout << list_regions(_game->regions.pRegionArrays[level]) << std::endl;
   }
   // ********************************************** MapAccess::reshuffle_gates
   /** 
@@ -726,7 +733,7 @@ public:
   Game* _game;
   
   // ********************************************************** MapAccess::str
-  std::string str_display( ARegionArray* regarr )
+  std::string str_display( ARegionArray* regarr, bool verb=false )
   {
     std::stringstream disp;
     disp << "RegionArray ";
@@ -750,8 +757,14 @@ public:
       disp << "to reg " << reg->num << " (" << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << "),";
     }
     disp << std::endl;
-    disp << str_gates( regarr ) << std::endl;
-    disp << str_shaft( regarr ) << std::endl;
+    if( verb ) {
+     disp << str_gates( regarr ) << std::endl;
+     disp << str_shaft( regarr ) << std::endl;
+    }
+    else {
+      disp << nb_gate( regarr ) << " gates and ";
+      disp << nb_shaft( regarr ) << " shaft" << std::endl;
+    }
 	
     return disp.str();
   }
@@ -846,13 +859,24 @@ public:
   {
     int nb_gates = 0;
     // list all the levels
-    for (int i = 0; i < _game->regions.numLevels; i++) {
-      ARegionArray *pArr = _game->regions.pRegionArrays[i];
+    for (int j = 0; j < _game->regions.numLevels; j++) {
+      ARegionArray *pArr = _game->regions.pRegionArrays[j];
       for( int i=0; i < pArr->x * pArr->y /2; i++) {
 	ARegion* reg = pArr->regions[i];
 	if( reg->gate > 0 ) {
 	  nb_gates ++;
 	}
+      }
+    }
+    return nb_gates;
+  }
+  int nb_gate( ARegionArray* pArr )
+  {
+    int nb_gates = 0;
+    for( int i=0; i < pArr->x * pArr->y /2; i++) {
+      ARegion* reg = pArr->regions[i];
+      if( reg->gate > 0 ) {
+	nb_gates ++;
       }
     }
     return nb_gates;

@@ -19,6 +19,7 @@ int _nb_underdeep = 0;
 int _nb_abyss = 0;
 bool _modified = false;
 bool _saved = false;
+int _verb_level = 0;
 Game _game;
 
 // ********************************************************* analyse_situation
@@ -33,8 +34,16 @@ void analyse_situation( Game* game )
   // and count levels
   for (int i = 0; i < regions->numLevels; i++) {
     ARegionArray *pArr = regions->pRegionArrays[i];
-    std::cout << "{"<<i<<"} " << mapAccess.str_display( pArr ) << std::endl;
-    //std::cout << mapAccess.list_regions( pArr ) << std::endl;
+    if( _verb_level == 0 ) {          
+      std::cout << "{"<<i<<"} " << mapAccess.str_display( pArr, false) << std::endl;
+    }
+    else if( _verb_level == 1 ) {                
+      std::cout << "{"<<i<<"} " << mapAccess.str_display( pArr, true) << std::endl;
+    }
+    else {
+      std::cout << "{"<<i<<"} " << mapAccess.str_display( pArr, true) << std::endl;     
+      std::cout << mapAccess.list_regions( pArr ) << std::endl;
+    }
     if( pArr->levelType == ARegionArray::LEVEL_UNDERWORLD ) {
       _max_underworld = i;
     }
@@ -65,7 +74,7 @@ void analyse_situation( Game* game )
 }
 // ************************************************************** make_choice
 /** 
- * Return true when finished.
+ * UI Menu
  */
 void make_choice( MapAccess& ma )
 {
@@ -75,12 +84,23 @@ void make_choice( MapAccess& ma )
   while( finished == false ) {
     // nb gates
     std::cout << ma.regions()->numberofgates - _nb_gates_ini << " gates a finaliser" << std::endl;
+    std::cout << " P) PLUS de détails " << std::endl;
+    std::cout << " M) MOINS de détails " << std::endl;
     if( _nb_underdeep == 0 ) {
-      std::cout << "  W) Intercale underWorld at level " << _max_underworld+1;
+      std::cout << "  W) Intercale un underWorld au level " << _max_underworld+1;
       std::cout << " size=" << _xsize_surf/2 << " x " << _ysize_surf/2;
       std::cout << std::endl;
     }
-    std::cout << "  D) Intercale underDeep at level " << _max_underworld+_nb_underdeep+1;
+    else {
+      std::cout << "  -- Ne peut pas interaler d'underWorld car il y a déja UnderDeep " << std::endl;
+    }
+    std::cout << "  D) Intercale un underDeep au level " << _max_underworld+_nb_underdeep+1;
+    if( _nb_underdeep == 0 ) {
+      std::cout << " size=" << _xsize_surf/2 << " x " << _ysize_surf/2;
+    }
+    else {
+      std::cout << " size=" << _xsize_surf/4 << " x " << _ysize_surf/4;
+    }
     std::cout << std::endl;
 
     std::cout << "  G) Finalise les Gates" << std::endl;
@@ -103,6 +123,16 @@ void make_choice( MapAccess& ma )
     else if( choice[0] == 'd' || choice[0] == 'D' ) {
       std::cout << "add_underdeep( _max_underworld+_nb_underdeep+1 )";
       std::cout << " [" << _max_underworld+_nb_underdeep+1 << "]" << std::endl;
+      if( _nb_underdeep == 0 ) {
+	ma.AddUnderDeepLevel( _max_underworld+_nb_underdeep+1,
+			      _xsize_surf/2, _ysize_surf/2,
+			      _max_underworld );
+      }
+      else {
+	ma.AddUnderDeepLevel( _max_underworld+_nb_underdeep+1,
+			      _xsize_surf/4, _ysize_surf/4,
+			      _max_underworld );
+      }
       finished = true;
       _modified = true;
     }
@@ -114,6 +144,18 @@ void make_choice( MapAccess& ma )
       _nb_gates_ini = ma.nb_gate();
       finished = true;
       _modified = true;
+    }
+    else if( choice[0] == 'p' || choice[0] == 'P' ) {
+      _verb_level += 1;
+      if( _verb_level > 2 ) _verb_level = 2;
+      std::cout << " Verbosité de niv " << _verb_level << std::endl;
+      finished = true;
+    }
+    else if( choice[0] == 'm' || choice[0] == 'M' ) {
+      _verb_level -= 1;
+      if( _verb_level < 0 ) _verb_level = 0;
+      std::cout << " Verbosité de niv " << _verb_level << std::endl;
+      finished = true;
     }
     else if( choice[0] == 's' || choice[0] == 'S' ) {
       std::cout << "save_game()" << std::endl;
@@ -127,29 +169,37 @@ void make_choice( MapAccess& ma )
     }
     else if( choice[0] == 'q' || choice[0] == 'Q' ) {
 
-      bool answered = false;
-      while( answered == false ) {
-	if( (ma.regions()->numberofgates - _nb_gates_ini) > 0 ) {
-	  std::cout << "Il y a des Gates à finaliser" << std::endl;
-	}
-	if( _modified == true && _saved == false ) {
-	  std::cout << "Game est modifie mais pas sauve.";
-	}
-	std::cout << " Voulez vous vraiment quitter (o/n) ? " << std::endl;
-	std::cin >> choice;
+      // Some action needs to be done
+      if( _modified == true and _saved == false ) {
+	bool answered = false;
+	while( answered == false ) {
+	  if( (ma.regions()->numberofgates - _nb_gates_ini) > 0 ) {
+	    std::cout << "Il y a des Gates à finaliser" << std::endl;
+	  }
+	  if( _modified == true && _saved == false ) {
+	    std::cout << "Game est modifié mais pas sauvé.";
+	  }
+	  std::cout << " Voulez vous vraiment quitter (o/n) ? " << std::endl;
+	  std::cin >> choice;
 
-	if( choice[0] == 'o' || choice[0] == 'O' ) {
-	  std::cout << "Au revoir..." << std::endl;
-	  exit(0);
+	  if( choice[0] == 'o' || choice[0] == 'O' ) {
+	    std::cout << "Au revoir..." << std::endl;
+	    exit(1);
+	  }
+	  else if( choice[0] == 'n' || choice[0] == 'N' ) {
+	    answered = true;
+	  }
 	}
-	else if( choice[0] == 'n' || choice[0] == 'N' ) {
-	  answered = true;
-	}
+      }
+      else {
+	std::cout << "Au revoir..." << std::endl;
+	exit(0);
       }
     }
   }
 }
 // ****************************************************************** addlevel
+/** TEST */
 void addlevel()
 {
   Game game;
@@ -238,6 +288,7 @@ void addlevel()
   
 }
 // ************************************************************** create_level
+/** TEST */ 
 void create_level()
 {
   Game game;
@@ -304,7 +355,7 @@ void shuffle()
 // ********************************************************************** main
 int main(int argc, char *argv[])
 {
-  shuffle();
+  //shuffle();
   menu();
   
   return 0;
