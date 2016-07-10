@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Atlantis" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Atlantis" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="." />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Atlantis" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="alist.cpp" />
+		<Unit filename="alist.h" />
+		<Unit filename="aregion.cpp" />
+		<Unit filename="aregion.h" />
+		<Unit filename="army.cpp" />
+		<Unit filename="army.h" />
+		<Unit filename="astring.cpp" />
+		<Unit filename="astring.h" />
+		<Unit filename="battle.cpp" />
+		<Unit filename="battle.h" />
+		<Unit filename="economy.cpp" />
+		<Unit filename="edit.cpp" />
+		<Unit filename="faction.cpp" />
+		<Unit filename="faction.h" />
+		<Unit filename="fileio.cpp" />
+		<Unit filename="fileio.h" />
+		<Unit filename="game.cpp" />
+		<Unit filename="game.h" />
+		<Unit filename="gamedata.cpp" />
+		<Unit filename="gamedata.h" />
+		<Unit filename="gamedefs.cpp" />
+		<Unit filename="gamedefs.h" />
+		<Unit filename="gameio.cpp" />
+		<Unit filename="gameio.h" />
+		<Unit filename="genrules.cpp" />
+		<Unit filename="helper.h" />
+		<Unit filename="i_rand.cpp" />
+		<Unit filename="i_rand.h" />
+		<Unit filename="i_std.h" />
+		<Unit filename="items.cpp" />
+		<Unit filename="items.h" />
+		<Unit filename="market.cpp" />
+		<Unit filename="market.h" />
+		<Unit filename="modify.cpp" />
+		<Unit filename="monthorders.cpp" />
+		<Unit filename="npc.cpp" />
+		<Unit filename="object.cpp" />
+		<Unit filename="object.h" />
+		<Unit filename="orders.cpp" />
+		<Unit filename="orders.h" />
+		<Unit filename="parseorders.cpp" />
+		<Unit filename="production.cpp" />
+		<Unit filename="production.h" />
+		<Unit filename="quests.cpp" />
+		<Unit filename="quests.h" />
+		<Unit filename="runorders.cpp" />
+		<Unit filename="shields.cpp" />
+		<Unit filename="shields.h" />
+		<Unit filename="skills.cpp" />
+		<Unit filename="skills.h" />
+		<Unit filename="skillshows.cpp" />
+		<Unit filename="specials.cpp" />
+		<Unit filename="spells.cpp" />
+		<Unit filename="spells.h" />
+		<Unit filename="standard/extra.cpp" />
+		<Unit filename="standard/map.cpp" />
+		<Unit filename="standard/monsters.cpp" />
+		<Unit filename="standard/rules.cpp" />
+		<Unit filename="standard/world.cpp" />
+		<Unit filename="template.cpp" />
+		<Unit filename="unit.cpp" />
+		<Unit filename="unit.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
