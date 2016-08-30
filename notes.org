@@ -1,0 +1,20 @@
+* [4/5] BUGS
+** DONE ALH semble ne pas prendre plus d'un underworld
+   tester avec UDN
+   en fait si... mais il faut que les niveaux soient bien numérotés.
+** DONE Report generation
+*** Pas de difference entre les underworld
+underworld et underworld
+2 <underworld> et 3 <underworld>
+==> FIX: il faut changer Globals-UNDERWORLD_LEVELS et UNDERDEEP_LEVELS dans rules.h
+** DONE Advisor ne sait pas lire les reports de la faction 1
+** DONE Les reports fait avec standard101 et standard221 ne sont pas les mêmes.
+** TODO Abyss : calcul des distances interplanaires dans
+*** aregion.cpp
+*** spells.cpp
+** Pas de populations dans les nouvelles Abysses
+* FIXES
+** dans standard/rules.cpp
+*** ligne 163 : changer le NOMBRE de niveau de underworld
+*** ligne 164 : changer le NOMBRE de niveay de underdeep
+*** TODO ligne 165 : changer le NOMBRE d'Abysses

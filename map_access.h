@@ -55,16 +55,17 @@ public:
     //  - numberofgates++
     //  - one region with gate = -1 (new gate)
     _game->regions.CreateAbyssLevel( level, "abyss" );
-    // Set up the new gate.
-    // Find the region of the new abyss with the gate
-    // and set its number to numberofgates-1
-    ARegionArray* regarr = _game->regions.pRegionArrays[level];
-    for( int i=0; i < regarr->x * regarr->y /2; i++) {
-      ARegion* reg = regarr->regions[i];
-      if( reg->gate == -1 ) {
-	reg->gate = _game->regions.numberofgates;
-      }    
-    }
+    /* // Set up the new gate. */
+    /* // Find the region of the new abyss with the gate */
+    /* // and set its number to numberofgates-1 */
+    /* ARegionArray* regarr = _game->regions.pRegionArrays[level]; */
+    /* for( int i=0; i < regarr->x * regarr->y /2; i++) { */
+    /*   ARegion* reg = regarr->regions[i]; */
+    /*   if( reg->gate == -1 ) { */
+    /* 	reg->gate = _game->regions.numberofgates; */
+    /*   }     */
+    /* } */
+    // Update number of levels
     _game->regions.numLevels += 1;
   }
   // ******************************************* MapAccess::AddUnderWorldLevel

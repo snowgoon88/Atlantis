@@ -103,6 +103,9 @@ void make_choice( MapAccess& ma )
     }
     std::cout << std::endl;
 
+    std::cout << "  A) Ajoute un Abysse au level " <<  _max_underworld+_nb_underdeep+_nb_abyss+1;
+    std::cout << " size=4x4" << std::endl;
+    
     std::cout << "  G) Finalise les Gates" << std::endl;
     std::cout << "  S) Save in game.out" << std::endl;
     std::cout << "  Q) Quit" << std::endl;
@@ -133,6 +136,13 @@ void make_choice( MapAccess& ma )
 			      _xsize_surf/4, _ysize_surf/4,
 			      _max_underworld );
       }
+      finished = true;
+      _modified = true;
+    }
+    else if( choice[0] == 'a' || choice[0] == 'A' ) {
+      std::cout << ".AddAbyssLevel( _max_underworld+_nb_underdeep+_nb_abyss+1 )";
+      std::cout << " [" << _max_underworld+_nb_underdeep+_nb_abyss+1 << "]" << std::endl;
+      ma.AddAbyssLevel( _max_underworld+_nb_underdeep+_nb_abyss+1 );
       finished = true;
       _modified = true;
     }
