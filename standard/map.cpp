@@ -83,6 +83,7 @@ void ARegionList::CreateAbyssLevel(int level, char const *name)
 		tempy = getrandom(4);
 		lair = pRegionArrays[level]->GetRegion(tempx, tempy);
 	} while(!lair || lair == reg);
+	std::cout << "ABYSS LAIR in " << *lair->name << " at " << lair->xloc << ", " << lair->yloc << ", " << lair->zloc << std::endl;
 	Object *o = new Object(lair);
 	o->num = lair->buildingseq++;
 	o->name = new AString(AString(ObjectDefs[O_BKEEP].name)+" ["+o->num+"]");

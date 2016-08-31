@@ -2514,11 +2514,12 @@ int ARegionList::GetPlanarDistance(ARegion *one, ARegion *two,
 		return 10000000;
 
 	if (Globals->ABYSS_LEVEL) {
-		// make sure you cannot teleport into or from the abyss
-		int ablevel = Globals->UNDERWORLD_LEVELS +
-			Globals->UNDERDEEP_LEVELS + 2;
-		if (one->zloc == ablevel || two->zloc == ablevel)
-			return 10000000;
+	  // make sure you cannot teleport into or from the abyss
+	  // Alain : not == ablevel but >= ablevel
+	  int ablevel = Globals->UNDERWORLD_LEVELS +
+	    Globals->UNDERDEEP_LEVELS + 2;
+	  if (one->zloc >= ablevel || two->zloc >= ablevel)
+	    return 10000000;
 	}
 
 	int one_x, one_y, two_x, two_y;

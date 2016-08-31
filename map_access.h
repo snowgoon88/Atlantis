@@ -66,6 +66,114 @@ public:
     /*   }     */
     /* } */
     // Update number of levels
+
+    // TODO : create Monsters
+    /* if (Globals->CITY_MONSTERS_EXIST) */
+    /*   CreateCityMons(); */
+    /* if (Globals->WANDERING_MONSTERS_EXIST) */
+    /*   CreateWMons(); */
+    /* if (Globals->LAIR_MONSTERS_EXIST) */
+    /*   CreateLMons(); */
+    
+    /* if (Globals->LAIR_MONSTERS_EXIST) */
+    /*   CreateVMons(); */
+
+    // Now add City and Lair Monsters
+    // Regions of the level
+    int rate = 50;
+    ARegionArray *pArr = _game->regions.pRegionArrays[level];
+    for( int i=0; i < pArr->x * pArr->y /2; i++) {
+      ARegion* reg = pArr->regions[i];
+      if( Globals->CITY_MONSTERS_EXIST ) {
+	if ((reg->type == R_NEXUS) || reg->IsStartingCity() || reg->town) {
+	  _game->CreateCityMon(reg, 100, 1);
+	  std::cout << "MONSTER CITY in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	}
+      }
+      if( Globals->LAIR_MONSTERS_EXIST ) {
+	// npc.cpp GrowLMons(50);
+	if (reg->IsGuarded()) continue;
+
+	forlist(&reg->objects) {
+	  Object *obj = (Object *) elem;
+	  if (obj->units.Num()) continue;
+	  int montype = ObjectDefs[obj->type].monster;
+	  int grow=!(ObjectDefs[obj->type].flags&ObjectType::NOMONSTERGROWTH);
+	  if ((montype != -1) && grow) {
+	    if (getrandom(100) < rate) {
+	      std::cout << "MONSTER LAIR in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	      _game->MakeLMon(obj);
+	    }
+	  }
+	}
+      }
+      if( Globals->LAIR_MONSTERS_EXIST ) {
+	forlist(&reg->objects) {
+	  Object * obj = (Object *) elem;
+	  if (obj->type != O_BKEEP) continue;
+	  std::cout << "MONSTER BKEEP in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	  Faction *monfac = GetFaction( &(_game->factions), 2 );
+	  Unit *u = _game->GetNewUnit( monfac, 0 );
+	  u->MakeWMon( "Elder Demons", I_BALROG, 200);
+	  u->MoveUnit(obj);
+	}
+      }
+    }
+    if( Globals->WANDERING_MONSTERS_EXIST ) {
+      int xsec;
+      for (xsec=0; xsec< pArr->x / 8; xsec++) {
+	for (int ysec=0; ysec< pArr->y / 16; ysec++) {
+	  /* OK, we have a sector. Count mons, and wanted */
+	  int mons=0;
+	  int wanted=0;
+	  for (int x=0; x<8; x++) {
+	    for (int y=0; y<16; y+=2) {
+	      ARegion *reg = pArr->GetRegion(x+xsec*8, y+ysec*16+x%2);
+	      if (reg && !reg->IsGuarded()) {
+		mons += reg->CountWMons();
+		/*
+		 * Make sure there is at least one monster type
+		 * enabled for this region
+		 */
+		int avail = 0;
+		int mon = TerrainDefs[reg->type].smallmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].bigmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].humanoid;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		
+		if (avail)
+		  wanted += TerrainDefs[reg->type].wmonfreq;
+	      }
+	    }
+	  }
+
+	  wanted /= 10;
+	  wanted -= mons;
+	  wanted = (wanted*rate + getrandom(100))/100;
+	  if (wanted > 0) {
+	    for (int i=0; i< wanted;) {
+	      int m=getrandom(8);
+	      int n=getrandom(8)*2+m%2;
+	      ARegion *reg = pArr->GetRegion(m+xsec*8, n+ysec*16);
+	      if (reg && !reg->IsGuarded() && _game->MakeWMon(reg)) {
+		std::cout << "MONSTER WANDER in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+		i++;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    
+    
     _game->regions.numLevels += 1;
   }
   // ******************************************* MapAccess::AddUnderWorldLevel
@@ -144,6 +252,91 @@ public:
 	}
       }
     }
+
+    // Now add City and Lair Monsters
+    // Regions of the level
+    int rate = 50;
+    ARegionArray *pArr = _game->regions.pRegionArrays[level];
+    for( int i=0; i < pArr->x * pArr->y /2; i++) {
+      ARegion* reg = pArr->regions[i];
+      if( Globals->CITY_MONSTERS_EXIST ) {
+	if ((reg->type == R_NEXUS) || reg->IsStartingCity() || reg->town) {
+	  _game->CreateCityMon(reg, 100, 1);
+	  std::cout << "MONSTER CITY in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	}
+      }
+      if( Globals->LAIR_MONSTERS_EXIST ) {
+	// npc.cpp GrowLMons(50);
+	if (reg->IsGuarded()) continue;
+
+	forlist(&reg->objects) {
+	  Object *obj = (Object *) elem;
+	  if (obj->units.Num()) continue;
+	  int montype = ObjectDefs[obj->type].monster;
+	  int grow=!(ObjectDefs[obj->type].flags&ObjectType::NOMONSTERGROWTH);
+	  if ((montype != -1) && grow) {
+	    if (getrandom(100) < rate) {
+	      std::cout << "MONSTER LAIR in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	      _game->MakeLMon(obj);
+	    }
+	  }
+	}
+      }
+    }
+    if( Globals->WANDERING_MONSTERS_EXIST ) {
+      int xsec;
+      for (xsec=0; xsec< pArr->x / 8; xsec++) {
+	for (int ysec=0; ysec< pArr->y / 16; ysec++) {
+	  /* OK, we have a sector. Count mons, and wanted */
+	  int mons=0;
+	  int wanted=0;
+	  for (int x=0; x<8; x++) {
+	    for (int y=0; y<16; y+=2) {
+	      ARegion *reg = pArr->GetRegion(x+xsec*8, y+ysec*16+x%2);
+	      if (reg && !reg->IsGuarded()) {
+		mons += reg->CountWMons();
+		/*
+		 * Make sure there is at least one monster type
+		 * enabled for this region
+		 */
+		int avail = 0;
+		int mon = TerrainDefs[reg->type].smallmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].bigmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].humanoid;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		
+		if (avail)
+		  wanted += TerrainDefs[reg->type].wmonfreq;
+	      }
+	    }
+	  }
+
+	  wanted /= 10;
+	  wanted -= mons;
+	  wanted = (wanted*rate + getrandom(100))/100;
+	  if (wanted > 0) {
+	    for (int i=0; i< wanted;) {
+	      int m=getrandom(8);
+	      int n=getrandom(8)*2+m%2;
+	      ARegion *reg = pArr->GetRegion(m+xsec*8, n+ysec*16);
+	      if (reg && !reg->IsGuarded() && _game->MakeWMon(reg)) {
+		std::cout << "MONSTER WANDER in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+		i++;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+    
     // Now add gates
     _game->regions.InitSetupGates( level );
     // And update number of levels
@@ -203,6 +396,92 @@ public:
 	  _game->regions.MakeShaftLinks( level, i, 25);
       }
     }
+
+    // Now add City and Lair Monsters
+    // Regions of the level
+    int rate = 50;
+    ARegionArray *pArr = _game->regions.pRegionArrays[level];
+    for( int i=0; i < pArr->x * pArr->y /2; i++) {
+      ARegion* reg = pArr->regions[i];
+      if( Globals->CITY_MONSTERS_EXIST ) {
+	if ((reg->type == R_NEXUS) || reg->IsStartingCity() || reg->town) {
+	  _game->CreateCityMon(reg, 100, 1);
+	  std::cout << "MONSTER CITY in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	}
+      }
+      if( Globals->LAIR_MONSTERS_EXIST ) {
+	// npc.cpp GrowLMons(50);
+	if (reg->IsGuarded()) continue;
+
+	forlist(&reg->objects) {
+	  Object *obj = (Object *) elem;
+	  if (obj->units.Num()) continue;
+	  int montype = ObjectDefs[obj->type].monster;
+	  int grow=!(ObjectDefs[obj->type].flags&ObjectType::NOMONSTERGROWTH);
+	  if ((montype != -1) && grow) {
+	    if (getrandom(100) < rate) {
+	      std::cout << "MONSTER LAIR in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+	      _game->MakeLMon(obj);
+	    }
+	  }
+	}
+      }
+    }
+    if( Globals->WANDERING_MONSTERS_EXIST ) {
+      int xsec;
+      for (xsec=0; xsec< pArr->x / 8; xsec++) {
+	for (int ysec=0; ysec< pArr->y / 16; ysec++) {
+	  /* OK, we have a sector. Count mons, and wanted */
+	  int mons=0;
+	  int wanted=0;
+	  for (int x=0; x<8; x++) {
+	    for (int y=0; y<16; y+=2) {
+	      ARegion *reg = pArr->GetRegion(x+xsec*8, y+ysec*16+x%2);
+	      if (reg && !reg->IsGuarded()) {
+		mons += reg->CountWMons();
+		/*
+		 * Make sure there is at least one monster type
+		 * enabled for this region
+		 */
+		int avail = 0;
+		int mon = TerrainDefs[reg->type].smallmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].bigmon;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		mon = TerrainDefs[reg->type].humanoid;
+		if (!((mon == -1) ||
+		      (ItemDefs[mon].flags & ItemType::DISABLED)))
+		  avail = 1;
+		
+		if (avail)
+		  wanted += TerrainDefs[reg->type].wmonfreq;
+	      }
+	    }
+	  }
+
+	  wanted /= 10;
+	  wanted -= mons;
+	  wanted = (wanted*rate + getrandom(100))/100;
+	  if (wanted > 0) {
+	    for (int i=0; i< wanted;) {
+	      int m=getrandom(8);
+	      int n=getrandom(8)*2+m%2;
+	      ARegion *reg = pArr->GetRegion(m+xsec*8, n+ysec*16);
+	      if (reg && !reg->IsGuarded() && _game->MakeWMon(reg)) {
+		std::cout << "MONSTER WANDER in " << *reg->name << " at " << reg->xloc << ", " << reg->yloc << ", " << reg->zloc << std::endl;
+		i++;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    
     // Underdeep has no gates, only the possible shafts above.
     _game->regions.numLevels += 1;
   }
