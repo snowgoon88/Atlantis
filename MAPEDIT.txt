@@ -1,0 +1,76 @@
+Atlantis Edit (10/07/016)
+=========================
+
+1) INSTALLER
+------------
+
+1. Copier les fichiers 'map_access.h' et 'map_editor.cpp' dans le répertoire
+où se trouvent les autres fichiers sources d'Atlantis.
+
+2. Modifier les fichiers 'game.h' et 'aregion.h'
+Dans [game.h], ajouter 'friend class MapAcess;' dans la déclaration de la 
+class Game (ligne 58 environs)
+ce qui devrait donner
+	class Game
+	{
+		friend class Faction;
+		friend class MapAccess;
+
+Dans [aregion.h], ajouter 'friend class MapAcess;' dans la déclaration de la
+class ARegionList (ligne 425 environs)
+ce qui devrait donner
+	class ARegionList : public AList
+	{
+		friend class MapAccess;
+		
+3. Compiler, la fonction 'main()' est dans map_editor.cpp
+
+---- Comment j'ai fait dans codeblock, en supposant que l'on travailler avec
+     les projets de codeblock -------------------------------------------------
+* J'ai crée un projet Atlantis pour compiler et utiliser Atlantis
+
+* J'ai copié le fichier projet Atlantis/Atlantis.cbp dans
+Atlantis/AtlantisEdit.cbp
+
+* Dans AtlantisEdit.cbp j'ai modifié le nom du projet en 'AtlantisEdit'
+* Dans AtlantisEdit.cbp j'ai enlevé le fichier 'main.cpp'
+* J'ai ouverte AtlantisEdit.cbp comme un projet de codeblock
+* J'y ai ajouté les fichiers 'map_access.h' et 'map_editor.cpp'
+* et j'ai fait Build
+
+2) UTILISER
+-----------
+
+1. En ligne de commande :o)
+
+2. Il faut être dans un répertoire avec un fichier 'game.in'
+
+3. On lance l'executable bulder, normalement 'AtlantisEdit.exe'
+
+4. Et hop, on se laisse guider par le menu. <joie>
+
+5. Quand on sauve, cela crée un fichier 'game.out'
+
+ATTENTION
+---------
+* Inutile de le dire, je pense, mais il vaut mieux faire une sauvegarde de
+'game.in' et 'game.out' avant de jouer aver :o) :o) :o)
+
+* Si on crée un/des niveaux underWorld, cela positionne des portes (gate)
+supplémentaires. Ces portes n'ont pas encore de numéro. Il faut spécifiquement
+utiliser l'option G) du menu pour leur donner un numéro. Et c'est mieux de le
+faire APRES avoir crées tout les niveaux, pour que les nouveaux numéros soient
+mieux mélangés.
+
+* Les noms des villes et des régions créées est piochés dans la liste qui est
+au début de 'standard/world.cpp'. Ca peut valoir le coup de l'effacer et d'yde
+mettre de nouveaux noms si on ne veut pas de redites...
+-> standard/world.cpp, 'regionnames'
+
+* Les portes qui seront crées auront toutes des numéros qui seront supérieurs 
+aux numéros qui existaient avant dans le monde. C'est pour ne pas casser la
+structure existente.
+
+* Cela va ajouter de nouveaux puits (Shaft) au monde, forcément...
+
+
