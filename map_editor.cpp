@@ -72,6 +72,22 @@ void analyse_situation( Game* game )
   }
   std::cout << std::endl;
 }
+// ***************************************************************** get_int
+/**
+ * Demande un entier.
+ */
+int get_int()
+{
+  int x;
+  std::cin >> x;
+  while(std::cin.fail()) {
+    std::cout << "Erreur! Je veux un nombre entier..." << std::endl;
+    std::cin.clear();
+    std::cin.ignore(256,'\n');
+    std::cin >> x;
+  }
+  return x;
+}
 // ************************************************************** make_choice
 /** 
  * UI Menu
@@ -88,7 +104,7 @@ void make_choice( MapAccess& ma )
     std::cout << " M) MOINS de détails " << std::endl;
     if( _nb_underdeep == 0 ) {
       std::cout << "  W) Intercale un underWorld au level " << _max_underworld+1;
-      std::cout << " size=" << _xsize_surf/2 << " x " << _ysize_surf/2;
+      std::cout << " (suggestion size=" << _xsize_surf/2 << " x " << _ysize_surf/2 << ")";
       std::cout << std::endl;
     }
     else {
@@ -96,10 +112,10 @@ void make_choice( MapAccess& ma )
     }
     std::cout << "  D) Intercale un underDeep au level " << _max_underworld+_nb_underdeep+1;
     if( _nb_underdeep == 0 ) {
-      std::cout << " size=" << _xsize_surf/2 << " x " << _ysize_surf/2;
+      std::cout << " (suggestion size=" << _xsize_surf/2 << " x " << _ysize_surf/2 << ")";
     }
     else {
-      std::cout << " size=" << _xsize_surf/4 << " x " << _ysize_surf/4;
+      std::cout << " (suggestion size=" << _xsize_surf/4 << " x " << _ysize_surf/4 << ")";
     }
     std::cout << std::endl;
 
@@ -117,8 +133,21 @@ void make_choice( MapAccess& ma )
     if( (choice[0] == 'w' || choice[0] == 'W') && _nb_underdeep == 0 ) {
       std::cout << "add_underworld( _max_underworld+1 )";
       std::cout << " [" << _max_underworld+1 << "]" << std::endl;
+
+
+      // Demande des infos
+      int xsize = _xsize_surf/2;
+      int ysize = _xsize_surf/2;
+      std::cout << " Taille de l'underWorld (" << xsize << ")  X=";
+      xsize = get_int();
+      std::cout << " Taille de l'underWorld (" << ysize << ")  Y=";
+      ysize = get_int();
+      std::cout << " Nb de Puits/Shaft NB_SHAFT=";
+      int nb_shaft = get_int();
       ma.AddUnderWorldLevel( _max_underworld+1,
-			     _xsize_surf/2, _ysize_surf/2,
+			     //_xsize_surf/2, _ysize_surf/2,
+			     xsize, ysize,
+			     nb_shaft,
 			     _max_underworld );
       finished = true;
       _modified = true;
@@ -126,16 +155,24 @@ void make_choice( MapAccess& ma )
     else if( choice[0] == 'd' || choice[0] == 'D' ) {
       std::cout << "add_underdeep( _max_underworld+_nb_underdeep+1 )";
       std::cout << " [" << _max_underworld+_nb_underdeep+1 << "]" << std::endl;
-      if( _nb_underdeep == 0 ) {
-	ma.AddUnderDeepLevel( _max_underworld+_nb_underdeep+1,
-			      _xsize_surf/2, _ysize_surf/2,
-			      _max_underworld );
+
+      // Demande des infos
+      int xsize = _xsize_surf/2;
+      int ysize = _xsize_surf/2;
+      if( _nb_underdeep > 0 ) {
+	xsize = xsize/2;
+	ysize = ysize/2;
       }
-      else {
-	ma.AddUnderDeepLevel( _max_underworld+_nb_underdeep+1,
-			      _xsize_surf/4, _ysize_surf/4,
-			      _max_underworld );
-      }
+      std::cout << " Taille de l'underDeep (" << xsize << ")  X=";
+      xsize = get_int();
+      std::cout << " Taille de l'underDeepg (" << ysize << ")  Y=";
+      ysize = get_int();
+      std::cout << " Nb de Puits/Shaft NB_SHAFT=";
+      int nb_shaft = get_int();
+      ma.AddUnderDeepLevel( _max_underworld+_nb_underdeep+1,
+			    xsize, ysize, nb_shaft,
+			    _max_underworld );
+    
       finished = true;
       _modified = true;
     }
@@ -281,7 +318,7 @@ void addlevel()
     sx = 4; sy = 4;
   }
   std::cout << "  Size will be " << pArr->x / sx << " x " << pArr->y / sy << std::endl;
-  mapAccess.AddUnderDeepLevel( level, pArr->x/sx, pArr->y/sy,
+  mapAccess.AddUnderDeepLevel( level, pArr->x/sx, pArr->y/sy, 8, /*nb_shaft*/
 			       max_underground );
   
   // regions = mapAccess.regions();

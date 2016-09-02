@@ -6,7 +6,9 @@
 /** 
  * Access the Game object to inspect and modify map.
  */
-
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
 #include <string>
 #include <sstream>
 #include <aregion.h>
@@ -30,6 +32,7 @@ public:
   // ***************************************************** MapAccess::creation
   MapAccess( Game* game ) : _game(game)
   {
+    init_random();
   }
   // ************************************************ MapAccess::AddAbyssLevel
   void AddAbyssLevel( int level )
@@ -181,6 +184,7 @@ public:
    * Si underworld_level == 0 => premier niveau de underworld.
    */
   void AddUnderWorldLevel( int level, int xSize, int ySize,
+			   int wanted_nb_shaft,
 			   int underworld_level )
   {
      // Need more room in ARegionArray
@@ -228,30 +232,56 @@ public:
     // }
 
 
-    // Now create shafts
-    if( underworld_level == 0 ) {
-      // connect as first underworld
-      // shafts from surface to underworld
-      std::cout << "initMakeShafts from" << 2 << " to " << 1 << std::endl;
-      _game->regions.MakeShaftLinks(2, 1, 8);
-    }
-    else {
-      // already some underworld
-      // shafts from surface to this underworld
-      std::cout << "MakeShafts from " << level << " to " << 1 << std::endl;
-      _game->regions.MakeShaftLinks( level, 1, 10*level-10 );
-      // Shafts from underworld to underworld
-      for( int i = 2; i < level; ++i) {
-	// right above ?
-	std::cout << "MakeShafts from" << level << " to " << i << std::endl;
-	if( i == (level-1) ) {
-	  _game->regions.MakeShaftLinks(level, i, 12);
+    // Crée un shaft
+    // random level above
+    ARegionArray *pFrom = _game->regions.pRegionArrays[level];
+    ARegionArray *pTo;
+    int nb_max_try_shaft = wanted_nb_shaft * 100;
+    int try_shaft = 0;
+    while( nb_shaft( pFrom ) < wanted_nb_shaft && try_shaft < nb_max_try_shaft) {
+      int from_x = get_random( pFrom->x );
+      int from_y = get_random( pFrom->y );
+      int level_to = get_random( level-1) + 1;
+      pTo = _game->regions.pRegionArrays[level_to];
+      ARegion *reg = pFrom->GetRegion( from_x, from_y );
+      // Essaye de créer un nouveau Shaft
+      if( reg ) {
+	if( !reg->HasShaft() ) {
+	  //std::cout << "  MS try dans reg="<< reg->num << " x="<<from_x << " y="<<from_y << " to level=" << level_to << std::endl;
+	  _game->regions.MakeShaft(reg, pFrom, pTo);
 	}
 	else {
-	  _game->regions.MakeShaftLinks(level, i, 24);
+	  //std::cout << "  MS try dans reg="<< reg->num << " x="<<from_x << " y="<<from_y << " HAS SHAFT ";
 	}
       }
+
+      try_shaft++;
     }
+    
+    /* // Now create shafts */
+    /* if( underworld_level == 0 ) { */
+    /*   // connect as first underworld */
+    /*   // shafts from surface to underworld */
+    /*   std::cout << "initMakeShafts from" << 2 << " to " << 1 << std::endl; */
+    /*   _game->regions.MakeShaftLinks(2, 1, 8); */
+    /* } */
+    /* else { */
+    /*   // already some underworld */
+    /*   // shafts from surface to this underworld */
+    /*   std::cout << "MakeShafts from " << level << " to " << 1 << std::endl; */
+    /*   _game->regions.MakeShaftLinks( level, 1, 10*level-10 ); */
+    /*   // Shafts from underworld to underworld */
+    /*   for( int i = 2; i < level; ++i) { */
+    /* 	// right above ? */
+    /* 	std::cout << "MakeShafts from" << level << " to " << i << std::endl; */
+    /* 	if( i == (level-1) ) { */
+    /* 	  _game->regions.MakeShaftLinks(level, i, 12); */
+    /* 	} */
+    /* 	else { */
+    /* 	  _game->regions.MakeShaftLinks(level, i, 24); */
+    /* 	} */
+    /*   } */
+    /* } */
 
     // Now add City and Lair Monsters
     // Regions of the level
@@ -343,7 +373,7 @@ public:
     _game->regions.numLevels += 1;
   }	  
   // ******************************************** MapAccess::AddUnderDeepLevel
-  void AddUnderDeepLevel( int level, int xSize, int ySize,
+  void AddUnderDeepLevel( int level, int xSize, int ySize, int wanted_nb_shaft,
 			  int underground_lvl )
   {
     // Need more room in ARegionArray
@@ -382,20 +412,46 @@ public:
     _game->regions.FinalSetup( aregarr );
     
 
-    // Now create shafts
-    if( level == underground_lvl+1 ) {
-      // connect as first underdeep
-      _game->regions.MakeShaftLinks( level, level-1, 12);
-    }
-    else {
-      for( int i=underground_lvl+1; i<level; i++ ) {
-	std::cout << "  +Connect with UnderDeep at " << i << std::endl;
-	if( i == (level-1) )
-	  _game->regions.MakeShaftLinks( level, i, 12);
-	else
-	  _game->regions.MakeShaftLinks( level, i, 25);
+    // Crée un shaft
+    // random level above
+    ARegionArray *pFrom = _game->regions.pRegionArrays[level];
+    ARegionArray *pTo;
+    int nb_max_try_shaft = wanted_nb_shaft * 100;
+    int try_shaft = 0;
+    while( nb_shaft( pFrom ) < wanted_nb_shaft && try_shaft < nb_max_try_shaft) {
+      int from_x = get_random( pFrom->x );
+      int from_y = get_random( pFrom->y );
+      int level_to = get_random( level-1) + 1;
+      pTo = _game->regions.pRegionArrays[level_to];
+      ARegion *reg = pFrom->GetRegion( from_x, from_y );
+      // Essaye de créer un nouveau Shaft
+      if( reg ) {
+	if( !reg->HasShaft() ) {
+	  //std::cout << "  MS try dans reg="<< reg->num << " x="<<from_x << " y="<<from_y << " to level=" << level_to << std::endl;
+	  _game->regions.MakeShaft(reg, pFrom, pTo);
+	}
+	else {
+	  //std::cout << "  MS try dans reg="<< reg->num << " x="<<from_x << " y="<<from_y << " HAS SHAFT ";
+	}
       }
+
+      try_shaft++;
     }
+    
+    // // Now create shafts
+    // if( level == underground_lvl+1 ) {
+    //   // connect as first underdeep
+    //   _game->regions.MakeShaftLinks( level, level-1, 12);
+    // }
+    // else {
+    //   for( int i=underground_lvl+1; i<level; i++ ) {
+    // 	std::cout << "  +Connect with UnderDeep at " << i << std::endl;
+    // 	if( i == (level-1) )
+    // 	  _game->regions.MakeShaftLinks( level, i, 12);
+    // 	else
+    // 	  _game->regions.MakeShaftLinks( level, i, 25);
+    //   }
+    // }
 
     // Now add City and Lair Monsters
     // Regions of the level
@@ -1160,6 +1216,19 @@ public:
       }
     }
     return nb_gates;
+  }
+  // *************************************************** MapAccess::rand_int
+  /**
+   * Generate a random int with a first seed taken from std::steady_clock
+   * and then using std::random.
+   */
+  int init_random()
+  {
+    std::srand(std::time(0));
+  }
+  int get_random(int max_val)
+  {
+    return std::rand() % max_val;
   }
 };
 #endif // MAP_ACCESS_H
