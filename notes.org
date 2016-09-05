@@ -1,23 +1,347 @@
-* [5/5] BUGS
-** DONE ALH semble ne pas prendre plus d'un underworld
-   tester avec UDN
-   en fait si... mais il faut que les niveaux soient bien numérotés.
-** DONE Report generation
-*** Pas de difference entre les underworld
+* map_editor
+** [5/5] BUGS
+*** DONE ALH semble ne pas prendre plus d'un underworld
+    tester avec UDN
+    en fait si... mais il faut que les niveaux soient bien numérotés.
+*** DONE Report generation
+**** Pas de difference entre les underworld
 underworld et underworld
 2 <underworld> et 3 <underworld>
 ==> FIX: il faut changer Globals-UNDERWORLD_LEVELS et UNDERDEEP_LEVELS dans rules.h
-** DONE Advisor ne sait pas lire les reports de la faction 1
-** DONE Les reports fait avec standard101 et standard221 ne sont pas les mêmes.
-** DONE Abyss : calcul des distances interplanaires dans
-*** aregion.cpp => changé
-*** spells.cpp = unchanged
-** Pas de populations dans les nouvelles Abysses
-* [1/1] FIXES
-** DONE Ajouter les monstres !
+*** DONE Advisor ne sait pas lire les reports de la faction 1
+*** DONE Les reports fait avec standard101 et standard221 ne sont pas les mêmes.
+*** DONE Abyss : calcul des distances interplanaires dans
+**** aregion.cpp => changé
+**** spells.cpp = unchanged
+*** Pas de populations dans les nouvelles Abysses
+** [1/1] FIXES
+*** DONE Ajouter les monstres !
 après la création d'un niveau...
-** dans standard/rules.cpp
-*** ligne 163 : changer le NOMBRE de niveau de underworld
-*** ligne 164 : changer le NOMBRE de niveay de underdeep
-*** ligne 165 : changer le NOMBRE d'Abysses
-    
+*** dans standard/rules.cpp
+**** ligne 163 : changer le NOMBRE de niveau de underworld
+**** ligne 164 : changer le NOMBRE de niveay de underdeep
+**** ligne 165 : changer le NOMBRE d'Abysses
+* see_world
+Un outils pour visualiser TERRAIN, RACE, ITEMS et autres.
+Et leurs liens.
+
+** TODO avant/après Game::ModifyTablesPerRumeset() (cf aussi standard/extra.cpp
+* ADD
+** Mid-game town (gamedefs.h)
+// Enable Creation of Towns mid-game, migration and population dynamics?
+	// NOTE: not implemented yet.
+	int DYNAMIC_POPULATION;
+** Ajouter un MONSTRE
+*** 1) dans gamedata.h
+Ajouter un I_XXXX unique pour ce monstre => I_BALROG
+*** 2) ItemType dans gamedata.cpp
+Ajouter une entrée ItemType (dans le même ordre) 
+// Table of items
+//
+// name, plural, abbr,
+// flags,
+// pSkill, pLevel, pMonths, pOutput, pInput array
+// mSkill, mLevel, mOutput, mInput array
+// weight, type, baseprice, combat,
+// walk, ride, fly, swim, speed
+// hitchItem, hitchwalk
+// mult_item, mult_val, max_inventory
+// escape, esc_skill, esc_val
+=> est-ce qu'on peut échapper à un Balrog ou est-ce que le BALROG peut s'échapper ?
+// granted skill, granted from array, minGrant, maxGrant
+{"balrog","balrogs","BALR",                            
+	 ItemType::NOTRANSPORT,
+	 NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+	 "SUBA",1,20, {{-1,0},{-1,0},{-1,0},{-1,0}},
+	 250, IT_MONSTER | IT_DEMON, 50,1,
+	 300,300,300,0,6,
+	 -1,0,
+	 -1,0, 1,
+	 ItemType::ESC_LEV_QUAD | ItemType::LOSE_LINKED, "SUBA", 4,
+	 "", { "", "", "", "" }, 0, 0},
+*** 3) MonType dans gamedata.cpp
+Ajouter une entrée MonType
+// Table of monsters.
+//
+// attackLevel, defense array => def contre divers type d'attaque (enum {
+	ATTACK_COMBAT,
+	ATTACK_ENERGY,
+	ATTACK_SPIRIT,
+	ATTACK_WEATHER,
+	ATTACK_RIDING,
+	ATTACK_RANGED,)
+// numAttacks, hits, regen,
+// tactics, stealth, obs
+// special, specialLevel,
+// silver spoiltype, hostile, number, name, abbr
+{6,{6,6,6,6,5,0},
+200,200,0,
+5,5,5,
+"hellfire", 6,
+50000,IT_MAGIC,100,1,"Balrog", "BALR"},
+*** 4) LAIR ou Wandering Monster dans gamedata.cpp
+Si c'est un LAIR monster, il faut au moins trouver un type de ObjectType qui 
+mentionne ce Monstre
+// name,
+// flags,
+// protect,capacity,sailors,maxMages
+// item,cost,skill,level,
+// max maintenance, max monthly decay, maintenance factor
+// monster, productionaided
+// defencearray (ATTACK_COMBAT, ATTACK_ENERGY, ATTACK_SPIRIT, 
+//						  ATTACK_WEATHER, ATTACK_RIDING and ATTACK_RANGED)
+//
+
+// Added Abyss Lair
+	{"Black Keep",
+	 ObjectType::NOMONSTERGROWTH | ObjectType::NEVERDECAY,
+	 0,0,0,0,
+	 -1,0,NULL,0,
+	 0,0,0,
+	 I_BALROG,-1,
+	 {0,0,0,0,0,0}},
+
+Et il faudra aussi dire dans quel terrain on peut trouver ce type de LAIR. Par exemple pour la caverne du dragon (O_CAVE), on peut (entre autre) le trouver en deep_forest
+{"deepforest", "deepforest", 'd', R_DFOREST,
+	 TerrainType::FLYINGMOUNTS,
+	 100,11,12,3,
+	 {{I_WOOD,100,10},{I_STONE,100,10},{I_IRON,100,10},{I_MUSHROOM,100,20},
+	  {I_ROUGHGEM,10,10},{-1,0,0},{-1,0,0}},
+	 {I_DROWMAN,I_UNDERDWARF,I_ORC,I_GREYELF},
+	 {-1,-1,-1},
+	 15,I_DEMON,I_DRAGON,I_TROLL,
+	 25,{O_RUIN,O_CAVE,O_DEMONPIT,O_MAGETOWER,O_ILAIR,O_DARKTOWER}},
+
+
+Si c'est un Wandering Monster, il faut des types de Terrain où il peut apparaître.
+Par exemple pour le loup WOLF
+
+// name, type_name, similar_type,
+// flags,
+// pop, wages, economy, movepoints,
+// product array
+// normal races array
+// coastal races array
+// wmonfreq, smallmon, bigmon, humanoid,
+// lairChance, lair array
+{"forest", "forest", 'f', R_FOREST,
+	 TerrainType::FLYINGMOUNTS,
+	 400,12,20,2,
+	 {{I_WOOD,100,20},{I_FUR,100,10},{I_HERBS,100,10},{I_IRONWOOD,25,5},
+	  {I_YEW,25,5},{-1,0,0},{-1,0,0}},
+	 {I_WOODELF,I_VIKING,-1,-1},
+	 {I_SEAELF,-1,-1},
+	 2,I_WOLF,I_TRENT,I_KOBOLD,
+	 10,{O_LAIR,O_RUIN,O_CRYPT,-1,-1,-1}},
+*** 5) attaque spéciale dans gamedata.cpp
+Le Balrong utilise du "hellfire", il y a une entrée dans SpecialType
+// SPECIAL_HELLFIRE
+	{"hellfire", "hellfire",
+	 0,
+	 {-1, -1, -1, -1, -1},
+	 {-1, -1, -1, -1, -1, -1, -1},
+	 {NULL, NULL, NULL},
+	 SpecialType::FX_DAMAGE|SpecialType::FX_USE_LEV,
+	 {-1, -1, -1, -1},
+	 {{-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}},
+	 "a non-shield spell",
+	 {{ATTACK_ENERGY,2,25,
+	   WeaponType::ALWAYSREADY|WeaponType::RANGED,MAGIC_ENERGY,0},
+	  {-1, 0, 0, 0, 0, 0},
+	  {-1, 0, 0, 0, 0, 0},
+	  {-1, 0, 0, 0, 0, 0}},
+	 "blasts the enemy with Hellfire", "killing ", ""},
+
+
+** Ajouter un OBJET
+
+
+** ITEM ItemType *ItemDefs
+// name, plural, abbr,
+// flags,
+ItemType::DISABLED | ItemType::NOTRANSPORT | ItemType::NOMARKET [ex:SILVER] | ItemType::CANTGIVE
+// pSkill, pLevel, pMonths, pOutput, pInput array
+Skill pour produire
+GRAI = "FARM",1,1,1, {{-1,0}, {-1,0},{-1,0},{-1,0}},
+RAFT = "SHIP",1,10,1, {{I_WOOD,1}, {-1,0},{-1,0},{-1,0}}, => 1 month, 10 WOOD
+// mSkill, mLevel, mOutput, mInput array
+=> magical skill to produce
+// weight, type, baseprice, combat,
+type=IT_MAN | IT_LEADER | IT_MOUNT | IT_MONEY | IT_NORMAL | IT_FOOD | IT_ADVANCED | IT_ANIMAL | IT_UNDEAD | IT_DEMON | IT_MAGIC | IT_BATTLE | IT_MAGEONLY | IT_NEVER_SPOIL
+combat=starting level
+// walk, ride, fly, swim, speed
+ex=15,0,0,0,2 pour LEAD
+// hitchItem, hitchwalk
+=> force de trait
+WAGO:I_HORSE,250,
+// mult_item, mult_val, max_inventory => item qui multiplient la production
+GRAI:I_BAG,2, 0,
+// escape, esc_skill, esc_val
+SKEL:ItemType::LOSS_CHANCE, NULL, 10
+IMP:ItemType::ESC_NUM_SQUARE | ItemType::ESC_LEV_SQUARE | ItemType::LOSE_LINKED, "SUIM", 16
+// granted skill, granted from array, minGrant, maxGrant
+Gate Crystal GTCR:"GATE", { "MANI", "PATT", "FORC", "SPIR" }, 1, 3}
+
+** MONSTER MonType *MonDefs
+//
+// Table of monsters.
+//
+// attackLevel, defense array
+// numAttacks, hits, regen,
+// tactics, stealth, obs
+// special, specialLevel,
+// silver spoiltype, hostile, number, name, abbr
+{6,{6,6,6,6,5,0},
+200,200,0,
+5,5,5,
+"hellfire", 6,
+50000,IT_MAGIC,100,1,"Balrog", "BALR"},
+** WEAPON WeaponType *WeaponDefs
+//
+// Table of weapons.
+//
+//  item abbr,
+//  flags,
+//  baseSkill, orSkill,
+//  weapClass, attackType, numAttacks
+//  attackBonus, defenseBonus, mountBonus
+** ARMOR ArmorType *ArmorDefs
+//
+// Table of armor.
+//
+// abbr, flags, from, slashChance, pierceChance, crushChance, cleaveChance,
+// armorpiercingChance, energyChance, spiritChance, weatherChance;
+** MOUNT MountType *MountDefs
+// Table of mounts
+// skill,minBonus,maxBonus,maxHamperedBonus
+
+// MOUNT_HORSE
+{ "HORS", "RIDI", 1, 3, 3, NULL, 0},
+** BATTLE ITEMS 
+// BATTLE_FSWORD BattleItemType *BattleItemDefs
+{"FSWO", BattleItemType::SPECIAL,"fireball", 1 },
+** SKILL SkillType *SkillDefs
+// Table of skills.
+//
+//
+// name, abbr, cost,
+// flags
+// special, rangeindex
+// skill dependancy array
+//
+{"portal lore","PORT",100,
+SkillType::MAGIC | SkillType::CAST,
+NULL, "rng_portal",
+{{"GATE",3},{"FARS",1},{NULL,0}}},
+** OBJECT ObjectType *ObjectDefs
+// name,
+// flags,
+// protect,capacity,sailors,maxMages
+// item,cost,skill,level,
+// max maintenance, max monthly decay, maintenance factor
+// monster, productionaided
+// defencearray (ATTACK_COMBAT, ATTACK_ENERGY, ATTACK_SPIRIT, 
+//						  ATTACK_WEATHER, ATTACK_RIDING and ATTACK_RANGED)
+//
+{"Cog",
+         ObjectType::NEVERDECAY | ObjectType::CANENTER | ObjectType::CANMODIFY | ObjectType::DISABLED,
+	 0,500,6,0,
+	 -1,0,NULL,0,
+	 0,0,0,
+	 -1,-1,
+	 {0,0,0,0,0,0}},
+{"Cave",
+	 ObjectType::NEVERDECAY,
+	 0,0,0,0,
+	 -1,0,NULL,0,
+	 0,0,0,
+	 I_DRAGON,-1,
+	 {0,0,0,0,0,0}},
+{"Farm",
+	 ObjectType::CANENTER | ObjectType::CANMODIFY,
+	 0,0,0,0,
+	 I_WOOD_OR_STONE,10,"FARM",3,
+	 5,1,2,
+	 -1,I_GRAIN,
+	 {0,0,0,0,0,0}},
+** TERRAIN TerrainType *TerrainDefs
+// name, type_name, similar_type,
+// flags,
+// pop, wages, economy, movepoints,
+// product array
+// normal races array
+// coastal races array
+// wmonfreq, smallmon, bigmon, humanoid,
+// lairChance, lair array
+{"plain", "plain", 'p', R_PLAIN,
+	 TerrainType::RIDINGMOUNTS | TerrainType::FLYINGMOUNTS,
+	 800,14,40,1,
+	 {{I_HORSE,100,20},{I_WHORSE,25,5},{-1,0,0},{-1,0,0},
+	  {-1,0,0},{-1,0,0},{-1,0,0}},
+	 {I_PLAINSMAN,I_NOMAD,I_HIGHELF,-1},
+	 {I_VIKING,I_SEAELF,-1},
+	 1,I_LION,-1,I_CENTAUR,
+	 10,{O_RUIN,O_CRYPT,O_MAGETOWER,-1,-1,-1}},
+** SPECIAL SpecialType *SpecialDefs
+// SPECIAL_HELLFIRE
+	{"hellfire", "hellfire",
+	 0,
+	 {-1, -1, -1, -1, -1},
+	 {-1, -1, -1, -1, -1, -1, -1},
+	 {NULL, NULL, NULL},
+	 SpecialType::FX_DAMAGE|SpecialType::FX_USE_LEV,
+	 {-1, -1, -1, -1},
+	 {{-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}},
+	 "a non-shield spell",
+	 {{ATTACK_ENERGY,2,25,
+	   WeaponType::ALWAYSREADY|WeaponType::RANGED,MAGIC_ENERGY,0}, // type,minum,value,flags,defclass 
+	  {-1, 0, 0, 0, 0, 0},
+	  {-1, 0, 0, 0, 0, 0},
+	  {-1, 0, 0, 0, 0, 0}},
+	 "blasts the enemy with Hellfire", "killing ", ""},
+** EFFECTS EffectType *EffectDefs
+// EFFECT_FEAR
+	{"fear", -2,
+	 {{ATTACK_COMBAT, -2}, {ATTACK_RIDING, -2}, {-1, 0}, {-1, 0}},
+* QUEST
+** Types
+*** SLAY
+int target (unit number)
+*** HARVEST
+Item objective // produire cet objet
+int regionnum  // dans telle région
+*** BUILD
+int bulding    // type d'objet ObjectDefs[q->building] or NO_OBJECT
+AString regioname
+*** VISIT
+un type de building dans différentes régions ?
+*** DEMOLISH
+int target    // num batiment à détruire
+int regionum  // dans quelle région
+*** TODO DELIVER 
+
+** Check => various .cpp de engine (battle,monthorder,runorders)
+** Format
+class Quest : public AListElem
+{
+	public:
+		Quest();
+		~Quest();
+
+		enum {
+			SLAY,
+			HARVEST,
+			BUILD,
+			VISIT,
+			DELIVER,
+			DEMOLISH
+		};
+		int	type;
+		int	target;
+		Item	objective;
+		int	building;
+		int	regionnum;
+		AString	regionname;
+		set<string> destinations;
+		AList	rewards;
+};
