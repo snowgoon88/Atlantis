@@ -155,7 +155,7 @@ Le Balrong utilise du "hellfire", il y a une entrée dans SpecialType
 
 ** Ajouter un OBJET
 
-
+   
 ** ITEM ItemType *ItemDefs
 // name, plural, abbr,
 // flags,
