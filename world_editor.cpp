@@ -14,7 +14,7 @@
 
 Game _game;
 
-std::string head_item = "name\tnames\tabr\tCANTGIVE\tDISABLED\tNOMARKET\tORINPUTS\tSKILLOUT\tNOTRANSPORT\tpSkill\tpLevel\tpMonths\tpOut\tpIn0_item\tpIn0_amt\tpIn1_item\tpIn1_amt\tpIn2_item\tpIn2_amt\tpIn3_item\tpIn3_amt\tmSkill\tmLevel\tmOut\tmIn0_item\tmIn0_amt\tmIn1_item\tmIn1_amt\tmIn2_item\tmIn2_amt\tmIn3_item\tmIn3_amt\tweight\tIT_NORMAL\tIT_ADVANCED\tIT_TRADE\tIT_MAN\tIT_MONSTER\tIT_MAGIC\tIT_WEAPON\tIT_ARMOR\tIT_MOUNT\tIT_BATTLE\tIT_SPECIAL\tIT_TOOL\tIT_FOOD\tIT_ILLUSION\tIT_UNDEAD\tIT_DEMON\tIT_LEADER\tIT_MONEY\tIT_ANIMAL\tIT_SHIP\tIT_MAGEONLY\tIT_ALWAYS_SPOIL\tIT_NEVER_SPOIL\tbaseprice\tcombat\twalk\tride\tfly\tswim\tspeed\thitchItem\thitchwalk\tmult_item\tmult_val\tmax_inventory\tLOSE_LINKED\tHAS_SKILL\tESC_LEV_LINEAR\tEESC_LEV_SQUARE\tESC_LEV_CUBE\tESC_LEV_QUAD\tLOSS_CHANCE\tESC_NUM_SQUARE\tesc_skill\tesc_val\tgrantSkill\tfromSkill0\tfromSkill1\tfromSkill2\tfromSkill3\tminGrant\tmaxGrant";
+std::string head_item = "name\tnames\tabr\tCANTGIVE\tDISABLED\tNOMARKET\tORINPUTS\tSKILLOUT\tNOTRANSPORT\tpSkill\tpLevel\tpMonths\tpOut\tpIn0_item\tpIn0_amt\tpIn1_item\tpIn1_amt\tpIn2_item\tpIn2_amt\tpIn3_item\tpIn3_amt\tmSkill\tmLevel\tmOut\tmIn0_item\tmIn0_amt\tmIn1_item\tmIn1_amt\tmIn2_item\tmIn2_amt\tmIn3_item\tmIn3_amt\tweight\tIT_NORMAL\tIT_ADVANCED\tIT_TRADE\tIT_MAN\tIT_MONSTER\tIT_MAGIC\tIT_WEAPON\tIT_ARMOR\tIT_MOUNT\tIT_BATTLE\tIT_SPECIAL\tIT_TOOL\tIT_FOOD\tIT_ILLUSION\tIT_UNDEAD\tIT_DEMON\tIT_LEADER\tIT_MONEY\tIT_ANIMAL\tIT_SHIP\tIT_MAGEONLY\tIT_ALWAYS_SPOIL\tIT_NEVER_SPOIL\tbaseprice\tcombat\twalk\tride\tfly\tswim\tspeed\thitchItem\thitchwalk\tmult_item\tmult_val\tmax_inventory\tLOSE_LINKED\tHAS_SKILL\tESC_LEV_LINEAR\tESC_LEV_SQUARE\tESC_LEV_CUBE\tESC_LEV_QUAD\tLOSS_CHANCE\tESC_NUM_SQUARE\tesc_skill\tesc_val\tgrantSkill\tfromSkill0\tfromSkill1\tfromSkill2\tfromSkill3\tminGrant\tmaxGrant";
 
 std::string head_mon = "attackLevel\tATT_COMBAT\tATT_ENERGY\tATT_SPIRIT\tATT_WEATHER\tATT_RIDING\tATT_RANGED\tnumAttacks\thits\tregen\ttactics\tstealth\tobs\tspecial\tspecialLevel\tsilver\tSPOIL_IT_NORMAL\tSPOIL_IT_ADVANCED\tSPOIL_IT_TRADE\tSPOIL_IT_MAN\tSPOIL_IT_MONSTER\tSPOIL_IT_MAGIC\tSPOIL_IT_WEAPON\tSPOIL_IT_ARMOR\tSPOIL_IT_MOUNT\tSPOIL_IT_BATTLE\tSPOIL_IT_SPECIAL\tSPOIL_IT_TOOL\tSPOIL_IT_FOOD\tSPOIL_IT_ILLUSION\tSPOIL_IT_UNDEAD\tSPOIL_IT_DEMON\tSPOIL_IT_LEADER\tSPOIL_IT_MONEY\tSPOIL_IT_ANIMAL\tSPOIL_IT_SHIP\tSPOIL_IT_MAGEONLY\tSPOIL_IT_ALWAYS_SPOIL\tSPOIL_IT_NEVER_SPOIL\thostile\tnumber\tmon_name\tmon_abbr";
 
@@ -103,9 +103,6 @@ void list_monsters()
 	      line << "Y\t";
 	    else  line << "N\t";
 	    if( ItemDefs[j].type & IT_MONSTER )
-	      line << "Y\t";
-	    else  line << "N\t";
-	    if( ItemDefs[j].type & IT_MAGIC )
 	      line << "Y\t";
 	    else  line << "N\t";
 	    if( ItemDefs[j].type & IT_MAGIC )
@@ -209,9 +206,8 @@ void list_monsters()
 	    }
 	    line << ItemDefs[j].minGrant << "\t";
 	    line << ItemDefs[j].maxGrant << "\t";
-	    // MonType
-	    line << MonDefs[i].attackLevel << "\t";
 	    
+	    // MonType
 	    line << MonDefs[i].attackLevel << "\t";
 	    for( int k=0; k<NUM_ATTACK_TYPES; ++k ) {
 	      line << MonDefs[i].defense[k] << "\t";
@@ -243,9 +239,6 @@ void list_monsters()
 	      line << "Y\t";
 	    else  line << "N\t";
 	    if( MonDefs[i].spoiltype & IT_MONSTER )
-	      line << "Y\t";
-	    else  line << "N\t";
-	    if( MonDefs[i].spoiltype & IT_MAGIC )
 	      line << "Y\t";
 	    else  line << "N\t";
 	    if( MonDefs[i].spoiltype & IT_MAGIC )
@@ -301,7 +294,9 @@ void list_monsters()
 	    else  line << "N\t";	    
 	    if( MonDefs[i].spoiltype & IT_NEVER_SPOIL )
 	      line << "Y\t";
-	    else  line << "N\t";	    
+	    else  line << "N\t";
+	    line << MonDefs[i].hostile << "\t";
+	    line << MonDefs[i].number << "\t";
 	    line << MonDefs[i].name << "\t";
 	    line << MonDefs[i].abbr;
 	    std::cout << line.str() << std::endl;
