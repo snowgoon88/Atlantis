@@ -225,7 +225,6 @@ void list_monsters()
 	    line << MonDefs[i].specialLevel << "\t";
 	    line << MonDefs[i].silver << "\t";
 	    
-	    line << MonDefs[i].hostile << "\t";
 	    if( MonDefs[i].spoiltype & IT_NORMAL )
 	      line << "Y\t";
 	    else  line << "N\t";
