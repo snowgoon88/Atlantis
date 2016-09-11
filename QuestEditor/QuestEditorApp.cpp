@@ -23,7 +23,7 @@ IMPLEMENT_APP(QuestEditorApp);
 
 bool QuestEditorApp::OnInit()
 {
-    QuestEditorFrame* frame = new QuestEditorFrame( (wxFrame*) NULL, _("wxWidgets Application Template"), wxSize(600,300));
+    QuestEditorFrame* frame = new QuestEditorFrame( (wxFrame*) NULL, _("wxWidgets Application Template"), wxSize(1700,600));
 
     frame->Show();
 

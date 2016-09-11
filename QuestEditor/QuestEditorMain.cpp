@@ -82,16 +82,16 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     wxBoxSizer *vbox = new wxBoxSizer( wxVERTICAL );
 
     // And add a Text - multiline and readonlu
-    _textCtrl = new wxTextCtrl( _panel, -1, _("exemple de texte"),
-                               wxDefaultPosition, wxDefaultSize,
-                               wxTE_MULTILINE | wxTE_READONLY );
-    vbox->Add( _textCtrl, 1, wxEXPAND );
-    vbox->Add( -1, 20); // Some space
-    wxBoxSizer *hbox = new wxBoxSizer( wxHORIZONTAL );
-    _label = new wxStaticText( _panel, -1, _("LABEL"));
-    hbox->Add( _label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
-    hbox->Add( new wxTextCtrl(_panel, -1, _("A modifier")), 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
-    vbox->Add( hbox );
+//    _textCtrl = new wxTextCtrl( _panel, -1, _("exemple de texte"),
+//                               wxDefaultPosition, wxDefaultSize,
+//                               wxTE_MULTILINE | wxTE_READONLY );
+//    vbox->Add( _textCtrl, 1, wxEXPAND );
+//    vbox->Add( -1, 20); // Some space
+//    wxBoxSizer *hbox = new wxBoxSizer( wxHORIZONTAL );
+//    _label = new wxStaticText( _panel, -1, _("LABEL"));
+//    hbox->Add( _label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
+//    hbox->Add( new wxTextCtrl(_panel, -1, _("A modifier")), 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+//    vbox->Add( hbox );
 
     _monster_view = new MonsterView( _panel );
     vbox->Add( _monster_view );
@@ -109,6 +109,8 @@ void QuestEditorFrame::OnOpenFile(wxCommandEvent& event)
     _textCtrl->AppendText( _("Hop, on ouvre un fichier\n"));
 
     _monster_view->set_monster( I_BALROG );
+
+    _monster_view->parse_gamedata();
 }
 
 void QuestEditorFrame::OnClose(wxCloseEvent &event)
