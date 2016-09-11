@@ -16,6 +16,7 @@
 #endif //__BORLANDC__
 
 #include "QuestEditorMain.h"
+#include "MonsterView.h"
 
 //helper functions
 enum wxbuildinfoformat {
@@ -47,17 +48,19 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 BEGIN_EVENT_TABLE(QuestEditorFrame, wxFrame)
     EVT_CLOSE(QuestEditorFrame::OnClose)
+    EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
     EVT_MENU(idMenuQuit, QuestEditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, QuestEditorFrame::OnAbout)
 END_EVENT_TABLE()
 
-QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title)
-    : wxFrame(frame, -1, title)
+QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const wxSize& aSize)
+    : wxFrame(frame, -1, title, wxDefaultPosition, aSize)
 {
 #if wxUSE_MENUS
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
+    fileMenu->Append(idMenuFileOpen, _("&Open\tCtrl-O"), _("Open a game file"));
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
@@ -75,11 +78,37 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title)
     SetStatusText(wxbuildinfo(short_f), 1);
 #endif // wxUSE_STATUSBAR
 
+    _panel = new wxPanel( this );
+    wxBoxSizer *vbox = new wxBoxSizer( wxVERTICAL );
+
+    // And add a Text - multiline and readonlu
+    _textCtrl = new wxTextCtrl( _panel, -1, _("exemple de texte"),
+                               wxDefaultPosition, wxDefaultSize,
+                               wxTE_MULTILINE | wxTE_READONLY );
+    vbox->Add( _textCtrl, 1, wxEXPAND );
+    vbox->Add( -1, 20); // Some space
+    wxBoxSizer *hbox = new wxBoxSizer( wxHORIZONTAL );
+    _label = new wxStaticText( _panel, -1, _("LABEL"));
+    hbox->Add( _label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
+    hbox->Add( new wxTextCtrl(_panel, -1, _("A modifier")), 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    vbox->Add( hbox );
+
+    _monster_view = new MonsterView( _panel );
+    vbox->Add( _monster_view );
+
+    _panel->SetSizer( vbox );
 }
 
 
 QuestEditorFrame::~QuestEditorFrame()
 {
+}
+
+void QuestEditorFrame::OnOpenFile(wxCommandEvent& event)
+{
+    _textCtrl->AppendText( _("Hop, on ouvre un fichier\n"));
+
+    _monster_view->set_monster( I_BALROG );
 }
 
 void QuestEditorFrame::OnClose(wxCloseEvent &event)

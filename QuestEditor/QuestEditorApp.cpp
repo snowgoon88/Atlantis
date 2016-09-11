@@ -18,13 +18,14 @@
 #include "QuestEditorApp.h"
 #include "QuestEditorMain.h"
 
+// Construct App and provide main entry point
 IMPLEMENT_APP(QuestEditorApp);
 
 bool QuestEditorApp::OnInit()
 {
-    QuestEditorFrame* frame = new QuestEditorFrame(0L, _("wxWidgets Application Template"));
-    
+    QuestEditorFrame* frame = new QuestEditorFrame( (wxFrame*) NULL, _("wxWidgets Application Template"), wxSize(600,300));
+
     frame->Show();
-    
+
     return true;
 }

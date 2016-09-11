@@ -15,18 +15,30 @@
 #endif
 
 #include "QuestEditorApp.h"
+#include "MonsterView.h"
 
+/**
+ * Main Window
+ */
 class QuestEditorFrame: public wxFrame
 {
     public:
-        QuestEditorFrame(wxFrame *frame, const wxString& title);
+        QuestEditorFrame(wxFrame *frame, const wxString& title, const wxSize& size = wxDefaultSize);
         ~QuestEditorFrame();
+
+
+        wxPanel *_panel;
+        wxTextCtrl *_textCtrl;
+        wxStaticText *_label;
+        MonsterView *_monster_view;
     private:
         enum
         {
+            idMenuFileOpen = 1,
             idMenuQuit = 1000,
             idMenuAbout
         };
+        void OnOpenFile(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
