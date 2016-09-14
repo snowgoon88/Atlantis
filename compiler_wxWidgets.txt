@@ -1,0 +1,93 @@
+Modifié la variable d'environnement PATH
+ - ds explorateur de fichier : click droit sur Ordinateur
+   -> Propriétés -> Paramètres système avancés -> Variables d'Environnement
+ - trouver PATh dans la liste déroulante et Modifier
+ - ajouter le chemin jusqu'au compilateur mingw dans cette variable
+   ex; Avant ds PATH C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;
+       Après ds PATH C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;F:\Programmes\CodeBlocks\MinGW\bin;
+	   
+Installer les source de wxWidget 
+ - sur https://www.wxwidgets.org/downloads/
+ - prendre Latest Stable Release 3.0.2, Windows Installer
+ - installer où tu veux, on va dire D:\Chemin\vers\wxWidget
+ 
+Ouvrir une console de commande (en mode administrateur si wxWidget est installé à un endroit
+   où seul l'administrateur peut écrire)
+
+Aller dans D:\Chemin\vers\wxWidget\build\msw
+
+Ouvrir le fichier config.cpp pour modifier 1 truc, et sauvegarder
+# Standard flags for C++ 
+CXXFLAGS ?= -std=gnu++11
+# Build quality assurance classes library (USE_GUI must be 1)? [0,1]
+USE_QA ?= 1
+
+Dans la console, compiler en faisant
+mingw32-make -f makefile.gcc
+
+Attendre :o)
+
+Si ça compile, c'est déjà un super bon point. Il ne reste plus qu'à dire à codeblock d'utiliser cette libraire :o)
+
+Création de projet "wxWidget project"
+  select wxWidgets 3.0.x
+  Preferred GUI builder : None
+  Application Type : Frame based
+  wxWidgets' location : D:\Chemin\vers\wxWidget
+  target => QUE debug
+  Option de wxWidgets
+    x Enable unicode
+    x Create and use precompiled header
+  Pas de librairies additionnelle
+  
+Ne pas oublier d'aller cocher [-std=c++11] dans BuildOptions -> compiler Flags
+
+ ************************************************************************************ 
+ ************************************************************************************ 
+  
+SINON, dans codeblock pour un projet existant...
+Projet + click_droit -> Properties -> Build targets -> Build options
+  -> Compiler Settings -> Compiler Flags
+  x Have g++ follow the C++11 ISO C++ language standard  
+  -> Linker Settings, link librairies
+     libwxmsw30ud_xrc.a
+	 libwxmsw30ud_html.a
+	 libwxmsw30ud_qa.a
+	 libwxmsw30ud_adv.a
+     libwxmsw30ud_core.a
+	 libwxbase30ud_xml.a
+	 libwxbase30ud_net.a
+	 libwxbase30ud.a
+	 
+	 ----
+	 
+	 
+  -> Search directories, Compiler
+     D:\Chemin\vers\wxWidget\lib\gcc_lib\mswud
+  -> Search directories, Linker
+     D:\Chemin\vers\wxWidget\lib\gcc_lib
+  -> Search directories, Resource Compiler
+     D:\Chemin\vers\wxWidget\lib\gcc_lib\mswud
+	 
+  
+***** Exemple de compilation
+Compile OK
+mingw32-g++.exe -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DwxUSE_UNICODE -Winvalid-pch -include wx_pch.h -DWX_PRECOMP -Wall -std=c++11 -g -D__WXDEBUG__ -IF:\Programmes\wxWidgets-3.0.2\include -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Users\Alain\Projets\Codeworks\AtlantisEdit -I"F:\Users\Alain\Mes documents\Codeworks\QuestBis" -c "F:\Users\Alain\Mes documents\Codeworks\QuestBis\wx_pch.h" -o "wx_pch.h.gch\Debug_Mes documents_Codeworks_QuestBis_wx_pch_h_gch"
+mingw32-g++.exe -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DwxUSE_UNICODE -Winvalid-pch -include wx_pch.h -DWX_PRECOMP -Wall -std=c++11 -g -D__WXDEBUG__ -IF:\Programmes\wxWidgets-3.0.2\include -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Users\Alain\Projets\Codeworks\AtlantisEdit -I"F:\Users\Alain\Mes documents\Codeworks\QuestBis" -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\gamedata.cpp -o obj\Debug\Projets\Codeworks\AtlantisEdit\gamedata.o
+mingw32-g++.exe -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DwxUSE_UNICODE -Winvalid-pch -include wx_pch.h -DWX_PRECOMP -Wall -std=c++11 -g -D__WXDEBUG__ -IF:\Programmes\wxWidgets-3.0.2\include -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Users\Alain\Projets\Codeworks\AtlantisEdit -I"F:\Users\Alain\Mes documents\Codeworks\QuestBis" -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\MonsterView.cpp -o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\MonsterView.o
+mingw32-g++.exe -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DwxUSE_UNICODE -Winvalid-pch -include wx_pch.h -DWX_PRECOMP -Wall -std=c++11 -g -D__WXDEBUG__ -IF:\Programmes\wxWidgets-3.0.2\include -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Users\Alain\Projets\Codeworks\AtlantisEdit -I"F:\Users\Alain\Mes documents\Codeworks\QuestBis" -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorApp.cpp -o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorApp.o
+mingw32-g++.exe -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DwxUSE_UNICODE -Winvalid-pch -include wx_pch.h -DWX_PRECOMP -Wall -std=c++11 -g -D__WXDEBUG__ -IF:\Programmes\wxWidgets-3.0.2\include -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Users\Alain\Projets\Codeworks\AtlantisEdit -I"F:\Users\Alain\Mes documents\Codeworks\QuestBis" -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorMain.cpp -o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorMain.o
+mingw32-g++.exe -LF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib -o bin\Debug\QuestBis.exe obj\Debug\Projets\Codeworks\AtlantisEdit\gamedata.o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\MonsterView.o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorApp.o obj\Debug\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorMain.o  -mthreads  -lwxmsw30ud_core -lwxbase30ud -lwxpngd -lwxzlibd -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lcomctl32 -lwsock32 -lodbc32 -mwindows
+Output file is bin\Debug\QuestBis.exe with size 65.65 MB
+Process terminated with status 0 (0 minute(s), 12 second(s))
+0 error(s), 0 warning(s) (0 minute(s), 12 second(s))
+
+Compile pas OK
+mingw32-g++.exe -Wall -std=c++11 -g -I.. -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Programmes\wxWidgets-3.0.2\include -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\gamedata.cpp -o obj\Debug\gamedata.o
+mingw32-g++.exe -Wall -std=c++11 -g -I.. -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Programmes\wxWidgets-3.0.2\include -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\MonsterView.cpp -o obj\Debug\QuestEditor\MonsterView.o
+mingw32-g++.exe -Wall -std=c++11 -g -I.. -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Programmes\wxWidgets-3.0.2\include -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorApp.cpp -o obj\Debug\QuestEditor\QuestEditorApp.o
+mingw32-g++.exe -Wall -std=c++11 -g -I.. -IF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib\mswud -IF:\Programmes\wxWidgets-3.0.2\include -c F:\Users\Alain\Projets\Codeworks\AtlantisEdit\QuestEditor\QuestEditorMain.cpp -o obj\Debug\QuestEditor\QuestEditorMain.o
+mingw32-g++.exe -LF:\Programmes\wxWidgets-3.0.2\lib\gcc_lib -o bin\Debug\QuestEditor.exe obj\Debug\gamedata.o obj\Debug\QuestEditor\MonsterView.o obj\Debug\QuestEditor\QuestEditorApp.o obj\Debug\QuestEditor\QuestEditorMain.o    -lwxmsw30ud_xrc -lwxmsw30ud_html -lwxmsw30ud_adv -lwxmsw30ud_core -lwxbase30ud_xml -lwxbase30ud_net -lwxbase30ud -mwindows
+
+  
+
