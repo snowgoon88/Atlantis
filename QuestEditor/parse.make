@@ -16,7 +16,8 @@ ENGINE_OBJECTS = alist.o aregion.o army.o astring.o battle.o economy.o \
 ##  $(patsubst %.o,obj/%.o,$(ENGINE_OBJECTS))
 OBJECTS := $(patsubst %.o,obj/%.o,$(RULESET_OBJECTS)) \
           $(patsubst %.o,obj/%.o,$(ENGINE_OBJECTS)) \
-	  obj/parse_gamedata.o
+	  obj/parse_gamedata.o obj/monster_data.o obj/utils.o \
+
 
 CXXFLAGS = -std=gnu++11 -g -I. -I..
 
