@@ -345,3 +345,6 @@ class Quest : public AListElem
 		set<string> destinations;
 		AList	rewards;
 };
+* [0/1] parse_gamedata.cpp
+** TODO split line pour lire itemtype
+IT_XXXX = Ox0972
