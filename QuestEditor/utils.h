@@ -3,7 +3,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-/** 
+/**
  * Global variables and useful functions.
  */
 #include <string>
@@ -13,6 +13,8 @@
 // ***************************************************************************
 // ******************************************************************* Globals
 extern std::map<std::string,int> _map_itype;
+extern int _max_item_id;
+extern int _max_mtype_id;
 
 
 // ******************************************************** read_itemtype_enum

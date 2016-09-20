@@ -115,6 +115,8 @@ void parse_gamedata()
       idx_monster ++;
     }
   }
+  _max_item_id = NITEMS;
+  _max_mtype_id = NUMMONSTERS;
 }
 
 // ***************************************************************************
@@ -122,7 +124,8 @@ void parse_gamedata()
 int main(int argc, char *argv[])
 {
   read_itemtype_enum();
-  parse_gamedata();
+  //parse_gamedata();
+  _monster_data.parse_gamedata();
 
   for( auto& monster : _monster_data._map_item ) {
     monster.second.write_debug();
@@ -130,6 +133,10 @@ int main(int argc, char *argv[])
     // monster.second.write_item( std::cout );
     // monster.second.write_type( std::cout );
   }
+
+  _monster_data.make_new();
+
+  _monster_data.write_gamedata();
 
   // auto res = split( "Coucou c'est moi c est" );
   // for(auto& str : res) {

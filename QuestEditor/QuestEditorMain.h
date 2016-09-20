@@ -35,10 +35,12 @@ class QuestEditorFrame: public wxFrame
         enum
         {
             idMenuFileOpen = 1,
+            idMenuMonsterAdd = 100,
             idMenuQuit = 1000,
             idMenuAbout
         };
         void OnOpenFile(wxCommandEvent& event);
+        void OnMonsterAdd( wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);

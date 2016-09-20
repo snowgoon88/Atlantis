@@ -107,7 +107,8 @@ $(DEPDIR)/%.d: ;
 ################################################################################
 TO_INCLUDE = $(patsubst %,$(DEPDIR)/%.d,$(basename $(RULESET_OBJECTS))) \
              $(patsubst %,$(DEPDIR)/%.d,$(basename $(ENGINE_OBJECTS))) \
-	     $(DEPDIR)/map_editor.d
+	     $(DEPDIR)/parse_gamedata.d \
+	     $(DEPDIR)/monster_data.d $(DEPDIR)/utils.d \
 
 -include $(TO_INCLUDE)
 ################################################################################

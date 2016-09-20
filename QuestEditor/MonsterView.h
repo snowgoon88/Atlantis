@@ -12,6 +12,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <monster_data.h>
 
 /**
  * View/edit a Monster.
@@ -25,6 +26,7 @@
         void parse_gamedata();
         /** set to an existing Monster */
         void set_monster( int num );
+        void set_monster( AMonster* monster );
 
         std::map<std::string,int> _map_abbr;
 //        std::vector<wxString> _list_abbr;

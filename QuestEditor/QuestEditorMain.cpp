@@ -17,6 +17,7 @@
 
 #include "QuestEditorMain.h"
 #include "MonsterView.h"
+#include <utils.h>
 
 //helper functions
 enum wxbuildinfoformat {
@@ -49,6 +50,7 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 BEGIN_EVENT_TABLE(QuestEditorFrame, wxFrame)
     EVT_CLOSE(QuestEditorFrame::OnClose)
     EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
+    EVT_MENU(idMenuMonsterAdd, QuestEditorFrame::OnMonsterAdd)
     EVT_MENU(idMenuQuit, QuestEditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, QuestEditorFrame::OnAbout)
 END_EVENT_TABLE()
@@ -56,7 +58,7 @@ END_EVENT_TABLE()
 QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const wxSize& aSize)
     : wxFrame(frame, -1, title, wxDefaultPosition, aSize)
 {
-#if wxUSE_MENUS
+//#if wxUSE_MENUS
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
@@ -64,12 +66,16 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
+    wxMenu* monsterMenu = new wxMenu(_T(""));
+    monsterMenu->Append( idMenuMonsterAdd, _("&Add Monster"), ("Ajoute un nouveau Monstre... brrrr....") );
+    mbar->Append(monsterMenu, _("&Monster"));
+
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
     mbar->Append(helpMenu, _("&Help"));
 
     SetMenuBar(mbar);
-#endif // wxUSE_MENUS
+//#endif // wxUSE_MENUS
 
 #if wxUSE_STATUSBAR
     // create a status bar with some information about the used wxWidgets version
@@ -112,7 +118,23 @@ void QuestEditorFrame::OnOpenFile(wxCommandEvent& event)
 
     _monster_view->parse_gamedata();
 }
+void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
+{
+    std::cout << "Add New Monster" << std::endl;
+    AMonster new_monster;
+    new_monster._item_enum = std::string( "TODO" );
+    new_monster._item = new ItemType();
+    new_monster._mtype = new MonType();
+    // id items and it_type
+    new_monster._item_id = _max_item_id + 1;
+    _max_item_id ++;
+    new_monster._mtype_id = _max_mtype_id + 1;
+    _max_mtype_id ++;
 
+    new_monster.write_debug();
+
+    _monster_view->set_monster( &new_monster );
+}
 void QuestEditorFrame::OnClose(wxCloseEvent &event)
 {
     Destroy();

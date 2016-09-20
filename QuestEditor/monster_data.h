@@ -3,7 +3,7 @@
 #ifndef MONSTERDATA_HPP
 #define MONSTERDATA_HPP
 
-/** 
+/**
  * All data about a monster for Atlantis
  */
 
@@ -12,6 +12,7 @@
 #include <items.h>
 #include <iostream>                   // std::cout, std::istream
 #include <map>
+#include <utils.h>
 
 // ***************************************************************************
 // ****************************************************************** AMonster
@@ -21,7 +22,7 @@ class AMonster
 public:
 
   AMonster();
-  
+
   /** is edited */
   bool _fg_edited;
 
@@ -53,34 +54,22 @@ public:
   /** Find AMonster */
   //static AMonster* find_item( int id_item );
 
-  /** Add elements */
-  void add( const std::string& str_enum, int id_item )
-  {
-    ItemType* monster_item = &(ItemDefs[id_item]);
-    
-    AMonster monster;
-    monster._fg_edited = false;
-    monster._item_enum = str_enum;
-    monster._item_id = id_item;
-    monster._item = monster_item;
-    // look for monster in MonDefs
-    if( monster_item->abr != NULL ) {
-      std::string tag = ( monster_item->type & IT_ILLUSION ? "i" : "");
-      tag += monster_item->abr;
+  /** Parse gamedata for I_MONSTER and MonDefs */
+  void parse_gamedata();
+  void write_gamedata();
+  
+  /** Add AMonster defined by its I_ITEMS and id_item */
+  void add( const std::string& str_enum, int id_item );
+  /** Add new AMonster with default values*/
+  void make_new();
 
-      for (int i = 0; i < NUMMONSTERS; i++) {
-	if (MonDefs[i].abbr == NULL) continue;
-	if (tag == MonDefs[i].abbr) {
-	  monster._mtype_id = i;
-	  monster._mtype = &(MonDefs[i]);
-	  break;
-	}
-      }
-    }
-
-    // Add
-    _map_item[id_item] = monster;
-  }
+ private:
+  /** parse gamedata.cpp looking for next item */
+  std::string parse_to_next_item( std::istream& in, std::ostream& out,
+				  bool fg_copy );
+  /** copy a monster from in to out */
+  void copy_monster( std::istream& in, std::ostream& out,
+		     const std::string& first_line );
 };
 // ******************************************************** end of MonsterData
 

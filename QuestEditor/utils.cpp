@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*- */
 
-/** 
+/**
  * TODO
  */
 #include <utils.h>
@@ -9,6 +9,8 @@
 
 // ******************************************************************* Globals
 std::map<std::string,int> _map_itype;
+int _max_item_id = -1;
+int _max_mtype_id = -2;
 // ******************************************************** read_itemtype_enum
 void read_itemtype_enum()
 {
@@ -40,7 +42,7 @@ std::vector<std::string> split(const std::string& str, char c)
       //std::cout << "s:(" << *it_start << ")" << std::endl;
       it_start++;
     }
-    
+
     // iterator on token.end
     auto it_end = it_start;
     while( *it_end != c and *it_end != ',' and *it_end != '\t' and it_end != str.end() ) {
@@ -51,6 +53,6 @@ std::vector<std::string> split(const std::string& str, char c)
     result.push_back( std::string( it_start, it_end ) );
     it_start = it_end++;
   } while( it_start != str.end() );
-  
+
   return result;
 }

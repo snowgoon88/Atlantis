@@ -192,3 +192,208 @@ void AMonster::write_debug( std::ostream& out )
   write_item( out );
   write_type( out );
 }
+
+// ***************************************************************************
+// ***************************************************************************
+// ********************************************* MonsterData::parse_gamedata()
+void MonsterData::parse_gamedata()
+{
+  std::ifstream h_in( "mygamedata.h" );
+  std::ifstream cpp_in( "mygamedata.cpp" );
+
+  std::string line;
+  int idx_monster = 0;
+  while( std::getline( h_in, line )) {
+    //std::cout << "[" << line[0] << "] " << line << std::endl;
+    if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
+      if( ItemDefs[idx_monster].type & IT_MONSTER ) {
+	//std::cout << "  + found monster " << line.substr( 1, line.size()-2 ) << ":" << ItemDefs[idx_monster].abr << std::endl;
+	add( line.substr( 1, line.size()-2 ), idx_monster );
+      }
+      idx_monster ++;
+    }
+  }
+  _max_item_id = NITEMS;
+  _max_mtype_id = NUMMONSTERS;
+}
+// ********************************************* MonsterData::write_gamedata()
+void MonsterData::write_gamedata()
+{
+  std::ifstream h_in( "mygamedata.h" );
+  std::ifstream cpp_in( "mygamedata.cpp" );
+
+  std::ofstream h_out( "new_gamedata.h" );
+  std::ofstream cpp_out( "new_gamedata.cpp" );
+
+  bool must_copy = true;
+  int idx_monster = 0;
+  int idx_item = 0;
+  std::string line;
+
+  // Deal with Items
+  while( std::getline( h_in, line )) {
+    // copy to new
+    h_out << line << std::endl;
+    if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
+      // found an Item in .h
+      std::cout << "ITEM " << idx_item << "/" << NITEMS << std::endl;
+      std::string item_line = parse_to_next_item( cpp_in, cpp_out, must_copy );
+      // Is it a monster ?
+      if( ItemDefs[idx_item].type & IT_MONSTER ) {
+	
+	// // Write new version if edited
+	// std::cout << "TODO: write new version of monster " << ItemDefs[idx_item].abr << " if edited" << std::endl;
+	// must_copy = false;
+
+	// Else copy this monster
+	std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
+	std::cout << "      with : " << item_line << std::endl;
+	copy_monster( cpp_in, cpp_out, item_line );
+	idx_monster++;
+      }
+      else {
+	// copy
+	//cpp_out << item_line << std::endl;
+	copy_monster( cpp_in, cpp_out, item_line );
+	must_copy = true;
+      }
+      // if( item_line.compare( "" ) != 0 ) {
+      // 	// Check if edited :o)
+      // }
+
+      idx_item++;
+      // if last item...
+      if( idx_item >= NITEMS ) {
+	std::cout << "write_gamedata: add new monsters with id_item >= " << NITEMS << std::endl;
+	for( auto& monster : _map_item ) {
+	  if( monster.second._item_id >= NITEMS ) {
+	    std::cout << "Write new monster " << monster.second._item_id << std::endl;
+	    h_out << "\t" << monster.second._item_enum << "," << std::endl;
+	    monster.second.write_item( cpp_out );
+	  }
+	}
+	// get out of this while-loop
+	break;
+      }
+    }
+  }
+
+  std::cout << "TODO: copier fin de cpp_in dans cpp_out" << std::endl;
+
+  h_in.close();
+  cpp_in.close();
+  h_out.close();
+  cpp_out.close();
+}
+/**
+ * Parse 'in' looking for the next item.
+ * @param: fg_copy, are each line of 'in' copied to 'out'
+ */
+std::string MonsterData::parse_to_next_item( std::istream& in, std::ostream& out,
+					     bool fg_copy )
+{
+  std::string line;
+  while (std::getline(in, line)) {
+    // std::cout << "READ: " << line << std::endl;
+    // detect item = First non-blanc must be '{'
+    auto it = line.begin();
+    while( *it == ' ' or *it == '\t') {
+      // std::cout << "/" << *it;
+      it++;
+    }
+    //std::cout << std::endl;
+    if( *it == '{' ) {
+      it++;
+      if( *it == '"' ) {
+	std::cout << "__START " << std::string( it, line.end() ) << std::endl;
+	return line;
+      }
+    }
+    // copy line juste read to 'out'
+    if( fg_copy ) {
+      out << line << std::endl;
+    }
+  }
+  return "";
+}
+void MonsterData::copy_monster( std::istream& in, std::ostream& out,
+				const std::string& first_line )
+{
+  out << first_line << std::endl;
+  std::string line;
+  while (std::getline(in, line)) {
+    out << line << std::endl;
+    // std::cout << "READ: " << line << std::endl;
+    // First non-blanc must be '"'
+    auto it = line.begin();
+    while( *it == ' ' or *it == '\t') {
+      // std::cout << "/" << *it;
+      it++;
+    }
+    //std::cout << std::endl;
+    if( *it == '"' ) {
+      std::cout << "__END  " << std::string( it, line.end() ) << std::endl;
+      return;
+    }
+  }
+  return;
+}
+// ********************************************************** MonsterData::add
+void MonsterData::add( const std::string& str_enum, int id_item )
+{
+  ItemType* monster_item = &(ItemDefs[id_item]);
+  
+  AMonster monster;
+  monster._fg_edited = false;
+  monster._item_enum = str_enum;
+  monster._item_id = id_item;
+  monster._item = monster_item;
+  // look for monster in MonDefs
+  if( monster_item->abr != NULL ) {
+    std::string tag = ( monster_item->type & IT_ILLUSION ? "i" : "");
+    tag += monster_item->abr;
+    
+    for (int i = 0; i < NUMMONSTERS; i++) {
+      if (MonDefs[i].abbr == NULL) continue;
+      if (tag == MonDefs[i].abbr) {
+	monster._mtype_id = i;
+	monster._mtype = &(MonDefs[i]);
+	break;
+      }
+    }
+  }
+  
+  // Add
+  _map_item[id_item] = monster;
+}
+// ***************************************************** MonsterData::make_new
+void MonsterData::make_new()
+{
+  std::cout << "TODO: make_new, check that no other new with same _item_enum" << std::endl;
+  AMonster monster;
+  monster._fg_edited = true;
+  monster._item_enum = "I_TODO";
+  monster._item = new ItemType
+    {"new monster", "new monsters", "TODO",
+     ItemType::CANTGIVE,
+     NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+     NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+     10, IT_MONSTER, 10,1,
+     50,50,0,0,2,
+     -1,0,
+     -1,0,0,
+     0, NULL, 0,
+     "", { "", "", "", "" }, 0, 0};
+  monster._item_id = _max_item_id++;
+  monster._mtype = new MonType
+    {1,{0,0,0,0,0,0},
+     1,1,0,
+     0,0,0,
+     NULL,0,
+     10, IT_NORMAL,10,1,"Un Truc Qui Griffe et Grogne", "TODO"};
+  monster._mtype_id = _max_mtype_id++;
+
+  _map_item[monster._item_id] = monster;
+  
+  monster.write_debug();
+}
