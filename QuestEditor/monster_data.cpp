@@ -199,7 +199,7 @@ void AMonster::write_debug( std::ostream& out )
 void MonsterData::parse_gamedata()
 {
   std::ifstream h_in( "mygamedata.h" );
-  std::ifstream cpp_in( "mygamedata.cpp" );
+  //std::ifstream cpp_in( "mygamedata.cpp" );
 
   std::string line;
   int idx_monster = 0;
@@ -237,24 +237,29 @@ void MonsterData::write_gamedata()
     if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
       // found an Item in .h
       std::cout << "ITEM " << idx_item << "/" << NITEMS << std::endl;
-      std::string item_line = parse_to_next_item( cpp_in, cpp_out, must_copy );
+      std::string item_line = parse_to_next_item( cpp_in, cpp_out,
+						  "{\"", must_copy );
       // Is it a monster ?
       if( ItemDefs[idx_item].type & IT_MONSTER ) {
-	
-	// // Write new version if edited
-	// std::cout << "TODO: write new version of monster " << ItemDefs[idx_item].abr << " if edited" << std::endl;
-	// must_copy = false;
-
-	// Else copy this monster
-	std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
-	std::cout << "      with : " << item_line << std::endl;
-	copy_monster( cpp_in, cpp_out, item_line );
+	if( _map_item[idx_item]._fg_edited ) {
+	  // // Write new version if edited
+	  std::cout << "write_gamedata: write new version of monster " << ItemDefs[idx_item].abr << std::endl;
+	  _map_item[idx_item].write_item( cpp_out );
+	  must_copy = false;
+	}
+	else {
+	  // Else copy this monster
+	  std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
+	  std::cout << "      with : " << item_line << std::endl;
+	  copy_item( cpp_in, cpp_out, item_line );
+	  must_copy = true;
+	}
 	idx_monster++;
       }
       else {
 	// copy
 	//cpp_out << item_line << std::endl;
-	copy_monster( cpp_in, cpp_out, item_line );
+	copy_item( cpp_in, cpp_out, item_line );
 	must_copy = true;
       }
       // if( item_line.compare( "" ) != 0 ) {
@@ -277,8 +282,60 @@ void MonsterData::write_gamedata()
       }
     }
   }
+  // Copy to end of h_in
+  std::string last_line = parse_to_next_item( h_in, h_out, "#endif", true);
+  h_out << last_line << std::endl;
 
-  std::cout << "TODO: copier fin de cpp_in dans cpp_out" << std::endl;
+  // Copy to MonType in cpp
+  std::string monster_line = parse_to_next_item( cpp_in, cpp_out,
+					       "MonType md[]", true);
+  cpp_out << monster_line << std::endl;
+  // copy Monster None
+  monster_line = parse_to_next_item( cpp_in, cpp_out,
+				     "{", true);
+  cpp_out << monster_line << std::endl;
+  int idx_ittype = 1;
+  must_copy = true;
+  while( idx_ittype < NUMMONSTERS ) {
+    // read to beginning
+    monster_line = parse_to_next_item( cpp_in, cpp_out,
+				       "{", must_copy );
+    AMonster* a_monster = find_monster( idx_ittype );
+    if( a_monster ) {
+      if( a_monster->_fg_edited ) {
+	std::cout << "write_gamedata: check if MonType is modified" << std::endl;
+	a_monster->write_type( cpp_out );
+	must_copy = false;
+      }
+      else {
+	// copy
+	cpp_out << monster_line << std::endl;
+	must_copy = true;
+      }
+    }
+    else {
+      std::cerr << "write_gamedata : Error MonType id=" << idx_ittype << " not found" << std::endl;
+      exit(1);
+    }
+    idx_ittype++;
+  }
+  // last monster
+  monster_line = parse_to_next_item( cpp_in, cpp_out,
+				     "};", must_copy );
+  // New monsters
+  std::cout << "write_gamedata: copy new MonType " << std::endl;
+  for( auto& monster : _map_item ) {
+    if( monster.second._mtype_id >= NUMMONSTERS ) {
+      std::cout << "Write new monster " << monster.second._mtype_id << std::endl;
+      monster.second.write_type( cpp_out );
+    }
+  }
+  cpp_out << monster_line << std::endl;
+  
+  // Copy to end of cpp_in
+  std::cout << "write_gamedata: copier fin de cpp_in dans cpp_out" << std::endl;
+  last_line = parse_to_next_item( cpp_in, cpp_out, "int NUMATTRIBMODS", true);
+  cpp_out << last_line << std::endl;
 
   h_in.close();
   cpp_in.close();
@@ -288,8 +345,10 @@ void MonsterData::write_gamedata()
 /**
  * Parse 'in' looking for the next item.
  * @param: fg_copy, are each line of 'in' copied to 'out'
+ * @param: startstr first non ' ' or non '\t' is this string
  */
 std::string MonsterData::parse_to_next_item( std::istream& in, std::ostream& out,
+					     const std::string& startstr,
 					     bool fg_copy )
 {
   std::string line;
@@ -302,12 +361,11 @@ std::string MonsterData::parse_to_next_item( std::istream& in, std::ostream& out
       it++;
     }
     //std::cout << std::endl;
-    if( *it == '{' ) {
-      it++;
-      if( *it == '"' ) {
-	std::cout << "__START " << std::string( it, line.end() ) << std::endl;
+    // Compare strippped line to startstr
+    std::string stripped_str(it, it+startstr.length());
+    if( stripped_str.compare(startstr) == 0 ) {
+      std::cout << "__START " << std::string( it, line.end() ) << std::endl;
 	return line;
-      }
     }
     // copy line juste read to 'out'
     if( fg_copy ) {
@@ -316,7 +374,7 @@ std::string MonsterData::parse_to_next_item( std::istream& in, std::ostream& out
   }
   return "";
 }
-void MonsterData::copy_monster( std::istream& in, std::ostream& out,
+void MonsterData::copy_item( std::istream& in, std::ostream& out,
 				const std::string& first_line )
 {
   out << first_line << std::endl;
@@ -396,4 +454,14 @@ void MonsterData::make_new()
   _map_item[monster._item_id] = monster;
   
   monster.write_debug();
+}
+// ************************************************* MonsterData::find_monster
+AMonster* MonsterData::find_monster( int id_mtype )
+{
+  for( auto& monster : _map_item ) {
+    if( monster.second._mtype_id == id_mtype ) {
+      return &(monster.second);
+    }
+  }
+  return nullptr;
 }

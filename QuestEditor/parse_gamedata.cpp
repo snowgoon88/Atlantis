@@ -134,6 +134,10 @@ int main(int argc, char *argv[])
     // monster.second.write_type( std::cout );
   }
 
+  _monster_data._map_item[108]._fg_edited = true;
+  _monster_data._map_item[108]._item->names = "Des gros Balrogs";
+  _monster_data._map_item[108]._mtype->name = "Des gros Balrogs qui Crient";
+  
   _monster_data.make_new();
 
   _monster_data.write_gamedata();

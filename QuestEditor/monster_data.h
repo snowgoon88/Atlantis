@@ -52,7 +52,7 @@ public:
   std::map<int,AMonster> _map_item;
 
   /** Find AMonster */
-  //static AMonster* find_item( int id_item );
+  AMonster* find_monster( int id_mtype );
 
   /** Parse gamedata for I_MONSTER and MonDefs */
   void parse_gamedata();
@@ -66,10 +66,11 @@ public:
  private:
   /** parse gamedata.cpp looking for next item */
   std::string parse_to_next_item( std::istream& in, std::ostream& out,
+				  const std::string& startstr,
 				  bool fg_copy );
   /** copy a monster from in to out */
-  void copy_monster( std::istream& in, std::ostream& out,
-		     const std::string& first_line );
+  void copy_item( std::istream& in, std::ostream& out,
+		  const std::string& first_line );
 };
 // ******************************************************** end of MonsterData
 
