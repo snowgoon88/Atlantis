@@ -345,6 +345,41 @@ class Quest : public AListElem
 		set<string> destinations;
 		AList	rewards;
 };
-* [0/1] parse_gamedata.cpp
-** TODO split line pour lire itemtype
+* MONSTER
+** [0/7] Item
+*** TODO str_enum : I_XXXX
+Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
+*** name, names : pas d'incidence. Singulier et pluriel.
+*** TODO abr : 4 lettre max (3 existe). Pas de doublons
+*** TODO Production magique
+Vérifier que c'est un skill (??) qui existe
+mLevel : le niveau du skill nécessaire pour l'invocation.
+*** Mouvement : encombrement maxi pour ce type de mouvement
+*** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
+*** TODO Escape.
+Voir items.h pour exclusif
+Voir game.cpp pour calcul de chances
+**** LOSS_CHANCE ( + HAS_SKILL)
+losses = (monster->num + random(esc_val)) / esc_val => nb monstres perdus
+losses vaut 0 si a le bon skill au bon niveau
+**** HAS_SKILL
+losses all si n'a pas le skill
+**** ESC_LEV_*
+si pas level, chance=10000
+si level :
+   top=num (ou num*num si ESC_NUM_SQUARE)
+   bottom = level (*level (*level...) (ou level=1)
+   bottom = bottom * esc_val
+   chance = (top * 10000) / bottom
+si LOSE_LINKED, peut perdre autres objets du même type (IT_UNDEAD), la chance sera la plus grande de tous ce genre d'objets
+perte si chance > random(10000)
+Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
+*** TODO special : list parmi ce qui existe
+*** TODO spoil : exclusif (??)
+*** TODO abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion
+** WANDERING Monster
+unit->type = U_WMON.
+
+* [1/1] parse_gamedata.cpp
+** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
