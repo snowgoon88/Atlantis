@@ -53,15 +53,16 @@ public:
 
   /** Find AMonster */
   AMonster* find_monster( int id_mtype );
+  AMonster* find_monster( const std::string& item_enum );
 
   /** Parse gamedata for I_MONSTER and MonDefs */
   void parse_gamedata();
   void write_gamedata();
-  
+
   /** Add AMonster defined by its I_ITEMS and id_item */
   void add( const std::string& str_enum, int id_item );
   /** Add new AMonster with default values*/
-  void make_new();
+  AMonster* make_new( const std::string& item_str = "I_BIDULE" );
 
  private:
   /** parse gamedata.cpp looking for next item */

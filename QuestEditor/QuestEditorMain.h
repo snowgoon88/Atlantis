@@ -27,6 +27,8 @@ class QuestEditorFrame: public wxFrame
         ~QuestEditorFrame();
 
 
+        MonsterData _monster_data;
+
         wxPanel *_panel;
         wxTextCtrl *_textCtrl;
         wxStaticText *_label;
@@ -36,11 +38,13 @@ class QuestEditorFrame: public wxFrame
         {
             idMenuFileOpen = 1,
             idMenuMonsterAdd = 100,
+            idMenuMonsterDebug = 101,
             idMenuQuit = 1000,
             idMenuAbout
         };
         void OnOpenFile(wxCommandEvent& event);
         void OnMonsterAdd( wxCommandEvent& event);
+        void OnMonsterDebug( wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);

@@ -20,14 +20,17 @@
  class MonsterView : public wxPanel
  {
     public:
-        MonsterView( wxWindow *parent );
+        MonsterView( wxWindow *parent, MonsterData& data );
 
         /** Parse files */
-        void parse_gamedata();
+        //void parse_gamedata();
         /** set to an existing Monster */
-        void set_monster( int num );
+        //void set_monster( int num );
         void set_monster( AMonster* monster );
+        void add_monster( AMonster* new_monster );
 
+        MonsterData& _data;
+        AMonster* _monster;
         std::map<std::string,int> _map_abbr;
 //        std::vector<wxString> _list_abbr;
         // abr, name and names
@@ -78,14 +81,20 @@
         // mdef abr and name
         wxTextCtrl *_mdefname_text, *_mdefabbr_text;
 
+        // Callbacks
         void on_cbox_update( wxCommandEvent& event );
-
-        MonType *find_monsterdef(char const *abbr, int illusion);
+        void on_abbrtext_update( wxCommandEvent& event );
+        void on_nametext_update( wxCommandEvent& event );
+        void on_namestext_update( wxCommandEvent& event );
+        void on_disabled_update( wxCommandEvent& event );
+        void on_cantgive_update( wxCommandEvent& event );
+        //MonType *find_monsterdef(char const *abbr, int illusion);
 
     private:
         enum
         {
             idAbbrCombo = 100,
+            idAbbrText  = 101,
         };
         wxDECLARE_EVENT_TABLE();
 

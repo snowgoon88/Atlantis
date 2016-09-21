@@ -18,6 +18,7 @@
 #include "QuestEditorMain.h"
 #include "MonsterView.h"
 #include <utils.h>
+#include <wx/textdlg.h>
 
 //helper functions
 enum wxbuildinfoformat {
@@ -51,6 +52,7 @@ BEGIN_EVENT_TABLE(QuestEditorFrame, wxFrame)
     EVT_CLOSE(QuestEditorFrame::OnClose)
     EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
     EVT_MENU(idMenuMonsterAdd, QuestEditorFrame::OnMonsterAdd)
+    EVT_MENU(idMenuMonsterDebug, QuestEditorFrame::OnMonsterDebug)
     EVT_MENU(idMenuQuit, QuestEditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, QuestEditorFrame::OnAbout)
 END_EVENT_TABLE()
@@ -68,6 +70,7 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
 
     wxMenu* monsterMenu = new wxMenu(_T(""));
     monsterMenu->Append( idMenuMonsterAdd, _("&Add Monster"), ("Ajoute un nouveau Monstre... brrrr....") );
+    monsterMenu->Append( idMenuMonsterDebug, _("&Debug Monster"), ("Denude le Monstre :o)") );
     mbar->Append(monsterMenu, _("&Monster"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
@@ -77,12 +80,12 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     SetMenuBar(mbar);
 //#endif // wxUSE_MENUS
 
-#if wxUSE_STATUSBAR
+//#if wxUSE_STATUSBAR
     // create a status bar with some information about the used wxWidgets version
     CreateStatusBar(2);
     SetStatusText(_("Hello Code::Blocks user!"),0);
     SetStatusText(wxbuildinfo(short_f), 1);
-#endif // wxUSE_STATUSBAR
+//#endif // wxUSE_STATUSBAR
 
     _panel = new wxPanel( this );
     wxBoxSizer *vbox = new wxBoxSizer( wxVERTICAL );
@@ -99,10 +102,17 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
 //    hbox->Add( new wxTextCtrl(_panel, -1, _("A modifier")), 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
 //    vbox->Add( hbox );
 
-    _monster_view = new MonsterView( _panel );
+    // Read data about monsters
+    read_itemtype_enum();
+    //parse_gamedata();
+    _monster_data.parse_gamedata();
+
+    _monster_view = new MonsterView( _panel, _monster_data );
     vbox->Add( _monster_view );
 
     _panel->SetSizer( vbox );
+
+
 }
 
 
@@ -114,26 +124,46 @@ void QuestEditorFrame::OnOpenFile(wxCommandEvent& event)
 {
     _textCtrl->AppendText( _("Hop, on ouvre un fichier\n"));
 
-    _monster_view->set_monster( I_BALROG );
+    _monster_view->set_monster( _monster_data.find_monster("I_BALROG") );
 
-    _monster_view->parse_gamedata();
+    //_monster_view->parse_gamedata();
 }
 void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
 {
-    std::cout << "Add New Monster" << std::endl;
-    AMonster new_monster;
-    new_monster._item_enum = std::string( "TODO" );
-    new_monster._item = new ItemType();
-    new_monster._mtype = new MonType();
-    // id items and it_type
-    new_monster._item_id = _max_item_id + 1;
-    _max_item_id ++;
-    new_monster._mtype_id = _max_mtype_id + 1;
-    _max_mtype_id ++;
 
-    new_monster.write_debug();
-
-    _monster_view->set_monster( &new_monster );
+    wxString unique_str = wxGetTextFromUser( wxString("Il faut un identifiant unique de la forme I_TRUC"),
+                                wxString("Nouveau Monstre"),
+                                _("I_BIDULE"),
+                               this );
+    bool fg_valid = false;
+    while( fg_valid == false ) {
+        if( unique_str.substr(0,2).compare("I_") != 0 ) {
+            unique_str = wxGetTextFromUser( wxString("Damn: "+unique_str+"', ca commence pas par 'I_', ok ?"),
+                                    wxString("Nouveau Monstre"),
+                                    unique_str,
+                                    this );
+        }
+        else {
+            // look if already in
+            for( auto& monster : _monster_data._map_item ) {
+                if( monster.second._item_enum.compare(unique_str) == 0) {
+                unique_str = wxGetTextFromUser( wxString("Pas de chance : "+unique_str+" existe deja..."),
+                                    wxString("Nouveau Monstre"),
+                                    unique_str,
+                                    this );
+                break;
+                }
+            }
+            fg_valid = true;
+        }
+    }
+    std::cout << "ADD valid new monster" << std::endl;
+    AMonster* newmonster = _monster_data.make_new( unique_str.ToStdString() );
+    _monster_view->add_monster( newmonster );
+}
+void QuestEditorFrame::OnMonsterDebug(wxCommandEvent& event)
+{
+    _monster_view->_monster->write_debug();
 }
 void QuestEditorFrame::OnClose(wxCloseEvent &event)
 {

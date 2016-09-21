@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*- */
 
-/** 
+/**
  * TODO
  */
 #include <monster_data.h>
@@ -136,7 +136,7 @@ void AMonster::write_type( std::ostream& out )
 {
   // Already written a flag on this line ?
   bool fg_before = false;
-  
+
   // attack level
   out << "\t{" << _mtype->attackLevel << ",";
   // defenses
@@ -331,7 +331,7 @@ void MonsterData::write_gamedata()
     }
   }
   cpp_out << monster_line << std::endl;
-  
+
   // Copy to end of cpp_in
   std::cout << "write_gamedata: copier fin de cpp_in dans cpp_out" << std::endl;
   last_line = parse_to_next_item( cpp_in, cpp_out, "int NUMATTRIBMODS", true);
@@ -400,7 +400,7 @@ void MonsterData::copy_item( std::istream& in, std::ostream& out,
 void MonsterData::add( const std::string& str_enum, int id_item )
 {
   ItemType* monster_item = &(ItemDefs[id_item]);
-  
+
   AMonster monster;
   monster._fg_edited = false;
   monster._item_enum = str_enum;
@@ -410,7 +410,7 @@ void MonsterData::add( const std::string& str_enum, int id_item )
   if( monster_item->abr != NULL ) {
     std::string tag = ( monster_item->type & IT_ILLUSION ? "i" : "");
     tag += monster_item->abr;
-    
+
     for (int i = 0; i < NUMMONSTERS; i++) {
       if (MonDefs[i].abbr == NULL) continue;
       if (tag == MonDefs[i].abbr) {
@@ -420,17 +420,17 @@ void MonsterData::add( const std::string& str_enum, int id_item )
       }
     }
   }
-  
+
   // Add
   _map_item[id_item] = monster;
 }
 // ***************************************************** MonsterData::make_new
-void MonsterData::make_new()
+AMonster* MonsterData::make_new( const std::string& item_str )
 {
   std::cout << "TODO: make_new, check that no other new with same _item_enum" << std::endl;
   AMonster monster;
   monster._fg_edited = true;
-  monster._item_enum = "I_TODO";
+  monster._item_enum = item_str;
   monster._item = new ItemType
     {"new monster", "new monsters", "TODO",
      ItemType::CANTGIVE,
@@ -452,8 +452,10 @@ void MonsterData::make_new()
   monster._mtype_id = _max_mtype_id++;
 
   _map_item[monster._item_id] = monster;
-  
+
   monster.write_debug();
+
+  return &(_map_item[monster._item_id]);
 }
 // ************************************************* MonsterData::find_monster
 AMonster* MonsterData::find_monster( int id_mtype )
@@ -465,3 +467,13 @@ AMonster* MonsterData::find_monster( int id_mtype )
   }
   return nullptr;
 }
+AMonster* MonsterData::find_monster( const std::string& item_enum )
+{
+    for( auto& monster : _map_item ) {
+    if( monster.second._item_enum.compare(item_enum) == 0 ) {
+      return &(monster.second);
+    }
+  }
+  return nullptr;
+}
+
