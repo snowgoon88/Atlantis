@@ -32,6 +32,7 @@
         MonsterData& _data;
         AMonster* _monster;
         std::map<std::string,int> _map_abbr;
+        std::map<std::string,int> _map_mSkill;
 //        std::vector<wxString> _list_abbr;
         // abr, name and names
         wxComboBox *_abbr_combo;
@@ -42,7 +43,8 @@
         wxCheckBox *_disabled_check;
         wxCheckBox *_cantgive_check;
         // magic production
-        wxTextCtrl *_mSkill_text;
+        wxComboBox *_mSkill_combo;
+        //wxTextCtrl *_mSkill_text;
         wxSpinCtrl *_mLevel_spin;
         // weight, baseprice
         wxSpinCtrl *_weight_spin, *_baseprice_spin;
@@ -53,9 +55,13 @@
         // max inventory
         wxSpinCtrl *_maxinventory_spin;
         // escape
-        wxCheckBox *_loselinked_check, *_hasskill_check, *_esclinear_check,
-            *_escsquare_check, *_esccube_check, *_escquad_check,
-            *_losschance_check, *_escnum_check;
+        wxCheckBox *_escape_check;
+        wxPanel* _escape_panel;
+        wxCheckBox *_loselinked_check;
+        wxRadioButton *_hasskill_radio, *_esclinear_radio,
+            *_escsquare_radio, *_esccube_radio, *_escquad_radio,
+            *_losschance_radio;
+        wxCheckBox *_escnum_check;
         wxTextCtrl *_eSkill_text;
         wxSpinCtrl *_esc_spin;
         // attack
@@ -88,6 +94,38 @@
         void on_namestext_update( wxCommandEvent& event );
         void on_disabled_update( wxCommandEvent& event );
         void on_cantgive_update( wxCommandEvent& event );
+        void on_mSkillcombo_update( wxCommandEvent& event);
+        void on_mLevelspin_update(wxSpinEvent& event);
+        void on_mLevelspin_updateenter(wxCommandEvent& event);
+        void on_weightspin_update( wxSpinEvent& event);
+        void on_weightspin_updateenter( wxCommandEvent& event);
+        void on_basepricespin_update( wxSpinEvent& event);
+        void on_basepricespin_updateenter( wxCommandEvent& event);
+        void on_animal_update( wxCommandEvent& event );
+        void on_demon_update( wxCommandEvent& event );
+        void on_illusion_update( wxCommandEvent& event );
+        void on_undead_update( wxCommandEvent& event );
+        void on_walkspin_update( wxSpinEvent& event);
+        void on_walkspin_updateenter( wxCommandEvent& event);
+        void on_ridespin_update( wxSpinEvent& event);
+        void on_ridespin_updateenter( wxCommandEvent& event);
+        void on_flyspin_update( wxSpinEvent& event);
+        void on_flyspin_updateenter( wxCommandEvent& event);
+        void on_swimspin_update( wxSpinEvent& event);
+        void on_swimspin_updateenter( wxCommandEvent& event);
+        void on_speedspin_update( wxSpinEvent& event);
+        void on_speedspin_updateenter( wxCommandEvent& event);
+        void on_maxinventoryspin_update( wxSpinEvent& event);
+        void on_maxinventoryspin_updateenter( wxCommandEvent& event);
+        void on_escape_update( wxCommandEvent& event );
+        void on_loselinked_update( wxCommandEvent& event );
+        void on_hasskill_update( wxCommandEvent& event );
+        void on_esclinear_update( wxCommandEvent& event );
+        void on_escsquare_update( wxCommandEvent& event );
+        void on_esccube_update( wxCommandEvent& event );
+        void on_escquad_update( wxCommandEvent& event );
+        void on_losschance_update( wxCommandEvent& event );
+        void on_escnum_update( wxCommandEvent& event );
         //MonType *find_monsterdef(char const *abbr, int illusion);
 
     private:
@@ -95,6 +133,8 @@
         {
             idAbbrCombo = 100,
             idAbbrText  = 101,
+            idWeightUpdate = 150,
+            idBasepriceUpdate = 151,
         };
         wxDECLARE_EVENT_TABLE();
 
@@ -104,6 +144,8 @@ void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
               wxTextCtrl*& wxtext, int proportionnal, int width );
 void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
               wxCheckBox*& wxcheck );
+void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+              wxRadioButton*& wxradio );
 void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title);
 void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
              wxSpinCtrl*& wxspin, int rmin, int rmax, int width);

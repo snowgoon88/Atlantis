@@ -7,7 +7,8 @@
 #endif //__BORLANDC__
 
 #include "MonsterView.h"
-#include "items.h"
+#include <items.h>
+#include <skills.h>
 #include <algorithm>
 
 wxBEGIN_EVENT_TABLE(MonsterView, wxPanel)
@@ -66,56 +67,127 @@ MonsterView::MonsterView(wxWindow *parent, MonsterData& data)
 
     // magical skill
     wxBoxSizer *magic_hbox = new wxBoxSizer( wxHORIZONTAL );
-    mk_title( this, magic_hbox, "Magical Production: ");
-    mk_field( this, wxID_ANY, magic_hbox, "Skill:", _mSkill_text, 0, 80);
+    mk_title( this, magic_hbox, "Magical Production: skill ");
+    //mk_field( this, wxID_ANY, magic_hbox, "Skill:", _mSkill_text, 0, 80);
+    _mSkill_combo = new wxComboBox(this, idAbbrCombo, _T(""), wxDefaultPosition, wxDefaultSize,
+                                0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
+    _mSkill_combo->Append( wxString("NULL"));
+    for( int i=0; i<NSKILLS; ++i) {
+        if( SkillDefs[i].flags & SkillType::MAGIC ) {
+            std::string mLabel = std::string( SkillDefs[i].name);
+            mLabel += " [" + std::string( SkillDefs[i].abbr) + "]";
+            _map_mSkill[mLabel] = i;
+            _mSkill_combo->Append( wxString(mLabel));
+            //std::cout << mLabel << "=>" << i << std::endl;
+            }
+    }
+    _mSkill_combo->SetValue( wxString("NULL") );
+    _mSkill_combo->Bind( wxEVT_COMBOBOX, &MonsterView::on_mSkillcombo_update, this);
+    magic_hbox->Add( _mSkill_combo, 0, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
     mk_spin( this, wxID_ANY, magic_hbox, "Level:", _mLevel_spin, 0, 10, 50);
+    _mLevel_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_mLevelspin_update, this);
+    _mLevel_spin->Bind( wxEVT_TEXT, &MonsterView::on_mLevelspin_updateenter, this);
+    _mLevel_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_mLevelspin_updateenter, this);
     mk_title( this, magic_hbox, "Materials: TODO");
     main_vbox->Add( magic_hbox, 0, wxEXPAND, 0 );
 
     // weight, baseprice
     wxBoxSizer *weight_hbox = new wxBoxSizer( wxHORIZONTAL );
     mk_spin( this, wxID_ANY, weight_hbox, "Weight:", _weight_spin, 0, 1000, 200);
+    _weight_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_weightspin_update, this);
+    _weight_spin->Bind( wxEVT_TEXT, &MonsterView::on_weightspin_updateenter, this);
+    _weight_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_weightspin_updateenter, this);
     mk_spin( this, wxID_ANY, weight_hbox, "Baseprice:", _baseprice_spin, 0, 1000, 200);
+    _baseprice_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_basepricespin_update, this);
+    _baseprice_spin->Bind( wxEVT_TEXT, &MonsterView::on_basepricespin_updateenter, this);
+    _baseprice_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_basepricespin_updateenter, this);
     main_vbox->Add( weight_hbox, 0, wxEXPAND, 0 );
 
     // type
     wxBoxSizer *type_hbox = new wxBoxSizer( wxHORIZONTAL );
     mk_title( this, type_hbox, "Type:");
     mk_check( this, wxID_ANY, type_hbox, "Animal", _animal_check );
+    _animal_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_animal_update, this);
     mk_check( this, wxID_ANY, type_hbox, "Demon", _demon_check );
+    _demon_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_demon_update, this);
     mk_check( this, wxID_ANY, type_hbox, "Illusion", _illusion_check );
+    _illusion_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_illusion_update, this);
     mk_check( this, wxID_ANY, type_hbox, "Undead", _undead_check );
+    _undead_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_undead_update, this);
     main_vbox->Add( type_hbox, 0, wxEXPAND, 0 );
 
     // Movements
     wxBoxSizer *move_hbox = new wxBoxSizer( wxHORIZONTAL );
     mk_title( this, move_hbox, "Movements: ");
     mk_spin( this, wxID_ANY, move_hbox, "Walk", _walk_spin, 0, 1000, 100);
+    _walk_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_walkspin_update, this);
+    _walk_spin->Bind( wxEVT_TEXT, &MonsterView::on_walkspin_updateenter, this);
+    _walk_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_walkspin_updateenter, this);
     mk_spin( this, wxID_ANY, move_hbox, "Ride", _ride_spin, 0, 1000, 100);
+    _ride_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_ridespin_update, this);
+    _ride_spin->Bind( wxEVT_TEXT, &MonsterView::on_ridespin_updateenter, this);
+    _ride_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_ridespin_updateenter, this);
     mk_spin( this, wxID_ANY, move_hbox, "Fly", _fly_spin, 0, 1000, 100);
+    _fly_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_flyspin_update, this);
+    _fly_spin->Bind( wxEVT_TEXT, &MonsterView::on_flyspin_updateenter, this);
+    _fly_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_flyspin_updateenter, this);
     mk_spin( this, wxID_ANY, move_hbox, "Swim", _swim_spin, 0, 1000, 100);
+    _swim_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_swimspin_update, this);
+    _swim_spin->Bind( wxEVT_TEXT, &MonsterView::on_swimspin_updateenter, this);
+    _swim_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_swimspin_updateenter, this);
     mk_spin( this, wxID_ANY, move_hbox, "Speed", _speed_spin, 0, 20, 80);
+    _speed_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_speedspin_update, this);
+    _speed_spin->Bind( wxEVT_TEXT, &MonsterView::on_speedspin_updateenter, this);
+    _speed_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_speedspin_updateenter, this);
     main_vbox->Add( move_hbox, 0, wxEXPAND, 0 );
 
     // Max Inventory
     wxBoxSizer *inventory_hbox = new wxBoxSizer( wxHORIZONTAL );
     mk_spin( this, wxID_ANY, inventory_hbox, "Max Inventory:", _maxinventory_spin, 0, 1000, 150);
+    _maxinventory_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_maxinventoryspin_update, this);
+    _maxinventory_spin->Bind( wxEVT_TEXT, &MonsterView::on_maxinventoryspin_updateenter, this);
+    _maxinventory_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_maxinventoryspin_updateenter, this);
     main_vbox->Add( inventory_hbox, 0, wxEXPAND, 0 );
 
     // Escape
-    wxBoxSizer *esc_hbox = new wxBoxSizer( wxHORIZONTAL );
-    mk_title( this, esc_hbox, "Escape:");
-    mk_check( this, wxID_ANY, esc_hbox, "Lose Linked", _loselinked_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Has skill", _hasskill_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Linear", _esclinear_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Square", _escsquare_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Cube", _esccube_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Quad", _escquad_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Loss chance", _losschance_check );
-    mk_check( this, wxID_ANY, esc_hbox, "Esc num square", _escnum_check );
-    mk_field( this, wxID_ANY, esc_hbox, "Skill:", _eSkill_text, 0, 80);
-    mk_spin( this, wxID_ANY, esc_hbox, "Level:", _esc_spin, 0, 10, 50);
-    main_vbox->Add( esc_hbox, 0, wxEXPAND, 0 );
+    wxBoxSizer *esc_main_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_check( this, wxID_ANY, esc_main_hbox, "Can Escape", _escape_check );
+    _escape_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_escape_update, this);
+    main_vbox->Add( esc_main_hbox, 0, wxEXPAND, 0 );
+
+    _escape_panel = new wxPanel( this, wxID_ANY );
+    wxBoxSizer *esc_vbox = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *esc_way_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( _escape_panel, esc_way_hbox, "Escape mode:");
+    _hasskill_radio = new wxRadioButton( _escape_panel, wxID_ANY, "has skill",
+                                        wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+    _hasskill_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_hasskill_update, this);
+    esc_way_hbox->Add( _hasskill_radio, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+    mk_radio( _escape_panel, wxID_ANY, esc_way_hbox, "Linear", _esclinear_radio );
+    _esclinear_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_esclinear_update, this);
+    mk_radio( _escape_panel, wxID_ANY, esc_way_hbox, "Square", _escsquare_radio );
+    _escsquare_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_escsquare_update, this);
+    mk_radio( _escape_panel, wxID_ANY, esc_way_hbox, "Cube", _esccube_radio );
+    _esccube_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_esccube_update, this);
+    mk_radio( _escape_panel, wxID_ANY, esc_way_hbox, "Quad", _escquad_radio );
+    _escquad_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_escquad_update, this);
+    mk_radio( _escape_panel, wxID_ANY, esc_way_hbox, "Loss chance", _losschance_radio );
+    _losschance_radio->Bind( wxEVT_RADIOBUTTON, &MonsterView::on_losschance_update, this);
+    mk_field( _escape_panel, wxID_ANY, esc_way_hbox, "Skill:", _eSkill_text, 0, 80);
+    mk_spin( _escape_panel, wxID_ANY, esc_way_hbox, "Level:", _esc_spin, 0, 10, 50);
+    esc_vbox->Add( esc_way_hbox );
+
+    wxBoxSizer *esc_opt_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( _escape_panel, esc_opt_hbox, "Escape options:");
+    mk_check( _escape_panel, wxID_ANY, esc_opt_hbox, "Lose Linked", _loselinked_check );
+    _loselinked_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_loselinked_update, this);
+    mk_check( _escape_panel, wxID_ANY, esc_opt_hbox, "Esc num square", _escnum_check );
+    _escnum_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_escnum_update, this);
+    esc_vbox->Add( esc_opt_hbox );
+    _escape_panel->SetSizer( esc_vbox );
+
+    main_vbox->Add( _escape_panel, 0, wxEXPAND, 0 );
 
     // Attack
     wxBoxSizer *atk_hbox = new wxBoxSizer( wxHORIZONTAL );
@@ -290,6 +362,200 @@ void MonsterView::on_cantgive_update( wxCommandEvent& event )
     else
         _monster->_item->flags = _monster->_item->flags ^ ItemType::CANTGIVE;
 }
+void MonsterView::on_mSkillcombo_update( wxCommandEvent& event )
+{
+    if ( event.GetEventType() == wxEVT_COMBOBOX )
+    {
+        std::cout << "EVT_COMBOBOX(mSkill), selection=" << _mSkill_combo->GetStringSelection().ToStdString() << std::endl;
+        //std::cout << "  " << _mSkill_combo.GetStringSelection().ToStdString() << std::endl;
+        std::string mLabel = _mSkill_combo->GetStringSelection().ToStdString();
+        int id_skill = _map_mSkill[mLabel];
+        //std::cout << "  => " << _list_abbr[event.GetSelection()] << std::endl;
+        std::cout << "  => " << SkillDefs[id_skill].abbr << std::endl;
+
+        _monster->_item->mSkill = (const char*) malloc( strlen(SkillDefs[id_skill].abbr)+1 );
+        strcpy( (char *) _monster->_item->mSkill, SkillDefs[id_skill].abbr );
+    }
+}
+void MonsterView::on_mLevelspin_update( wxSpinEvent& event)
+{
+    _monster->_item->mLevel = _mLevel_spin->GetValue();
+}
+void MonsterView::on_mLevelspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->mLevel = _mLevel_spin->GetValue();
+}
+void MonsterView::on_weightspin_update( wxSpinEvent& event)
+{
+    _monster->_item->weight = _weight_spin->GetValue();
+}
+void MonsterView::on_weightspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->weight = _weight_spin->GetValue();
+}
+void MonsterView::on_basepricespin_update( wxSpinEvent& event)
+{
+    _monster->_item->baseprice = _baseprice_spin->GetValue();
+}
+void MonsterView::on_basepricespin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->baseprice = _baseprice_spin->GetValue();
+}
+void MonsterView::on_animal_update( wxCommandEvent& event )
+{
+    if( _animal_check->GetValue() )
+        _monster->_item->type = _monster->_item->type | IT_ANIMAL;
+    else
+        _monster->_item->type = _monster->_item->type ^ IT_ANIMAL;
+}
+void MonsterView::on_demon_update( wxCommandEvent& event )
+{
+    if( _demon_check->GetValue() )
+        _monster->_item->type = _monster->_item->type | IT_DEMON;
+    else
+        _monster->_item->type = _monster->_item->type ^ IT_DEMON;
+}
+void MonsterView::on_illusion_update( wxCommandEvent& event )
+{
+    if( _illusion_check->GetValue() )
+        _monster->_item->type = _monster->_item->type | IT_ILLUSION;
+    else
+        _monster->_item->type = _monster->_item->type ^ IT_ILLUSION;
+
+    std::string abbr(_monster->_item->abr);
+    if( _monster->_item->type & IT_ILLUSION ) {
+        abbr = "i"+abbr;
+        strcpy( (char *) _monster->_mtype->abbr, abbr.c_str() );
+    }
+    else {
+        strcpy( (char *) _monster->_mtype->abbr, abbr.c_str() );
+    }
+    _mdefabbr_text->Clear();
+    _mdefabbr_text->AppendText( wxString( _monster->_mtype->abbr));
+}
+void MonsterView::on_undead_update( wxCommandEvent& event )
+{
+    if( _undead_check->GetValue() )
+        _monster->_item->type = _monster->_item->type | IT_UNDEAD;
+    else
+        _monster->_item->type = _monster->_item->type ^ IT_UNDEAD;
+}
+void MonsterView::on_walkspin_update( wxSpinEvent& event)
+{
+    _monster->_item->walk = _walk_spin->GetValue();
+}
+void MonsterView::on_walkspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->walk = _walk_spin->GetValue();
+}
+void MonsterView::on_ridespin_update( wxSpinEvent& event)
+{
+    _monster->_item->ride = _ride_spin->GetValue();
+}
+void MonsterView::on_ridespin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->ride = _ride_spin->GetValue();
+}
+void MonsterView::on_flyspin_update( wxSpinEvent& event)
+{
+    _monster->_item->fly = _fly_spin->GetValue();
+}
+void MonsterView::on_flyspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->fly = _fly_spin->GetValue();
+}
+void MonsterView::on_swimspin_update( wxSpinEvent& event)
+{
+    _monster->_item->swim = _swim_spin->GetValue();
+}
+void MonsterView::on_swimspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->swim = _swim_spin->GetValue();
+}
+void MonsterView::on_speedspin_update( wxSpinEvent& event)
+{
+    _monster->_item->speed = _speed_spin->GetValue();
+}
+void MonsterView::on_speedspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->speed = _speed_spin->GetValue();
+}
+void MonsterView::on_maxinventoryspin_update( wxSpinEvent& event)
+{
+    _monster->_item->max_inventory = _maxinventory_spin->GetValue();
+}
+void MonsterView::on_maxinventoryspin_updateenter( wxCommandEvent& event)
+{
+    _monster->_item->max_inventory = _maxinventory_spin->GetValue();
+}
+void MonsterView::on_escape_update( wxCommandEvent& event )
+{
+    _escape_panel->Enable( _escape_check->GetValue() );
+}
+void on_loselinked_update( wxCommandEvent& event );
+        void on_hasskill_update( wxCommandEvent& event );
+        void on_esclinear_update( wxCommandEvent& event );
+        void on_escsquare_update( wxCommandEvent& event );
+        void on_esccube_update( wxCommandEvent& event );
+        void on_escquad_update( wxCommandEvent& event );
+        void on_losschance_update( wxCommandEvent& event );
+        void on_escnum_update( wxCommandEvent& event );
+void MonsterView::on_loselinked_update( wxCommandEvent& event )
+{
+    if( _loselinked_check->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::LOSE_LINKED;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::LOSE_LINKED;
+}
+void MonsterView::on_escnum_update( wxCommandEvent& event )
+{
+    if( _escnum_check->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::ESC_NUM_SQUARE;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::ESC_NUM_SQUARE;
+}
+void MonsterView::on_hasskill_update( wxCommandEvent& event )
+{
+    if( _hasskill_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::HAS_SKILL;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::HAS_SKILL;
+}
+void MonsterView::on_esclinear_update( wxCommandEvent& event )
+{
+    if( _esclinear_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::ESC_LEV_LINEAR;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::ESC_LEV_LINEAR;
+}
+void MonsterView::on_escsquare_update( wxCommandEvent& event )
+{
+    if( _escsquare_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::ESC_LEV_SQUARE;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::ESC_LEV_SQUARE;
+}
+void MonsterView::on_esccube_update( wxCommandEvent& event )
+{
+    if( _esccube_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::ESC_LEV_CUBE;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::ESC_LEV_CUBE;
+}
+void MonsterView::on_escquad_update( wxCommandEvent& event )
+{
+    if( _escquad_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::ESC_LEV_QUAD;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::ESC_LEV_QUAD;
+}
+void MonsterView::on_losschance_update( wxCommandEvent& event )
+{
+    if( _losschance_radio->GetValue() )
+        _monster->_item->escape = _monster->_item->escape | ItemType::LOSS_CHANCE;
+    else
+        _monster->_item->escape = _monster->_item->escape ^ ItemType::LOSS_CHANCE;
+}
 // ****************************************************************************
 void MonsterView::set_monster( AMonster* monster )
 {
@@ -308,14 +574,25 @@ void MonsterView::set_monster( AMonster* monster )
 
     // Magic production
     if( monster->_item->mSkill != NULL ) {
-        _mSkill_text->Clear();
-        _mSkill_text->AppendText( wxString( monster->_item->mSkill ));
+        // Find proper Skill
+        for( int i=0; i < NSKILLS; ++i ) {
+            std::cout << "CMP " << SkillDefs[i].abbr << " with " << monster->_item->mSkill << std::endl;
+            if( strcmp( SkillDefs[i].abbr, monster->_item->mSkill) == 0 ) {
+                std::cout << "  => FOUND" << std::endl;
+                std::string mLabel = std::string( SkillDefs[i].name);
+                mLabel += " [" + std::string( SkillDefs[i].abbr) + "]";
+                _map_mSkill[mLabel] = i;
+                _mSkill_combo->SetValue( wxString(mLabel));
+                break;
+            }
+        }
         _mLevel_spin->SetValue( monster->_item->mLevel );
     }
     else {
-        _mSkill_text->Clear();
-        _mSkill_text->AppendText( _("-") );
-    _mLevel_spin->SetValue( 0 );
+//        _mSkill_text->Clear();
+//        _mSkill_text->AppendText( _("-") );
+        _mSkill_combo->SetValue( wxString("NULL") );
+        _mLevel_spin->SetValue( 0 );
     }
 
     // weight
@@ -339,23 +616,31 @@ void MonsterView::set_monster( AMonster* monster )
     _maxinventory_spin->SetValue( monster->_item->max_inventory );
 
     // escape
-    _loselinked_check->SetValue( monster->_item->escape & ItemType::LOSE_LINKED );
-    _hasskill_check->SetValue( monster->_item->escape & ItemType::HAS_SKILL );
-    _esclinear_check->SetValue( monster->_item->escape & ItemType::ESC_LEV_LINEAR );
-    _escsquare_check->SetValue( monster->_item->escape & ItemType::ESC_LEV_SQUARE );
-    _esccube_check->SetValue( monster->_item->escape & ItemType::ESC_LEV_CUBE );
-    _escquad_check->SetValue( monster->_item->escape & ItemType::ESC_LEV_QUAD );
-    _losschance_check->SetValue( monster->_item->escape & ItemType::LOSS_CHANCE );
-    _escnum_check->SetValue( monster->_item->escape & ItemType::ESC_NUM_SQUARE );
-    if( monster->_item->esc_skill != NULL ) {
-        _eSkill_text->Clear();
-        _eSkill_text->AppendText( wxString( monster->_item->esc_skill ));
+    if( monster->_item->escape == 0 ) { // no escape
+        _escape_check->SetValue( false );
+        _escape_panel->Enable( false );
     }
-    else {
-        _eSkill_text->Clear();
-        _eSkill_text->AppendText( _("-") );
+    else { // escape
+        _escape_check->SetValue( true );
+        _escape_panel->Enable( true );
+        _loselinked_check->SetValue( monster->_item->escape & ItemType::LOSE_LINKED );
+        _hasskill_radio->SetValue( monster->_item->escape & ItemType::HAS_SKILL );
+        _esclinear_radio->SetValue( monster->_item->escape & ItemType::ESC_LEV_LINEAR );
+        _escsquare_radio->SetValue( monster->_item->escape & ItemType::ESC_LEV_SQUARE );
+        _esccube_radio->SetValue( monster->_item->escape & ItemType::ESC_LEV_CUBE );
+        _escquad_radio->SetValue( monster->_item->escape & ItemType::ESC_LEV_QUAD );
+        _losschance_radio->SetValue( monster->_item->escape & ItemType::LOSS_CHANCE );
+        _escnum_check->SetValue( monster->_item->escape & ItemType::ESC_NUM_SQUARE );
+        if( monster->_item->esc_skill != NULL ) {
+            _eSkill_text->Clear();
+            _eSkill_text->AppendText( wxString( monster->_item->esc_skill ));
+        }
+        else {
+            _eSkill_text->Clear();
+            _eSkill_text->AppendText( _("-") );
+        }
+        _esc_spin->SetValue( monster->_item->esc_val );
     }
-    _esc_spin->SetValue( monster->_item->esc_val );
 
     // Attack
     _atk_spin->SetValue( monster->_mtype->attackLevel );
@@ -425,183 +710,6 @@ void MonsterView::set_monster( AMonster* monster )
     _mdefabbr_text->AppendText( wxString( monster->_mtype->abbr));
 }
 
-//// *************************************************** MonsterView::set_monster
-//void MonsterView::set_monster( int id )
-//{
-//    // Check valid
-//    if( id < I_LEADERS || id >= NITEMS ) {
-//        std::cout << "MonsterView::set_monster: " << id << " is not a valid id" << std::endl;
-//        return;
-//    }
-//    ItemType *monster = &(ItemDefs[id]);
-//    int is_illusion = monster->type & IT_ILLUSION;
-//    MonType *mdef = find_monsterdef( monster->abr, is_illusion );
-//
-//
-//    // abr, name, names
-//    _abbr_text->Clear();
-//    _abbr_text->AppendText( wxString( monster->abr));
-//    _name_text->Clear();
-//    _name_text->AppendText( wxString( monster->name));
-//    _names_text->Clear();
-//    _names_text->AppendText( wxString( monster->names));
-//
-//    // flags
-//    _disabled_check->SetValue( monster->flags & ItemType::DISABLED );
-//    _cantgive_check->SetValue( monster->flags & ItemType::CANTGIVE );
-//
-//    // Magic production
-//    if( monster->mSkill != NULL ) {
-//        _mSkill_text->Clear();
-//        _mSkill_text->AppendText( wxString( monster->mSkill ));
-//        _mLevel_spin->SetValue( monster->mLevel );
-//    }
-//    else {
-//        _mSkill_text->Clear();
-//        _mSkill_text->AppendText( _("-") );
-//    _mLevel_spin->SetValue( 0 );
-//    }
-//
-//    // weight
-//    _weight_spin->SetValue( monster->weight );
-//    _baseprice_spin->SetValue( monster->baseprice );
-//
-//    // type
-//    _animal_check->SetValue( monster->type & IT_ANIMAL );
-//    _demon_check->SetValue( monster->type & IT_DEMON );
-//    _illusion_check->SetValue( monster->type & IT_ILLUSION );
-//    _undead_check->SetValue( monster->type & IT_UNDEAD );
-//
-//    // movements
-//    _walk_spin->SetValue( monster->walk );
-//    _ride_spin->SetValue( monster->ride );
-//    _fly_spin->SetValue( monster->fly );
-//    _swim_spin->SetValue( monster->swim );
-//    _speed_spin->SetValue( monster->speed );
-//
-//    // max inventory
-//    _maxinventory_spin->SetValue( monster->max_inventory );
-//
-//    // escape
-//    _loselinked_check->SetValue( monster->escape & ItemType::LOSE_LINKED );
-//    _hasskill_check->SetValue( monster->escape & ItemType::HAS_SKILL );
-//    _esclinear_check->SetValue( monster->escape & ItemType::ESC_LEV_LINEAR );
-//    _escsquare_check->SetValue( monster->escape & ItemType::ESC_LEV_SQUARE );
-//    _esccube_check->SetValue( monster->escape & ItemType::ESC_LEV_CUBE );
-//    _escquad_check->SetValue( monster->escape & ItemType::ESC_LEV_QUAD );
-//    _losschance_check->SetValue( monster->escape & ItemType::LOSS_CHANCE );
-//    _escnum_check->SetValue( monster->escape & ItemType::ESC_NUM_SQUARE );
-//    if( monster->esc_skill != NULL ) {
-//        _eSkill_text->Clear();
-//        _eSkill_text->AppendText( wxString( monster->esc_skill ));
-//    }
-//    else {
-//        _eSkill_text->Clear();
-//        _eSkill_text->AppendText( _("-") );
-//    }
-//    _esc_spin->SetValue( monster->esc_val );
-//
-//    // Attack
-//    _atk_spin->SetValue( mdef->attackLevel );
-//    _numatk_spin->SetValue( mdef->numAttacks );
-//    _nbhits_spin->SetValue( mdef->hits );
-//    _regen_spin->SetValue( mdef->regen );
-//    // defense
-//    int idx_def = 0;
-//    _def_combat_spin->SetValue( mdef->defense[idx_def++]);
-//    _def_nrj_spin->SetValue( mdef->defense[idx_def++]);
-//    _def_spirit_spin->SetValue( mdef->defense[idx_def++]);
-//    _def_weather_spin->SetValue( mdef->defense[idx_def++]);
-//    _def_riding_spin->SetValue( mdef->defense[idx_def++]);
-//    _def_ranged_spin->SetValue( mdef->defense[idx_def++]);
-//
-//    // skill
-//    _tactics_spin->SetValue( mdef->tactics );
-//    _stealth_spin->SetValue( mdef->stealth );
-//    _obs_spin->SetValue( mdef->obs );
-//
-//    // special
-//    if( mdef->special != NULL ) {
-//        _special_text->Clear();
-//        _special_text->AppendText( wxString( mdef->special ));
-//    }
-//    else {
-//        _special_text->Clear();
-//        _special_text->AppendText( _("-") );
-//    }
-//    _specialLevel_spin->SetValue( mdef->specialLevel );
-//
-//    // spoil
-//    _silverspoil_spin->SetValue( mdef->silver);
-//    _normalspoil_check->SetValue( mdef->spoiltype & IT_NORMAL );
-//    _advancedspoil_check->SetValue( mdef->spoiltype & IT_ADVANCED );
-//    _tradespoil_check->SetValue( mdef->spoiltype & IT_TRADE );
-//    _manspoil_check->SetValue( mdef->spoiltype & IT_MAN );
-//    _monsterspoil_check->SetValue( mdef->spoiltype & IT_MONSTER );
-//    _magicspoil_check->SetValue( mdef->spoiltype & IT_MAGIC );
-//    _weaponspoil_check->SetValue( mdef->spoiltype & IT_WEAPON );
-//    _armorspoil_check->SetValue( mdef->spoiltype & IT_ARMOR );
-//    _mountspoil_check->SetValue( mdef->spoiltype & IT_MOUNT );
-//    _battlespoil_check->SetValue( mdef->spoiltype & IT_BATTLE );
-//    _specialspoil_check->SetValue( mdef->spoiltype & IT_SPECIAL );
-//    _toolspoil_check->SetValue( mdef->spoiltype & IT_TOOL );
-//
-//    _foodspoil_check->SetValue( mdef->spoiltype & IT_FOOD );
-//    _illusionspoil_check->SetValue( mdef->spoiltype & IT_ILLUSION );
-//    _undeadspoil_check->SetValue( mdef->spoiltype & IT_UNDEAD );
-//    _demonspoil_check->SetValue( mdef->spoiltype & IT_DEMON );
-//    _leaderspoil_check->SetValue( mdef->spoiltype & IT_LEADER );
-//    _moneyspoil_check->SetValue( mdef->spoiltype & IT_MONEY );
-//    _animalspoil_check->SetValue( mdef->spoiltype & IT_ANIMAL );
-//    _shipspoil_check->SetValue( mdef->spoiltype & IT_SHIP );
-//    _mageonlyspoil_check->SetValue( mdef->spoiltype & IT_MAGEONLY );
-//    _alwaysspoil_check->SetValue( mdef->spoiltype & IT_ALWAYS_SPOIL );
-//    _neverspoil_check->SetValue( mdef->spoiltype & IT_NEVER_SPOIL );
-//
-//    // hostile
-//    _hostile_spin->SetValue( mdef->hostile );
-//    _number_spin->SetValue( mdef->number );
-//
-//    // mdef name and abbrev
-//    _mdefname_text->Clear();
-//    _mdefname_text->AppendText( wxString( mdef->name));
-//    _mdefabbr_text->Clear();
-//    _mdefabbr_text->AppendText( wxString( mdef->abbr));
-//}
-//// ************************************************ MonsterView::parse_gamedata
-//void MonsterView::parse_gamedata()
-//{
-//    std::ifstream in( "mygamedata.h" );
-//    std::string line;
-//    int idx_monster = 0;
-//    while( std::getline(in, line )) {
-//        std::cout << "[" << line[0] << "] " << line << std::endl;
-//        if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
-//            if( ItemDefs[idx_monster].type & IT_MONSTER ) {
-//                //std::cout << "+ found monster " << line.substr( 1, line.size()-2 ) << ":" << ItemDefs[idx_monster].abr << std::endl;
-//                _map_abbr[line.substr( 1, line.size()-2 )] = idx_monster;
-//            }
-//            idx_monster ++;
-//        }
-//    }
-//    std::map<std::string,int>::iterator it;
-//    for (it=_map_abbr.begin(); it!=_map_abbr.end(); ++it)
-//        std::cout << it->first << " => " << it->second << '\n';
-//}
-//// ************************************************ MonsterView::find_monsterdef
-//MonType *MonsterView::find_monsterdef(char const *abbr, int illusion)
-//{
-//	if (abbr == NULL) return NULL;
-//	std::string tag = (illusion ? "i" : "");
-//	tag += abbr;
-//
-//	for (int i = 0; i < NUMMONSTERS; i++) {
-//		if (MonDefs[i].abbr == NULL) continue;
-//		if (tag == MonDefs[i].abbr)
-//			return &MonDefs[i];
-//	}
-//	return NULL;
-//}
 // ******************************************************************** mk_field
 void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
               wxTextCtrl*& wxtext, int proportionnal, int width )
@@ -617,6 +725,12 @@ void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
     wxcheck = new wxCheckBox( parent, id, _(title));
     sizer->Add( wxcheck, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
 }
+void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+              wxRadioButton*& wxradio )
+{
+    wxradio = new wxRadioButton( parent, id, _(title));
+    sizer->Add( wxradio, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+}
 void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)
 {
     wxStaticText *label = new wxStaticText( parent, -1, _(title));
@@ -627,7 +741,7 @@ void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
 {
     wxStaticText *label = new wxStaticText( parent, -1, _(title));
     sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2);
-    wxspin = new wxSpinCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1));
+    wxspin = new wxSpinCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1), wxTE_PROCESS_ENTER);
     wxspin->SetRange(rmin,rmax);
     wxspin->SetValue( 0 );
     sizer->Add( wxspin, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);

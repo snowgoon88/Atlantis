@@ -346,17 +346,17 @@ class Quest : public AListElem
 		AList	rewards;
 };
 * MONSTER
-** [0/7] Item
-*** TODO str_enum : I_XXXX
+** [3/8] Item
+*** DONE str_enum : I_XXXX
 Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
 *** name, names : pas d'incidence. Singulier et pluriel.
-*** TODO abr : 4 lettre max (3 existe). Pas de doublons
-*** TODO Production magique
+*** DONE abr : 4 lettre max (3 existe). Pas de doublons
+*** DONE Production magique
 Vérifier que c'est un skill (??) qui existe
 mLevel : le niveau du skill nécessaire pour l'invocation.
 *** Mouvement : encombrement maxi pour ce type de mouvement
 *** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
-*** TODO Escape.
+*** TODO Escape. => exclusif flags !!!!!!
 Voir items.h pour exclusif
 Voir game.cpp pour calcul de chances
 **** LOSS_CHANCE ( + HAS_SKILL)
@@ -374,6 +374,7 @@ si level :
 si LOSE_LINKED, peut perdre autres objets du même type (IT_UNDEAD), la chance sera la plus grande de tous ce genre d'objets
 perte si chance > random(10000)
 Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
+*** TODO write with new escape
 *** TODO special : list parmi ce qui existe
 *** TODO spoil : exclusif (??)
 *** TODO abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion
