@@ -33,6 +33,9 @@
         AMonster* _monster;
         std::map<std::string,int> _map_abbr;
         std::map<std::string,int> _map_mSkill;
+        std::map<std::string,int> _map_eSkill;
+        std::map<std::string,int> _map_special;
+        //std::map<std::string,int> _map_spoil;
 //        std::vector<wxString> _list_abbr;
         // abr, name and names
         wxComboBox *_abbr_combo;
@@ -62,7 +65,7 @@
             *_escsquare_radio, *_esccube_radio, *_escquad_radio,
             *_losschance_radio;
         wxCheckBox *_escnum_check;
-        wxTextCtrl *_eSkill_text;
+        wxComboBox *_eSkill_combo;
         wxSpinCtrl *_esc_spin;
         // attack
         wxSpinCtrl *_atk_spin, *_numatk_spin, *_nbhits_spin, *_regen_spin;
@@ -72,16 +75,18 @@
         // skills
         wxSpinCtrl *_tactics_spin, *_stealth_spin, *_obs_spin;
         // special
-        wxTextCtrl *_special_text;
+        //wxTextCtrl *_special_text;
+        wxComboBox *_special_combo;
         wxSpinCtrl *_specialLevel_spin;
         // spoil
         wxSpinCtrl *_silverspoil_spin;
-        wxCheckBox *_normalspoil_check, *_advancedspoil_check, *_tradespoil_check, *_manspoil_check,
-            *_monsterspoil_check, *_magicspoil_check, *_weaponspoil_check, *_armorspoil_check,
-            *_mountspoil_check, *_battlespoil_check, *_specialspoil_check, *_toolspoil_check,
-            *_foodspoil_check, *_illusionspoil_check, *_undeadspoil_check, *_demonspoil_check,
-            *_leaderspoil_check, *_moneyspoil_check, *_animalspoil_check, *_shipspoil_check,
-            *_mageonlyspoil_check, *_alwaysspoil_check, *_neverspoil_check;
+        wxComboBox *_spoil_combo;
+//        wxCheckBox *_normalspoil_check, *_advancedspoil_check, *_tradespoil_check, *_manspoil_check,
+//            *_monsterspoil_check, *_magicspoil_check, *_weaponspoil_check, *_armorspoil_check,
+//            *_mountspoil_check, *_battlespoil_check, *_specialspoil_check, *_toolspoil_check,
+//            *_foodspoil_check, *_illusionspoil_check, *_undeadspoil_check, *_demonspoil_check,
+//            *_leaderspoil_check, *_moneyspoil_check, *_animalspoil_check, *_shipspoil_check,
+//            *_mageonlyspoil_check, *_alwaysspoil_check, *_neverspoil_check;
         // hostile, number
         wxSpinCtrl *_hostile_spin, *_number_spin;
         // mdef abr and name
@@ -118,14 +123,62 @@
         void on_maxinventoryspin_update( wxSpinEvent& event);
         void on_maxinventoryspin_updateenter( wxCommandEvent& event);
         void on_escape_update( wxCommandEvent& event );
-        void on_loselinked_update( wxCommandEvent& event );
-        void on_hasskill_update( wxCommandEvent& event );
-        void on_esclinear_update( wxCommandEvent& event );
-        void on_escsquare_update( wxCommandEvent& event );
-        void on_esccube_update( wxCommandEvent& event );
-        void on_escquad_update( wxCommandEvent& event );
-        void on_losschance_update( wxCommandEvent& event );
-        void on_escnum_update( wxCommandEvent& event );
+        void on_esccheck_update( wxCommandEvent& event );
+//        void on_hasskill_update( wxCommandEvent& event );
+//        void on_esclinear_update( wxCommandEvent& event );
+//        void on_escsquare_update( wxCommandEvent& event );
+//        void on_esccube_update( wxCommandEvent& event );
+//        void on_escquad_update( wxCommandEvent& event );
+//        void on_losschance_update( wxCommandEvent& event );
+//        void on_escnum_update( wxCommandEvent& event );
+        //void on_esctext_update( wxCommandEvent& event );
+        void on_eSkillcombo_update( wxCommandEvent& event );
+        void on_escspin_update( wxSpinEvent& event);
+        void on_escspin_updateenter( wxCommandEvent& event);
+
+        void on_atkspin_update( wxSpinEvent& event);
+        void on_atkspin_updateenter( wxCommandEvent& event);
+        void on_numatkspin_update( wxSpinEvent& event);
+        void on_numatkspin_updateenter( wxCommandEvent& event);
+        void on_nbhitsspin_update( wxSpinEvent& event);
+        void on_nbhitsspin_updateenter( wxCommandEvent& event);
+        void on_regenspin_update( wxSpinEvent& event);
+        void on_regenspin_updateenter( wxCommandEvent& event);
+
+        void on_defcombatspin_update( wxSpinEvent& event);
+        void on_defcombatspin_updateenter( wxCommandEvent& event);
+        void on_defnrjspin_update( wxSpinEvent& event);
+        void on_defnrjspin_updateenter( wxCommandEvent& event);
+        void on_defspiritspin_update( wxSpinEvent& event);
+        void on_defspiritspin_updateenter( wxCommandEvent& event);
+        void on_defweatherspin_update( wxSpinEvent& event);
+        void on_defweatherspin_updateenter( wxCommandEvent& event);
+        void on_defridingspin_update( wxSpinEvent& event);
+        void on_defridingspin_updateenter( wxCommandEvent& event);
+        void on_defrangedspin_update( wxSpinEvent& event);
+        void on_defrangedspin_updateenter( wxCommandEvent& event);
+
+        void on_tacticsspin_update( wxSpinEvent& event);
+        void on_tacticsspin_updateenter( wxCommandEvent& event);
+        void on_stealthspin_update( wxSpinEvent& event);
+        void on_stealthspin_updateenter( wxCommandEvent& event);
+        void on_obsspin_update( wxSpinEvent& event);
+        void on_obsspin_updateenter( wxCommandEvent& event);
+
+        void on_special_update( wxCommandEvent& event );
+        void on_specialspin_update( wxSpinEvent& event);
+        void on_specialspin_updateenter( wxCommandEvent& event);
+
+        void on_silverspoilspin_update( wxSpinEvent& event);
+        void on_silverspoilspin_updateenter( wxCommandEvent& event);
+        void on_spoilcombo_update( wxCommandEvent& event );
+
+        void on_hostilespin_update( wxSpinEvent& event);
+        void on_hostilespin_updateenter( wxCommandEvent& event);
+        void on_numberspin_update( wxSpinEvent& event);
+        void on_numberspin_updateenter( wxCommandEvent& event);
+
+        void on_mdefnametext_update( wxCommandEvent& event );
         //MonType *find_monsterdef(char const *abbr, int illusion);
 
     private:
