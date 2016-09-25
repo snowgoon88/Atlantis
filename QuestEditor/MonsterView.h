@@ -39,6 +39,11 @@
 //        std::vector<wxString> _list_abbr;
         // abr, name and names
         wxComboBox *_abbr_combo;
+        wxCheckBox *_edit_check;
+
+        wxPanel* _monster_panel;
+
+
         wxTextCtrl *_abbr_text;
         wxTextCtrl *_name_text;
         wxTextCtrl *_names_text;
@@ -60,13 +65,14 @@
         // escape
         wxCheckBox *_escape_check;
         wxPanel* _escape_panel;
-        wxCheckBox *_loselinked_check;
-        wxRadioButton *_hasskill_radio, *_esclinear_radio,
-            *_escsquare_radio, *_esccube_radio, *_escquad_radio,
-            *_losschance_radio;
+        wxCheckBox *_loselinked_check, *_hasskill_check, *_losschance_check,
+                *_esclinear_check, *_escsquare_check, *_esccube_check, *_escquad_check;
+//        wxRadioButton  *_esclinear_radio,
+//            *_escsquare_radio, *_esccube_radio, *_escquad_radio;
         wxCheckBox *_escnum_check;
         wxComboBox *_eSkill_combo;
         wxSpinCtrl *_esc_spin;
+        wxStaticText *_esc_text;
         // attack
         wxSpinCtrl *_atk_spin, *_numatk_spin, *_nbhits_spin, *_regen_spin;
         // defense
@@ -94,6 +100,7 @@
 
         // Callbacks
         void on_cbox_update( wxCommandEvent& event );
+        void on_edit_update( wxCommandEvent& event );
         void on_abbrtext_update( wxCommandEvent& event );
         void on_nametext_update( wxCommandEvent& event );
         void on_namestext_update( wxCommandEvent& event );
@@ -179,6 +186,8 @@
         void on_numberspin_updateenter( wxCommandEvent& event);
 
         void on_mdefnametext_update( wxCommandEvent& event );
+
+        std::string compute_escape();
         //MonType *find_monsterdef(char const *abbr, int illusion);
 
     private:
@@ -188,6 +197,14 @@
             idAbbrText  = 101,
             idWeightUpdate = 150,
             idBasepriceUpdate = 151,
+            idEscLossChance = 200,
+            idEscHasSkill = 201,
+            idEscLinear = 202,
+            idEscSquare = 203,
+            idEscCube = 204,
+            idEscQuad = 205,
+            idEscNumSquare = 206,
+            idEscLinked = 207,
         };
         wxDECLARE_EVENT_TABLE();
 

@@ -346,7 +346,8 @@ class Quest : public AListElem
 		AList	rewards;
 };
 * MONSTER
-** [6/8] Item
+** [6/11] Item
+*** TODO Lire ../gamedata.h/cpp et sauver dans new_gamedata.h/cpp
 *** DONE str_enum : I_XXXX
 Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
 *** name, names : pas d'incidence. Singulier et pluriel.
@@ -356,6 +357,8 @@ Vérifier que c'est un skill (??) qui existe
 mLevel : le niveau du skill nécessaire pour l'invocation.
 *** Mouvement : encombrement maxi pour ce type de mouvement
 *** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
+*** TODO Escape => changer les widget quand on fait set monster
+*** TODO Escape => comment on write quand no-escape
 *** TODO Escape. => exclusif flags !!!!!!
 Voir items.h pour exclusif
 Voir game.cpp pour calcul de chances
