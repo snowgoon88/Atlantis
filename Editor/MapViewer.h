@@ -5,6 +5,10 @@
     #include <wx/wx.h>
 #endif
 
+
+#define SCALE_MIN 0.25
+#define SCALE_MAX 5.0
+#define SCALE_DELTA 10.0
 /**
  * View a map
  */
@@ -20,6 +24,7 @@ private:
 
     /** coordinate */
     wxPoint _origin;
+    double _scale;
     wxPoint* _selected;
 
     /** info about hexagons */
@@ -42,6 +47,7 @@ private:
     void on_rightdown( wxMouseEvent& event );
     void on_rightup( wxMouseEvent& event );
     void on_mousemotion( wxMouseEvent& event );
+    void on_mousewheel( wxMouseEvent& event );
     wxDECLARE_EVENT_TABLE();
 };
 

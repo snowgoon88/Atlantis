@@ -30,12 +30,13 @@ wxBEGIN_EVENT_TABLE(MapViewer, wxPanel)
     EVT_RIGHT_DOWN(MapViewer::on_rightdown)
     EVT_RIGHT_UP(MapViewer::on_rightup)
     EVT_MOTION(MapViewer::on_mousemotion)
+    EVT_MOUSEWHEEL(MapViewer::on_mousewheel)
 wxEND_EVENT_TABLE()
 
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
 MapViewer::MapViewer(wxWindow* parent) :
-    wxPanel(parent), _origin(0,0), _selected(nullptr),
+    wxPanel(parent), _origin(100,100), _scale(1.0), _selected(nullptr),
     _hexsize(30), _action(Action::NONE)
 {
     _hexwidth = 2 * _hexsize;
@@ -59,12 +60,12 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 
     wxSize dc_size = dc.GetSize();
     wxPoint dc_ori = dc.GetDeviceOrigin();
-    double xscale, yscale;
-    dc.GetUserScale( &xscale, &yscale );
+    double dummy;
+    dc.GetUserScale( &dummy, &dummy );
     std::cout << "Geom ";
     std::cout << " (" << dc_ori.x << ", " << dc_ori.y << ") ";
     std::cout << dc_size.GetWidth() << "x" << dc_size.GetHeight();
-    std::cout << " scale=" << xscale << ", " << yscale << std::endl;
+    std::cout << " scale=" << _scale << ", [" << dummy << "]" << std::endl;
 
 
     render(dc);
@@ -79,6 +80,7 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 void MapViewer::render(wxDC&  dc)
 {
     dc.Clear();
+    dc.SetUserScale( _scale, _scale );
 //    // draw some text
 //    dc.DrawText(wxT("Testing"), 40, 60);
 //
@@ -97,7 +99,7 @@ void MapViewer::render(wxDC&  dc)
 //    dc.DrawLine( 300, 100, 700, 300 ); // draw line across the rectangle
 
     // Draw hexes
-    std::cout << "_hexwidth=" << _hexwidth << "  _hexheight=" << _hexheight << std::endl;
+//    std::cout << "_hexwidth=" << _hexwidth << "  _hexheight=" << _hexheight << std::endl;
     dc.SetBrush( wxNullBrush );
     dc.SetPen( wxPen( wxColor(0,0,0), 1 ) );
     int nb_x = 5;
@@ -106,8 +108,8 @@ void MapViewer::render(wxDC&  dc)
         int y = idy * _hexheight/2;
         for( int idx=0; idx<nb_x; ++idx ) {
             int x = idx * (_hexwidth * 3/2) + (idy%2)*(_hexwidth * 3/4);
-            std::cout << "plot at " << x << ", " << y << std::endl;
-            dc.DrawPolygon( 6, _hex, 100+x, 100+y, wxODDEVEN_RULE);
+//            std::cout << "plot at " << x << ", " << y << std::endl;
+            dc.DrawPolygon( 6, _hex, _origin.x+x, _origin.y+y, wxODDEVEN_RULE);
         }
     }
 
@@ -115,15 +117,15 @@ void MapViewer::render(wxDC&  dc)
     for( int idy=0; idy<5; ++idy) {
         for( int idx=(idy%2); idx<11; idx+=2 ) {
             wxPoint center = hex_coord( idx, idy );
-            dc.DrawPolygon( 6, _hex, 100+center.x, 100+center.y, wxODDEVEN_RULE);
+            dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
         }
     }
 
     if( _selected ) {
-        std::cout << "DRAW _selected" << std::endl;
+//        std::cout << "DRAW _selected" << std::endl;
         dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
         wxPoint center = hex_coord( _selected->x, _selected->y );
-        dc.DrawPolygon( 6, _hex, 100+center.x, 100+center.y, wxODDEVEN_RULE);
+        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
     }
 
     // Look at the wxDC docs to learn how to draw other stuff
@@ -135,7 +137,10 @@ void MapViewer::on_leftclick( wxMouseEvent& event )
     wxPoint pos = event.GetLogicalPosition(dc);
 
     std::cout << "LEFT_CLICK pos=" << pos.x << ", " << pos.y << std::endl;
-    wxPoint coord = pos - _origin - wxPoint(100,100);
+    pos.x = round((double) pos.x / _scale);
+    pos.y = round((double) pos.y / _scale);
+    std::cout << "          _pos=" << pos.x << ", " << pos.y << std::endl;
+    wxPoint coord = pos - _origin;
     int x = coord.x / (_hexwidth * 3/4);
     int y = coord.y / (_hexheight / 2 );
     std::cout << "  coord=" << coord.x << ", " << coord.y << "  -> x=" << x << " y=" << y << std::endl;
@@ -173,10 +178,27 @@ void MapViewer::on_mousemotion( wxMouseEvent& event )
             wxPoint pos = event.GetLogicalPosition(dc);
             _origin += (pos - _old_pos);
             _old_pos = pos;
-            dc.SetDeviceOrigin( _origin.x, _origin.y );
+            //dc.SetDeviceOrigin( _origin.x, _origin.y );
             render(dc);
         }
     }
+}
+// *************************************************** MapViewer::on_mousewheel
+void MapViewer::on_mousewheel( wxMouseEvent& event )
+{
+    wxPaintDC dc(this);
+
+    std::cout << "MOUSE_WHEEL";
+    std::cout << " delta=" << event.GetWheelDelta();
+    std::cout << " rotation=" << event.GetWheelRotation();
+    std::cout << std::endl;
+
+    _scale = _scale * (1.0 + (double) event.GetWheelRotation() / (event.GetWheelDelta() * SCALE_DELTA) );
+    if( _scale < SCALE_MIN ) _scale = SCALE_MIN;
+    if( _scale > SCALE_MAX ) _scale = SCALE_MAX;
+
+    //dc.SetUserScale( _scale, _scale );
+    render(dc);
 }
 // ****************************************************************************
 // ***************************************************************** hex_corner
