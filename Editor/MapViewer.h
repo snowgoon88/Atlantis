@@ -7,7 +7,7 @@
 
 
 #define SCALE_MIN 0.25
-#define SCALE_MAX 5.0
+#define SCALE_MAX 10.0
 #define SCALE_DELTA 10.0
 /**
  * View a map

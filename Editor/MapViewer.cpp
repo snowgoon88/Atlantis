@@ -176,7 +176,8 @@ void MapViewer::on_mousemotion( wxMouseEvent& event )
         if( event.Dragging() ) {
             wxPaintDC dc(this);
             wxPoint pos = event.GetLogicalPosition(dc);
-            _origin += (pos - _old_pos);
+            _origin.x += round((pos.x - _old_pos.x)/_scale);
+            _origin.y += round((pos.y - _old_pos.y)/_scale);
             _old_pos = pos;
             //dc.SetDeviceOrigin( _origin.x, _origin.y );
             render(dc);
@@ -188,14 +189,34 @@ void MapViewer::on_mousewheel( wxMouseEvent& event )
 {
     wxPaintDC dc(this);
 
+
     std::cout << "MOUSE_WHEEL";
     std::cout << " delta=" << event.GetWheelDelta();
     std::cout << " rotation=" << event.GetWheelRotation();
     std::cout << std::endl;
 
+    wxPoint pos = event.GetLogicalPosition(dc);
+    double old_scale = _scale;
+//    wxPoint op = pos - _origin;
+//    std::cout << "  V(o,pos) =(" << op.x/_scale << ", " << op.y /_scale << ")";
+//    std::cout << " O=(" << _origin.x << ", " << _origin.y << ")";
+//    std::cout << " P=(" << pos.x << ", " << pos.y << ")";
+//    std::cout << std::endl;
+
     _scale = _scale * (1.0 + (double) event.GetWheelRotation() / (event.GetWheelDelta() * SCALE_DELTA) );
     if( _scale < SCALE_MIN ) _scale = SCALE_MIN;
     if( _scale > SCALE_MAX ) _scale = SCALE_MAX;
+
+    // move origin to center zooming on actual mouse position
+    // vector( _origin -> (pos/scale)) should be constant
+    _origin.x = round(pos.x * ((1.0/_scale)-(1.0/old_scale))) +_origin.x;
+    _origin.y = round(pos.y * ((1.0/_scale)-(1.0/old_scale))) +_origin.y;
+
+//    op = pos - _origin;
+//    std::cout << "  NEW V(o,pos) =(" << op.x/_scale << ", " << op.y /_scale << ")";
+//    std::cout << " O=(" << _origin.x << ", " << _origin.y << ")";
+//    std::cout << " P=(" << pos.x << ", " << pos.y << ")";
+//    std::cout << std::endl;
 
     //dc.SetUserScale( _scale, _scale );
     render(dc);
