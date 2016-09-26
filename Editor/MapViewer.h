@@ -25,6 +25,7 @@ private:
     /** coordinate */
     wxPoint _origin;
     double _scale;
+    wxFont _hexfont;
     wxPoint* _selected;
 
     /** info about hexagons */
@@ -37,6 +38,7 @@ private:
     wxPoint _old_pos;
 
     /** utility */
+    void draw_region( wxDC& dc, const wxPoint& hexpos );
     wxPoint hex_corner( int size, int index );
     wxPoint hex_coord( int xhex, int yhex );
     wxPoint find_hexcoord( wxPoint& pt );

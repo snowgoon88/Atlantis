@@ -8,6 +8,7 @@
 
 #include <MapViewer.h>
 #include <math.h>
+#include <sstream>
 
 wxBEGIN_EVENT_TABLE(MapViewer, wxPanel)
 //    EVT_COMBOBOX(idAbbrCombo, MonsterView::on_cbox_update)
@@ -46,6 +47,15 @@ MapViewer::MapViewer(wxWindow* parent) :
         _hex[i] = hex_corner( _hexsize, i );
         std::cout << _hex[i].x << ", " << _hex[i].y << std::endl;
     }
+
+    // look for proper text scaling
+    wxPaintDC dc(this);
+    wxSize text_size = dc.GetTextExtent( wxString("[99,99]"));
+    std::cout << "text_size=" << text_size.GetWidth() << "x" << text_size.GetHeight() << std::endl;
+    float text_scale = (float) _hexsize / (float) text_size.GetWidth();
+    _hexfont = dc.GetFont();
+    _hexfont = _hexfont.Scaled( text_scale );
+
 }
 // ****************************************************************************
 // ***************************************************** MapViewer::paint_event
@@ -58,15 +68,14 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 {
     wxPaintDC dc(this);
 
-    wxSize dc_size = dc.GetSize();
-    wxPoint dc_ori = dc.GetDeviceOrigin();
-    double dummy;
-    dc.GetUserScale( &dummy, &dummy );
-    std::cout << "Geom ";
-    std::cout << " (" << dc_ori.x << ", " << dc_ori.y << ") ";
-    std::cout << dc_size.GetWidth() << "x" << dc_size.GetHeight();
-    std::cout << " scale=" << _scale << ", [" << dummy << "]" << std::endl;
-
+//    wxSize dc_size = dc.GetSize();
+//    wxPoint dc_ori = dc.GetDeviceOrigin();
+//    double dummy;
+//    dc.GetUserScale( &dummy, &dummy );
+//    std::cout << "Geom ";
+//    std::cout << " (" << dc_ori.x << ", " << dc_ori.y << ") ";
+//    std::cout << dc_size.GetWidth() << "x" << dc_size.GetHeight();
+//    std::cout << " scale=" << _scale << ", [" << dummy << "]" << std::endl;
 
     render(dc);
 }
@@ -80,6 +89,7 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 void MapViewer::render(wxDC&  dc)
 {
     dc.Clear();
+    dc.SetFont( _hexfont );
     dc.SetUserScale( _scale, _scale );
 //    // draw some text
 //    dc.DrawText(wxT("Testing"), 40, 60);
@@ -116,16 +126,18 @@ void MapViewer::render(wxDC&  dc)
     dc.SetPen( wxPen( wxColor(0,0,255), 2 ));
     for( int idy=0; idy<5; ++idy) {
         for( int idx=(idy%2); idx<11; idx+=2 ) {
-            wxPoint center = hex_coord( idx, idy );
-            dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+//            wxPoint center = hex_coord( idx, idy );
+//            dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+            draw_region( dc, wxPoint(idx,idy));
         }
     }
 
     if( _selected ) {
 //        std::cout << "DRAW _selected" << std::endl;
         dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
-        wxPoint center = hex_coord( _selected->x, _selected->y );
-        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+//        wxPoint center = hex_coord( _selected->x, _selected->y );
+//        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);*
+        draw_region( dc, *_selected );
     }
 
     // Look at the wxDC docs to learn how to draw other stuff
@@ -222,6 +234,17 @@ void MapViewer::on_mousewheel( wxMouseEvent& event )
     render(dc);
 }
 // ****************************************************************************
+// ***************************************************** MapViewer::draw_region
+void MapViewer::draw_region( wxDC& dc, const wxPoint& hexpos )
+{
+    wxPoint center = hex_coord( hexpos.x, hexpos.y );
+    dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+
+    std::stringstream msg;
+    msg << "[" << hexpos.x << "," << hexpos.y << "]";
+    wxPoint textpos = center + wxPoint(  -_hexsize/2, 1 -_hexheight/2);
+    dc.DrawText(wxString(msg.str()), _origin + textpos );
+}
 // ***************************************************************** hex_corner
 wxPoint MapViewer::hex_corner( int size, int index )
 {
