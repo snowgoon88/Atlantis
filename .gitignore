@@ -1,3 +1,33 @@
+# build repertoire
+obj/
+.d/
+bin/
+
+# some extensions
+*.depend
+*.layout
+*.log
+*.bak
+*~
+TAGS
+*#
+
+# Rstudio stuff
+.RData
+.Rhistory
+
+# Specific
+Images
+game_*/
+standard/standard*
+QuestEditor/parse_gamedata
+QuestEditor/atlantis
+worldedit
+monsters.data
+quest.zip
+Editor/game.*
+QuestEditor/my*
+QuestEditor/new_*
+
+# local to Mac
 .DS_Store
-obj
-.d
