@@ -6,21 +6,27 @@
 #endif
 
 #include <aregion.h>
+#include <observer.h>
+#include <RegionData.h>
 
 /**
  * View a ARegion
  */
-class RegViewer : public wxPanel
+class RegViewer : public wxPanel, public Observer
 {
 public:
     /** Creation */
-    RegViewer( wxWindow *parent );
+    RegViewer( wxWindow *parent, RegionData& model );
 
     /** Attach model */
     void attach( ARegion* reg);
+    void reset();
 
+    /** Override as Observer */
+    void update( int signal=0 );
 private:
     /** Model */
+    RegionData& _model;
     ARegion* _reg;
 
     /** Widgets */
@@ -35,6 +41,7 @@ private:
 
 
     /** Event gestion */
+    void update_values();
     wxDECLARE_EVENT_TABLE();
 };
 

@@ -10,6 +10,8 @@
 
 #include <aregion.h>
 #include <RegViewer.h>
+#include <RegionData.h>
+#include <observer.h>
 
 #define SCALE_MIN 0.25
 #define SCALE_MAX 10.0
@@ -19,18 +21,25 @@
 /**
  * View a map
  */
-class MapViewer : public wxPanel
+class MapViewer : public wxPanel, public Observer
 {
 public:
     /** Creation */
-    MapViewer( wxWindow *parent );
+    MapViewer( wxWindow *parent, RegionData& model );
 
     /** Attach model */
     void attach_regviewer( RegViewer* regview );
     void attach( ARegionArray* pArr );
 
+    /** Selected Regions */
+    std::list<ARegion*> _selected_list;
+
+    /** Override as Observer */
+    void update( int signal=0 );
+
 private:
     /** Model */
+    RegionData& _model;
     ARegionArray* _pArr;
     RegViewer* _reg_viewer;
     /** Paint */
@@ -41,7 +50,6 @@ private:
     double _scale;
     wxFont _hexfont;
     wxPoint* _cursor_pos;
-    std::list<ARegion*> _selected_list;
 
     /** info about hexagons */
     wxCoord _hexwidth, _hexheight;

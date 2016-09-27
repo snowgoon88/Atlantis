@@ -98,6 +98,11 @@
 		<Unit filename="MapViewer.h" />
 		<Unit filename="RegViewer.cpp" />
 		<Unit filename="RegViewer.h" />
+		<Unit filename="RegionData.cpp" />
+		<Unit filename="RegionData.h" />
+		<Unit filename="model.cpp" />
+		<Unit filename="model.h" />
+		<Unit filename="observer.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -37,11 +37,12 @@ wxEND_EVENT_TABLE()
 
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
-MapViewer::MapViewer(wxWindow* parent) :
-    wxPanel(parent), _pArr(nullptr), _reg_viewer(nullptr),
+MapViewer::MapViewer(wxWindow* parent, RegionData& model) :
+    wxPanel(parent), _model(model), _pArr(nullptr), _reg_viewer(nullptr),
     _origin(100,100), _scale(1.0), _cursor_pos(nullptr),
     _action(Action::NONE)
 {
+
     _hexwidth = 2 * HEXSIZE;
     _hexheight = sqrt(3) / 2 * _hexwidth;
 
@@ -109,6 +110,11 @@ void MapViewer::attach( ARegionArray* pArr )
         }
         std::cout << std::endl;
     }
+
+    // reset regview
+    if( _reg_viewer ) {
+        _reg_viewer->reset();
+    }
 }
 // ****************************************************************************
 // ***************************************************** MapViewer::paint_event
@@ -130,6 +136,12 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 //    std::cout << dc_size.GetWidth() << "x" << dc_size.GetHeight();
 //    std::cout << " scale=" << _scale << ", [" << dummy << "]" << std::endl;
 
+    render(dc);
+}
+// ********************************************************** MapViewer::update
+void MapViewer::update( int signal )
+{
+    wxPaintDC dc(this);
     render(dc);
 }
 // ****************************************************************************

@@ -29,6 +29,7 @@ class EditorFrame: public wxFrame
         Game _game;
         MapViewer* _map_viewer;
         RegViewer* _reg_viewer;
+        RegionData* _region_data;
 
     private:
         enum
@@ -36,6 +37,7 @@ class EditorFrame: public wxFrame
             idMenuSurface = 100,
             idMenuUnderWorld = 101,
             idMenuUnderDeep = 102,
+            idMenuChangeName = 200,
             idMenuQuit = 1000,
             idMenuAbout
         };
@@ -43,6 +45,8 @@ class EditorFrame: public wxFrame
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
+
+        void OnChangeName(wxCommandEvent& event);
         DECLARE_EVENT_TABLE()
 };
 

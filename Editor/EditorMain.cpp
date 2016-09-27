@@ -54,6 +54,7 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_MENU(idMenuSurface, EditorFrame::OnRegion)
     EVT_MENU(idMenuUnderWorld, EditorFrame::OnRegion)
     EVT_MENU(idMenuUnderDeep, EditorFrame::OnRegion)
+    EVT_MENU(idMenuChangeName, EditorFrame::OnChangeName)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
@@ -68,6 +69,10 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     fileMenu->Append(idMenuUnderDeep, _("&UnderDeep"), _("Display region"));
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
+
+    wxMenu* actMenu = new wxMenu(_T(""));
+    actMenu->Append(idMenuChangeName, _("&Change Name"), _("Change le nom de 1 ou plusieurs hex"));
+    mbar->Append(actMenu, _("&Action"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
@@ -96,6 +101,7 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     }
     MapAccess mapAccess = MapAccess( &_game );
     ARegionList* regions = mapAccess.regions();
+    _region_data = new RegionData( regions );
 
     // list all the levels
     for (int i = 0; i < regions->numLevels; i++) {
@@ -108,9 +114,11 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
     wxPanel* _main_panel = new wxPanel( this );
     wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    _map_viewer = new MapViewer( _main_panel );
+    _map_viewer = new MapViewer( _main_panel, *_region_data );
+    _region_data->attach_observer( _map_viewer );
     sizer->Add( _map_viewer, 1, wxEXPAND);
-    _reg_viewer = new RegViewer( _main_panel );
+    _reg_viewer = new RegViewer( _main_panel, *_region_data );
+    _region_data->attach_observer( _reg_viewer );
     _map_viewer->attach_regviewer( _reg_viewer );
     sizer->Add( _reg_viewer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
 
@@ -160,4 +168,15 @@ void EditorFrame::OnAbout(wxCommandEvent &event)
 {
     wxString msg = wxbuildinfo(long_f);
     wxMessageBox(msg, _("Welcome to..."));
+}
+
+void EditorFrame::OnChangeName(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() > 0 ) {
+        wxString name = wxGetTextFromUser( wxString("Nouveau nom:"),
+                            wxString("Change Name"),
+                            _("--nom--"),
+                            this );
+        _region_data->set_name( _map_viewer->_selected_list, name.ToStdString());
+    }
 }
