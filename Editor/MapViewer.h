@@ -5,6 +5,8 @@
     #include <wx/wx.h>
 #endif
 
+#include <aregion.h>
+#include <RegViewer.h>
 
 #define SCALE_MIN 0.25
 #define SCALE_MAX 10.0
@@ -18,7 +20,14 @@ public:
     /** Creation */
     MapViewer( wxWindow *parent );
 
+    /** Attach model */
+    void attach_regviewer( RegViewer* regview );
+    void attach( ARegionArray* pArr );
+
 private:
+    /** Model */
+    ARegionArray* _pArr;
+    RegViewer* _reg_viewer;
     /** Paint */
     void render(wxDC&  dc);
 
@@ -38,10 +47,14 @@ private:
     wxPoint _old_pos;
 
     /** utility */
-    void draw_region( wxDC& dc, const wxPoint& hexpos );
+    void draw_region( wxDC& dc, ARegion* reg );
+    void draw_hex( wxDC& dc, const wxPoint& hexpos );
     wxPoint hex_corner( int size, int index );
     wxPoint hex_coord( int xhex, int yhex );
     wxPoint find_hexcoord( wxPoint& pt );
+
+    /** terrain */
+    std::map<int,wxBrush> _color_terrain;
 
     /** Event gestion */
     void paint_event(wxPaintEvent & evt);

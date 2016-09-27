@@ -17,6 +17,7 @@
 					<Add option="-g" />
 					<Add option="`wx-config  --cflags`" />
 					<Add directory="." />
+					<Add directory=".." />
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config  --libs`" />
@@ -26,12 +27,77 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../alist.cpp" />
+		<Unit filename="../alist.h" />
+		<Unit filename="../aregion.cpp" />
+		<Unit filename="../aregion.h" />
+		<Unit filename="../army.cpp" />
+		<Unit filename="../army.h" />
+		<Unit filename="../astring.cpp" />
+		<Unit filename="../astring.h" />
+		<Unit filename="../battle.cpp" />
+		<Unit filename="../battle.h" />
+		<Unit filename="../economy.cpp" />
+		<Unit filename="../edit.cpp" />
+		<Unit filename="../faction.cpp" />
+		<Unit filename="../faction.h" />
+		<Unit filename="../fileio.cpp" />
+		<Unit filename="../fileio.h" />
+		<Unit filename="../game.cpp" />
+		<Unit filename="../game.h" />
+		<Unit filename="../gamedata.cpp" />
+		<Unit filename="../gamedata.h" />
+		<Unit filename="../gamedefs.cpp" />
+		<Unit filename="../gamedefs.h" />
+		<Unit filename="../gameio.cpp" />
+		<Unit filename="../gameio.h" />
+		<Unit filename="../genrules.cpp" />
+		<Unit filename="../helper.h" />
+		<Unit filename="../i_rand.cpp" />
+		<Unit filename="../i_rand.h" />
+		<Unit filename="../i_std.h" />
+		<Unit filename="../items.cpp" />
+		<Unit filename="../items.h" />
+		<Unit filename="../map_access.h" />
+		<Unit filename="../market.cpp" />
+		<Unit filename="../market.h" />
+		<Unit filename="../modify.cpp" />
+		<Unit filename="../monthorders.cpp" />
+		<Unit filename="../npc.cpp" />
+		<Unit filename="../object.cpp" />
+		<Unit filename="../object.h" />
+		<Unit filename="../orders.cpp" />
+		<Unit filename="../orders.h" />
+		<Unit filename="../parseorders.cpp" />
+		<Unit filename="../production.cpp" />
+		<Unit filename="../production.h" />
+		<Unit filename="../quests.cpp" />
+		<Unit filename="../quests.h" />
+		<Unit filename="../runorders.cpp" />
+		<Unit filename="../shields.cpp" />
+		<Unit filename="../shields.h" />
+		<Unit filename="../skills.cpp" />
+		<Unit filename="../skills.h" />
+		<Unit filename="../skillshows.cpp" />
+		<Unit filename="../specials.cpp" />
+		<Unit filename="../spells.cpp" />
+		<Unit filename="../spells.h" />
+		<Unit filename="../standard/extra.cpp" />
+		<Unit filename="../standard/map.cpp" />
+		<Unit filename="../standard/monsters.cpp" />
+		<Unit filename="../standard/rules.cpp" />
+		<Unit filename="../standard/world.cpp" />
+		<Unit filename="../template.cpp" />
+		<Unit filename="../unit.cpp" />
+		<Unit filename="../unit.h" />
 		<Unit filename="EditorApp.cpp" />
 		<Unit filename="EditorApp.h" />
 		<Unit filename="EditorMain.cpp" />
 		<Unit filename="EditorMain.h" />
 		<Unit filename="MapViewer.cpp" />
 		<Unit filename="MapViewer.h" />
+		<Unit filename="RegViewer.cpp" />
+		<Unit filename="RegViewer.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -15,18 +15,29 @@
 #endif
 
 #include "EditorApp.h"
+#include <MapViewer.h>
+#include <RegViewer.h>
+#include <game.h>
+#include <map_access.h>
 
 class EditorFrame: public wxFrame
 {
     public:
         EditorFrame(wxFrame *frame, const wxString& title);
         ~EditorFrame();
+
+        Game _game;
+        MapViewer* _map_viewer;
+        RegViewer* _reg_viewer;
+
     private:
         enum
         {
+            idMenuRegion = 100,
             idMenuQuit = 1000,
             idMenuAbout
         };
+        void OnRegion( wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);

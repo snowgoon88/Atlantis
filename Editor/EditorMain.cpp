@@ -16,7 +16,8 @@
 #endif //__BORLANDC__
 
 #include "EditorMain.h"
-#include <MapViewer.h>
+
+
 
 //helper functions
 enum wxbuildinfoformat {
@@ -50,6 +51,7 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_CLOSE(EditorFrame::OnClose)
     EVT_MENU(idMenuQuit, EditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, EditorFrame::OnAbout)
+    EVT_MENU(idMenuRegion, EditorFrame::OnRegion)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
@@ -59,6 +61,7 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
+    fileMenu->Append(idMenuRegion, _("&Region"), _("Display region"));
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
@@ -76,16 +79,39 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     SetStatusText(wxbuildinfo(short_f), 1);
 #endif // wxUSE_STATUSBAR
 
-//    wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-//    frame = new wxFrame((wxFrame *)NULL, -1,  wxT("Hello wxDC"), wxPoint(50,50), wxSize(800,600));
+    // Essai pour game
+    //Game game;
+
+    initIO();
+
+    _game.ModifyTablesPerRuleset();
+
+    if ( !_game.OpenGame() ) {
+        Awrite( "Couldn't open the game file!" );
+        exit(1);
+    }
+    MapAccess mapAccess = MapAccess( &_game );
+    ARegionList* regions = mapAccess.regions();
+
+    // list all the levels
+    for (int i = 0; i < regions->numLevels; i++) {
+        ARegionArray *pArr = regions->pRegionArrays[i];
+        std::cout << "{"<<i<<"} " << mapAccess.str_display( pArr, false) << std::endl;
+        if( pArr->strName )
+            std::cout << "          name=" << *(pArr->strName) << std::endl;
+    }
+
 
     wxPanel* _main_panel = new wxPanel( this );
     wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    MapViewer* map_panel = new MapViewer( _main_panel );
-
-    sizer->Add( map_panel, 1, wxEXPAND);
+    _map_viewer = new MapViewer( _main_panel );
+    sizer->Add( _map_viewer, 1, wxEXPAND);
+    _reg_viewer = new RegViewer( _main_panel );
+    _map_viewer->attach_regviewer( _reg_viewer );
+    sizer->Add( _reg_viewer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
 
     _main_panel->SetSizer(sizer);
+    //map_panel->attach( regions->pRegionArrays[1] );
     //frame->SetAutoLayout(true);
 
 //    frame->Show();
@@ -95,6 +121,16 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
 EditorFrame::~EditorFrame()
 {
+}
+
+void EditorFrame::OnRegion( wxCommandEvent& event)
+{
+    MapAccess map_access = MapAccess( &_game );
+    ARegionList* regions = map_access.regions();
+    ARegionArray *pArr = regions->pRegionArrays[2];
+    if( pArr->strName )
+        std::cout << "ATTACH name=" << *(pArr->strName) << std::endl;
+    _map_viewer->attach( pArr );
 }
 
 void EditorFrame::OnClose(wxCloseEvent &event)

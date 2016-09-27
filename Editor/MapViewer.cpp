@@ -37,7 +37,8 @@ wxEND_EVENT_TABLE()
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
 MapViewer::MapViewer(wxWindow* parent) :
-    wxPanel(parent), _origin(100,100), _scale(1.0), _selected(nullptr),
+    wxPanel(parent), _pArr(nullptr), _reg_viewer(nullptr),
+    _origin(100,100), _scale(1.0), _selected(nullptr),
     _hexsize(30), _action(Action::NONE)
 {
     _hexwidth = 2 * _hexsize;
@@ -56,6 +57,33 @@ MapViewer::MapViewer(wxWindow* parent) :
     _hexfont = dc.GetFont();
     _hexfont = _hexfont.Scaled( text_scale );
 
+    // Set the colors
+    _color_terrain[0] = wxBrush(wxColor(102,178,255)); //OCEAN
+    _color_terrain[1] = wxBrush(wxColor(255,204,153)); //PLAIN
+    _color_terrain[2] = wxBrush(wxColor(0,204,0)); //FOREST,
+	_color_terrain[3] = wxBrush(wxColor(224,224,224));//_MOUNTAIN,
+	_color_terrain[4] = wxBrush(wxColor(0,153,153));//R_SWAM,
+	_color_terrain[5] = wxBrush(wxColor(76,153,0));//R_JUNGLE,
+	_color_terrain[6] = wxBrush(wxColor(255,255,153));//R_DESERT,
+	_color_terrain[7] = wxBrush(wxColor(255,204,153));//R_TUNDRA,
+	_color_terrain[8] = wxBrush(wxColor(153,153,255));//R_CAVERN,
+	_color_terrain[9] = wxBrush(wxColor(0,204,0));//R_UFOREST,
+	_color_terrain[10] = wxBrush(wxColor(178,102,255));//R_TUNNELS,
+	_color_terrain[60] = wxBrush(wxColor(1,128,255));//R_LAKE
+}
+// ********************************************************** MapViewer::attach
+void MapViewer::attach_regviewer( RegViewer* regview )
+{
+    _reg_viewer = regview;
+}
+void MapViewer::attach( ARegionArray* pArr )
+{
+    wxPaintDC dc(this);
+//    wxBufferedDC dc(this);
+    _pArr = pArr;
+    if( _pArr->strName )
+        std::cout << "ATTACHED name=" << *(pArr->strName) << std::endl;
+    render(dc);
 }
 // ****************************************************************************
 // ***************************************************** MapViewer::paint_event
@@ -67,7 +95,7 @@ MapViewer::MapViewer(wxWindow* parent) :
 void MapViewer::paint_event(wxPaintEvent & evt)
 {
     wxPaintDC dc(this);
-
+//    wxAutoBufferedPaintDC dc(this);
 //    wxSize dc_size = dc.GetSize();
 //    wxPoint dc_ori = dc.GetDeviceOrigin();
 //    double dummy;
@@ -91,6 +119,30 @@ void MapViewer::render(wxDC&  dc)
     dc.Clear();
     dc.SetFont( _hexfont );
     dc.SetUserScale( _scale, _scale );
+
+    // Draw RegionArr
+    if( _pArr != nullptr) {
+//        std::cout << "DRAW REGION" << std::endl;
+        dc.SetBrush( wxNullBrush );
+        dc.SetPen( wxPen( wxColor(0,0,0), 1 ) );
+        for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+            ARegion* reg = _pArr->regions[i];
+//            std::cout << i << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";
+            draw_region( dc, reg );
+        }
+//        std::cout << std::endl;
+
+        if( _selected ) {
+//        std::cout << "DRAW _selected" << std::endl;
+            dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
+//        wxPoint center = hex_coord( _selected->x, _selected->y );
+//        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);*
+            draw_hex( dc, *_selected );
+        }
+    }
+    else {
+        dc.DrawText( wxString("Pas de region"), _origin );
+    }
 //    // draw some text
 //    dc.DrawText(wxT("Testing"), 40, 60);
 //
@@ -110,35 +162,29 @@ void MapViewer::render(wxDC&  dc)
 
     // Draw hexes
 //    std::cout << "_hexwidth=" << _hexwidth << "  _hexheight=" << _hexheight << std::endl;
-    dc.SetBrush( wxNullBrush );
-    dc.SetPen( wxPen( wxColor(0,0,0), 1 ) );
-    int nb_x = 5;
-    int nb_y = 10;
-    for( int idy=0; idy<nb_y; ++idy ) {
-        int y = idy * _hexheight/2;
-        for( int idx=0; idx<nb_x; ++idx ) {
-            int x = idx * (_hexwidth * 3/2) + (idy%2)*(_hexwidth * 3/4);
-//            std::cout << "plot at " << x << ", " << y << std::endl;
-            dc.DrawPolygon( 6, _hex, _origin.x+x, _origin.y+y, wxODDEVEN_RULE);
-        }
-    }
+//    dc.SetBrush( wxNullBrush );
+//    dc.SetPen( wxPen( wxColor(0,0,0), 1 ) );
+//    int nb_x = 5;
+//    int nb_y = 10;
+//    for( int idy=0; idy<nb_y; ++idy ) {
+//        int y = idy * _hexheight/2;
+//        for( int idx=0; idx<nb_x; ++idx ) {
+//            int x = idx * (_hexwidth * 3/2) + (idy%2)*(_hexwidth * 3/4);
+////            std::cout << "plot at " << x << ", " << y << std::endl;
+//            dc.DrawPolygon( 6, _hex, _origin.x+x, _origin.y+y, wxODDEVEN_RULE);
+//        }
+//    }
+//
+//    dc.SetPen( wxPen( wxColor(0,0,255), 2 ));
+//    for( int idy=0; idy<5; ++idy) {
+//        for( int idx=(idy%2); idx<11; idx+=2 ) {
+////            wxPoint center = hex_coord( idx, idy );
+////            dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+//            draw_region( dc, wxPoint(idx,idy));
+//        }
+//    }
 
-    dc.SetPen( wxPen( wxColor(0,0,255), 2 ));
-    for( int idy=0; idy<5; ++idy) {
-        for( int idx=(idy%2); idx<11; idx+=2 ) {
-//            wxPoint center = hex_coord( idx, idy );
-//            dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
-            draw_region( dc, wxPoint(idx,idy));
-        }
-    }
 
-    if( _selected ) {
-//        std::cout << "DRAW _selected" << std::endl;
-        dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
-//        wxPoint center = hex_coord( _selected->x, _selected->y );
-//        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);*
-        draw_region( dc, *_selected );
-    }
 
     // Look at the wxDC docs to learn how to draw other stuff
 }
@@ -146,6 +192,7 @@ void MapViewer::render(wxDC&  dc)
 void MapViewer::on_leftclick( wxMouseEvent& event )
 {
     wxPaintDC dc(this);
+//    wxAutoBufferedPaintDC dc(this);
     wxPoint pos = event.GetLogicalPosition(dc);
 
     std::cout << "LEFT_CLICK pos=" << pos.x << ", " << pos.y << std::endl;
@@ -159,6 +206,17 @@ void MapViewer::on_leftclick( wxMouseEvent& event )
     wxPoint res = find_hexcoord( coord );
     _selected = new wxPoint( res );
     std::cout << "  _selected=" << _selected->x << ", " << _selected->y << std::endl;
+
+    // Find associated hex
+    if( _pArr != nullptr) {
+        for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+            ARegion* reg = _pArr->regions[i];
+            if( reg->xloc == _selected->x and reg->yloc == _selected->y ) {
+                if( _reg_viewer ) _reg_viewer->attach( reg );
+                break;
+            }
+        }
+    }
 
     render(dc);
 }
@@ -200,6 +258,7 @@ void MapViewer::on_mousemotion( wxMouseEvent& event )
 void MapViewer::on_mousewheel( wxMouseEvent& event )
 {
     wxPaintDC dc(this);
+//    wxAutoBufferedPaintDC dc(this);
 
 
     std::cout << "MOUSE_WHEEL";
@@ -235,15 +294,50 @@ void MapViewer::on_mousewheel( wxMouseEvent& event )
 }
 // ****************************************************************************
 // ***************************************************** MapViewer::draw_region
-void MapViewer::draw_region( wxDC& dc, const wxPoint& hexpos )
+void MapViewer::draw_hex( wxDC& dc, const wxPoint& hexpos )
 {
+    dc.SetBrush( wxNullBrush );
     wxPoint center = hex_coord( hexpos.x, hexpos.y );
+    dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+}
+void MapViewer::draw_region( wxDC& dc, ARegion* reg )
+{
+    // Color
+    auto brush_it = _color_terrain.find( reg->type );
+    if( brush_it != _color_terrain.end()) {
+        dc.SetBrush( brush_it->second );
+    }
+    else {
+        dc.SetBrush( wxNullBrush );
+        std::cout << "BRUSH not found for " << reg->type << " " << TerrainDefs[reg->type].name << std::endl;
+    }
+    dc.SetPen( wxNullPen );
+    wxPoint center = hex_coord( reg->xloc, reg->yloc );
     dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
 
     std::stringstream msg;
-    msg << "[" << hexpos.x << "," << hexpos.y << "]";
+    msg << "[" << reg->xloc << "," << reg->yloc << "]";
     wxPoint textpos = center + wxPoint(  -_hexsize/2, 1 -_hexheight/2);
     dc.DrawText(wxString(msg.str()), _origin + textpos );
+
+    if( reg->HasShaft() ) {
+        dc.SetPen( *wxRED_PEN );
+        draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
+        dc.SetBrush( *wxRED_BRUSH );
+        dc.DrawCircle( _origin+center, 5);
+    }
+    if( reg->gate > 0 ) {
+        dc.SetPen( *wxBLUE_PEN );
+        draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
+        dc.SetBrush( *wxBLUE_BRUSH );
+        dc.DrawCircle( _origin+center, 5);
+    }
+    if( reg->town ) {
+        dc.SetPen( *wxBLACK_PEN );
+        draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
+        dc.SetBrush( *wxBLACK_BRUSH );
+        dc.DrawCircle( _origin+center, 5);
+    }
 }
 // ***************************************************************** hex_corner
 wxPoint MapViewer::hex_corner( int size, int index )
