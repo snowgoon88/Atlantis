@@ -5,12 +5,17 @@
     #include <wx/wx.h>
 #endif
 
+#include <list>
+#include <algorithm>
+
 #include <aregion.h>
 #include <RegViewer.h>
 
 #define SCALE_MIN 0.25
 #define SCALE_MAX 10.0
 #define SCALE_DELTA 10.0
+#define HEXSIZE 30
+#define SELSIZE 27
 /**
  * View a map
  */
@@ -35,11 +40,12 @@ private:
     wxPoint _origin;
     double _scale;
     wxFont _hexfont;
-    wxPoint* _selected;
+    wxPoint* _cursor_pos;
+    std::list<ARegion*> _selected_list;
 
     /** info about hexagons */
-    wxCoord _hexsize, _hexwidth, _hexheight;
-    wxPoint _hex[6];
+    wxCoord _hexwidth, _hexheight;
+    wxPoint _hex[6], _selhex[6];
 
     /** movements */
     enum class Action { NONE, TRANSLATE };
@@ -47,8 +53,9 @@ private:
     wxPoint _old_pos;
 
     /** utility */
+    void draw_cursor( wxDC& dc, const wxPoint& hexpos );
     void draw_region( wxDC& dc, ARegion* reg );
-    void draw_hex( wxDC& dc, const wxPoint& hexpos );
+    void draw_hex( wxDC& dc, const wxPoint& hexpos, bool select=false );
     wxPoint hex_corner( int size, int index );
     wxPoint hex_coord( int xhex, int yhex );
     wxPoint find_hexcoord( wxPoint& pt );
@@ -63,6 +70,7 @@ private:
     void on_rightup( wxMouseEvent& event );
     void on_mousemotion( wxMouseEvent& event );
     void on_mousewheel( wxMouseEvent& event );
+    void on_keydown( wxKeyEvent& event );
     wxDECLARE_EVENT_TABLE();
 };
 

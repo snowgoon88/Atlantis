@@ -32,28 +32,33 @@ wxBEGIN_EVENT_TABLE(MapViewer, wxPanel)
     EVT_RIGHT_UP(MapViewer::on_rightup)
     EVT_MOTION(MapViewer::on_mousemotion)
     EVT_MOUSEWHEEL(MapViewer::on_mousewheel)
+    EVT_KEY_DOWN(MapViewer::on_keydown)
 wxEND_EVENT_TABLE()
 
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
 MapViewer::MapViewer(wxWindow* parent) :
     wxPanel(parent), _pArr(nullptr), _reg_viewer(nullptr),
-    _origin(100,100), _scale(1.0), _selected(nullptr),
-    _hexsize(30), _action(Action::NONE)
+    _origin(100,100), _scale(1.0), _cursor_pos(nullptr),
+    _action(Action::NONE)
 {
-    _hexwidth = 2 * _hexsize;
+    _hexwidth = 2 * HEXSIZE;
     _hexheight = sqrt(3) / 2 * _hexwidth;
 
     for( int i=0; i<6; ++i ) {
-        _hex[i] = hex_corner( _hexsize, i );
+        _hex[i] = hex_corner( HEXSIZE, i );
+        _selhex[i] = hex_corner( SELSIZE, i);
         std::cout << _hex[i].x << ", " << _hex[i].y << std::endl;
     }
+
+    // Selection
+    _selected_list.clear();
 
     // look for proper text scaling
     wxPaintDC dc(this);
     wxSize text_size = dc.GetTextExtent( wxString("[99,99]"));
     std::cout << "text_size=" << text_size.GetWidth() << "x" << text_size.GetHeight() << std::endl;
-    float text_scale = (float) _hexsize / (float) text_size.GetWidth();
+    float text_scale = (float) HEXSIZE / (float) text_size.GetWidth();
     _hexfont = dc.GetFont();
     _hexfont = _hexfont.Scaled( text_scale );
 
@@ -83,6 +88,9 @@ void MapViewer::attach( ARegionArray* pArr )
     _pArr = pArr;
     if( _pArr->strName )
         std::cout << "ATTACHED name=" << *(pArr->strName) << std::endl;
+    _selected_list.clear();
+    if( _cursor_pos ) { _cursor_pos->x = 0; _cursor_pos->y = 0;}
+    else { _cursor_pos = new wxPoint(0,0);}
     render(dc);
 }
 // ****************************************************************************
@@ -132,12 +140,16 @@ void MapViewer::render(wxDC&  dc)
         }
 //        std::cout << std::endl;
 
-        if( _selected ) {
+        if( _cursor_pos ) {
 //        std::cout << "DRAW _selected" << std::endl;
-            dc.SetPen( wxPen( wxColor(255,0,0), 5 ) ); // 5-pixels-thick red outline
+            dc.SetPen( wxPen( wxColor(255,0,0), 2 ) ); // 5-pixels-thick red outline
 //        wxPoint center = hex_coord( _selected->x, _selected->y );
 //        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);*
-            draw_hex( dc, *_selected );
+            draw_cursor( dc, *_cursor_pos );
+        }
+        dc.SetPen( wxPen( wxColor(255,0,0), 5 ) );
+        for( auto& region : _selected_list ) {
+            draw_hex( dc, wxPoint( region->xloc, region->yloc), true);
         }
     }
     else {
@@ -204,14 +216,27 @@ void MapViewer::on_leftclick( wxMouseEvent& event )
     int y = coord.y / (_hexheight / 2 );
     std::cout << "  coord=" << coord.x << ", " << coord.y << "  -> x=" << x << " y=" << y << std::endl;
     wxPoint res = find_hexcoord( coord );
-    _selected = new wxPoint( res );
-    std::cout << "  _selected=" << _selected->x << ", " << _selected->y << std::endl;
+    if( _cursor_pos ) { _cursor_pos->x = res.x; _cursor_pos->y = res.y;}
+    else { _cursor_pos = new wxPoint(res);}
+    std::cout << "  _cursor_pos=" << _cursor_pos->x << ", " << _cursor_pos->y << std::endl;
 
     // Find associated hex
     if( _pArr != nullptr) {
+        // If not CTRL -> clear selection
+        if( event.ControlDown() == false ) {
+            _selected_list.clear();
+        }
         for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
             ARegion* reg = _pArr->regions[i];
-            if( reg->xloc == _selected->x and reg->yloc == _selected->y ) {
+            if( reg->xloc == _cursor_pos->x and reg->yloc == _cursor_pos->y ) {
+                // ARegion
+                auto reg_it = std::find( _selected_list.begin(), _selected_list.end(), reg);
+                if( reg_it == _selected_list.end() ) { // not found
+                    _selected_list.push_back( reg );
+                }
+                else {
+                    _selected_list.erase(reg_it);
+                }
                 if( _reg_viewer ) _reg_viewer->attach( reg );
                 break;
             }
@@ -292,13 +317,105 @@ void MapViewer::on_mousewheel( wxMouseEvent& event )
     //dc.SetUserScale( _scale, _scale );
     render(dc);
 }
+// ****************************************************** MapViewer::on_keydown
+void MapViewer::on_keydown( wxKeyEvent& event )
+{
+    std::cout << "KEY code=" << event.GetKeyCode() << std::endl;
+    bool arrow_pressed = false;
+    switch( event.GetKeyCode() ) {
+    case 315: //UP
+        arrow_pressed = true;
+        _cursor_pos->y -= 2;
+        if( ((_cursor_pos->x)%2 == 0) and _cursor_pos->y < 0) _cursor_pos->y = 0;
+        if( ((_cursor_pos->x)%2 == 1) and _cursor_pos->y < 1) _cursor_pos->y = 1;
+        break;
+    case 316: //RIGHT
+        arrow_pressed = true;
+        if( _cursor_pos->x < (_pArr->x-1)) {
+            if( _cursor_pos->x % 2 == 0) {
+                _cursor_pos->y += 1;
+            }
+            else {
+                _cursor_pos->y -= 1;
+            }
+            _cursor_pos->x += 1;
+        }
+        break;
+    case 317: //DOWN
+        arrow_pressed = true;
+        if( _cursor_pos->y < (_pArr->y-2) ) {
+            _cursor_pos->y += 2;
+        }
+        break;
+    case 314: //LEFT
+        arrow_pressed = true;
+        if( _cursor_pos->x > 0 ) {
+            if( _cursor_pos->x % 2 == 0 and _cursor_pos->y <(_pArr->y) ) {
+                _cursor_pos->y += 1;
+            }
+            else {
+                _cursor_pos->y -= 1;
+            }
+            _cursor_pos->x -= 1;
+        }
+        break;
+    case 32://SPACE
+        _selected_list.clear();
+        if( _pArr ) {
+            for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+                ARegion* reg = _pArr->regions[i];
+                if( reg->xloc == _cursor_pos->x and reg->yloc == _cursor_pos->y ) {
+                    _selected_list.push_back( reg );
+                    if( _reg_viewer ) _reg_viewer->attach( reg );
+                    break;
+                }
+            }
+        }
+        break;
+    default:
+        std::cout << "unknown code=" << event.GetKeyCode() << std::endl;
+    }
+
+    // Add to seleection
+    if( event.ControlDown() == true and _pArr and arrow_pressed ) {
+        for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+            ARegion* reg = _pArr->regions[i];
+            if( reg->xloc == _cursor_pos->x and reg->yloc == _cursor_pos->y ) {
+                // ARegion
+                auto reg_it = std::find( _selected_list.begin(), _selected_list.end(), reg);
+                if( reg_it == _selected_list.end() ) { // not found
+                    _selected_list.push_back( reg );
+                }
+                else {
+                    _selected_list.erase(reg_it);
+                }
+                if( _reg_viewer ) _reg_viewer->attach( reg );
+                break;
+            }
+        }
+    }
+
+    wxPaintDC dc(this);
+    render(dc);
+}
 // ****************************************************************************
 // ***************************************************** MapViewer::draw_region
-void MapViewer::draw_hex( wxDC& dc, const wxPoint& hexpos )
+void MapViewer::draw_cursor( wxDC& dc, const wxPoint& hexpos )
 {
     dc.SetBrush( wxNullBrush );
     wxPoint center = hex_coord( hexpos.x, hexpos.y );
-    dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+    dc.DrawCircle( _origin+center, HEXSIZE/3 );
+}
+void MapViewer::draw_hex( wxDC& dc, const wxPoint& hexpos, bool select )
+{
+    dc.SetBrush( wxNullBrush );
+    wxPoint center = hex_coord( hexpos.x, hexpos.y );
+    if( select ) {
+        dc.DrawPolygon( 6, _selhex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+    }
+    else {
+        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+    }
 }
 void MapViewer::draw_region( wxDC& dc, ARegion* reg )
 {
@@ -317,26 +434,26 @@ void MapViewer::draw_region( wxDC& dc, ARegion* reg )
 
     std::stringstream msg;
     msg << "[" << reg->xloc << "," << reg->yloc << "]";
-    wxPoint textpos = center + wxPoint(  -_hexsize/2, 1 -_hexheight/2);
+    wxPoint textpos = center + wxPoint( 4 -HEXSIZE/2, 4 -_hexheight/2);
     dc.DrawText(wxString(msg.str()), _origin + textpos );
 
     if( reg->HasShaft() ) {
         dc.SetPen( *wxRED_PEN );
         draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
         dc.SetBrush( *wxRED_BRUSH );
-        dc.DrawCircle( _origin+center, 5);
+        dc.DrawCircle( _origin+center+wxPoint(-HEXSIZE/3,_hexheight/4), 5);
     }
     if( reg->gate > 0 ) {
         dc.SetPen( *wxBLUE_PEN );
         draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
         dc.SetBrush( *wxBLUE_BRUSH );
-        dc.DrawCircle( _origin+center, 5);
+        dc.DrawCircle( _origin+center+wxPoint(+HEXSIZE/3,_hexheight/4), 5);
     }
     if( reg->town ) {
         dc.SetPen( *wxBLACK_PEN );
         draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
         dc.SetBrush( *wxBLACK_BRUSH );
-        dc.DrawCircle( _origin+center, 5);
+        dc.DrawCircle( _origin+center+wxPoint(0,_hexheight/4), 5);
     }
 }
 // ***************************************************************** hex_corner

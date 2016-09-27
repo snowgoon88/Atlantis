@@ -387,3 +387,10 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
+* [4/4] EDITOR
+** DONE [2/2] multi selection (CTRL)
+*** DONE smaller hex for selection or semi-transparent red
+*** DONE diff between cursor and selection -> circle ??
+** DONE [/] key/arrow navigation
+** DONE [/] Décaler les symboles de gate, tow, shaft
+** DONE Memory for cursor
