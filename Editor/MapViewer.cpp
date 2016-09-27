@@ -74,7 +74,12 @@ MapViewer::MapViewer(wxWindow* parent) :
 	_color_terrain[8] = wxBrush(wxColor(153,153,255));//R_CAVERN,
 	_color_terrain[9] = wxBrush(wxColor(0,204,0));//R_UFOREST,
 	_color_terrain[10] = wxBrush(wxColor(178,102,255));//R_TUNNELS,
+	_color_terrain[53] = wxBrush(wxColor(153,76,0));//R_GROTTO
+	_color_terrain[54] = wxBrush(wxColor(153,153,0));//R_DFORET
+	_color_terrain[55] = wxBrush(wxColor(255,102,255));//R_CHASM
 	_color_terrain[60] = wxBrush(wxColor(1,128,255));//R_LAKE
+	// Pens
+	_wall_pen = new wxPen( *wxBLACK, 5);
 }
 // ********************************************************** MapViewer::attach
 void MapViewer::attach_regviewer( RegViewer* regview )
@@ -92,6 +97,18 @@ void MapViewer::attach( ARegionArray* pArr )
     if( _cursor_pos ) { _cursor_pos->x = 0; _cursor_pos->y = 0;}
     else { _cursor_pos = new wxPoint(0,0);}
     render(dc);
+
+    // Neigbors
+    for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+        ARegion* reg = _pArr->regions[i];
+        std::cout << i << ":" << reg->num << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";
+        std::cout << "  + ";
+        for( int j=0; j<NDIRS; ++j) {
+            if( reg->neighbors[j] == 0 ) std::cout << j << ":nil ";
+            else std::cout << j << ":" << reg->neighbors[j]->num << "=[" << reg->neighbors[j]->xloc << "," << reg->neighbors[j]->yloc << "] ";
+        }
+        std::cout << std::endl;
+    }
 }
 // ****************************************************************************
 // ***************************************************** MapViewer::paint_event
@@ -454,6 +471,29 @@ void MapViewer::draw_region( wxDC& dc, ARegion* reg )
         draw_hex( dc, wxPoint( reg->xloc, reg->yloc));
         dc.SetBrush( *wxBLACK_BRUSH );
         dc.DrawCircle( _origin+center+wxPoint(0,_hexheight/4), 5);
+    }
+
+    // Walls
+//    std::cout << i << ":" << reg->num << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";
+//    std::cout << "  + ";
+    dc.SetPen( *_wall_pen );
+    if( reg->yloc > 1 and reg->neighbors[0] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 4 ), _origin+center+hex_corner( HEXSIZE, 5 ));
+    }
+    if( reg->yloc > 0 and reg->neighbors[1] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 5 ), _origin+center+hex_corner( HEXSIZE, 0 ));
+    }
+    if( reg->yloc < (_pArr->y-1) and reg->neighbors[2] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 0 ), _origin+center+hex_corner( HEXSIZE, 1 ));
+    }
+    if( reg->yloc < (_pArr->y-2) and reg->neighbors[3] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 1 ), _origin+center+hex_corner( HEXSIZE, 2 ));
+    }
+    if( reg->yloc < (_pArr->y-1) and reg->neighbors[4] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 2 ), _origin+center+hex_corner( HEXSIZE, 3 ));
+    }
+    if( reg->yloc > 0 and reg->neighbors[5] == 0 ) {
+        dc.DrawLine( _origin+center+hex_corner( HEXSIZE, 3 ), _origin+center+hex_corner( HEXSIZE, 4 ));
     }
 }
 // ***************************************************************** hex_corner

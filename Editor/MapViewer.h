@@ -62,6 +62,7 @@ private:
 
     /** terrain */
     std::map<int,wxBrush> _color_terrain;
+    wxPen* _wall_pen;
 
     /** Event gestion */
     void paint_event(wxPaintEvent & evt);

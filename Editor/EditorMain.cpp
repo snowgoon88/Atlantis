@@ -51,7 +51,9 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_CLOSE(EditorFrame::OnClose)
     EVT_MENU(idMenuQuit, EditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, EditorFrame::OnAbout)
-    EVT_MENU(idMenuRegion, EditorFrame::OnRegion)
+    EVT_MENU(idMenuSurface, EditorFrame::OnRegion)
+    EVT_MENU(idMenuUnderWorld, EditorFrame::OnRegion)
+    EVT_MENU(idMenuUnderDeep, EditorFrame::OnRegion)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
@@ -61,7 +63,9 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
-    fileMenu->Append(idMenuRegion, _("&Region"), _("Display region"));
+    fileMenu->Append(idMenuSurface, _("&Surface"), _("Display region"));
+    fileMenu->Append(idMenuUnderWorld, _("&UnderWorld"), _("Display region"));
+    fileMenu->Append(idMenuUnderDeep, _("&UnderDeep"), _("Display region"));
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
@@ -127,7 +131,16 @@ void EditorFrame::OnRegion( wxCommandEvent& event)
 {
     MapAccess map_access = MapAccess( &_game );
     ARegionList* regions = map_access.regions();
-    ARegionArray *pArr = regions->pRegionArrays[2];
+    ARegionArray *pArr;
+    if( event.GetId() == idMenuSurface ) {
+        pArr = regions->pRegionArrays[1];
+    }
+    if( event.GetId() == idMenuUnderWorld ) {
+        pArr = regions->pRegionArrays[2];
+    }
+    if( event.GetId() == idMenuUnderDeep ) {
+        pArr = regions->pRegionArrays[3];
+    }
     if( pArr->strName )
         std::cout << "ATTACH name=" << *(pArr->strName) << std::endl;
     _map_viewer->attach( pArr );

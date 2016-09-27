@@ -33,7 +33,9 @@ class EditorFrame: public wxFrame
     private:
         enum
         {
-            idMenuRegion = 100,
+            idMenuSurface = 100,
+            idMenuUnderWorld = 101,
+            idMenuUnderDeep = 102,
             idMenuQuit = 1000,
             idMenuAbout
         };
