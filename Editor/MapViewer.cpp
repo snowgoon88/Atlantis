@@ -463,6 +463,7 @@ void MapViewer::draw_region( wxDC& dc, ARegion* reg )
 
     std::stringstream msg;
     msg << "[" << reg->xloc << "," << reg->yloc << "]";
+    msg << std::endl << reg->num;
     wxPoint textpos = center + wxPoint( 4 -HEXSIZE/2, 4 -_hexheight/2);
     dc.DrawText(wxString(msg.str()), _origin + textpos );
 

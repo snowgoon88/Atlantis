@@ -161,6 +161,8 @@ class ARegion : public AListElem
 {
 	friend class Game;
 	friend class ARegionArray;
+	// Alain
+	friend class MapAccess;
 
 	public:
 		ARegion();
@@ -299,7 +301,7 @@ class ARegion : public AListElem
 		int wages;
 		int maxwages;
 		int wealth;
-		
+
 		/* Economy */
 		int habitat;
 		int development;
@@ -316,7 +318,7 @@ class ARegion : public AListElem
 		int emigrants;
 		// economic improvement
 		int improvement;
-		
+
 		/* Potential bonuses to economy */
 		int clearskies;
 		int earthlore;
@@ -416,17 +418,17 @@ class GeoMap
 		int GetVegetation(int, int);
 		int GetCulture(int, int);
 		void ApplyGeography(ARegionArray *pArr);
-		
+
 		int size, xscale, yscale, xoff, yoff;
 		map<long int,Geography> geomap;
-		
+
 };
 
 class ARegionList : public AList
 {
   // Alain Hack to access 'regions'
   friend class MapAccess;
-  
+
 	public:
 		ARegionList();
 		~ARegionList();
@@ -483,7 +485,7 @@ class ARegionList : public AList
 		void UnsetRace(ARegionArray *pRegs);
 		void RaceAnchors(ARegionArray *pRegs);
 		void GrowRaces(ARegionArray *pRegs);
-		
+
 		void TownStatistics();
 
 		void CalcDensities();

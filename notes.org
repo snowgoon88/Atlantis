@@ -387,14 +387,21 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [6/12] EDITOR
-** TODO [/] déplacer les shafts
-** TODO [/] déplacer les gates
-** Changer de terrain
-** Changer de race
-** TODO [/] Renommer, changer les noms
+* [12/16] EDITOR
+** [0/2] Find a given Region Game::EditGameFindRegion()
+*** TODO x,y,z
+*** TODO num
+** DONE [/] Sauver
+** DONE [2/2] déplacer les shafts
+*** DONE ADD shaft
+*** DONE DEL Shaft
+** DONE [/] déplacer les gates
+** DONE [/] Changer de terrain
+** DONE Changer de race
+** DONE [/] Renommer, changer les noms
 ** TODO [/] créer des unités
 ** TODO [/] créer des mobs et les placer
+** TODO [/] Ville
 ** DONE [/] Labyrinthe dans underword
 *** Ex1 Underdeep
 ATTACHED name=underdeep

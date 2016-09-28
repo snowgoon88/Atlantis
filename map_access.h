@@ -3,7 +3,7 @@
 #ifndef MAP_ACCESS_H
 #define MAP_ACCESS_H
 
-/** 
+/**
  * Access the Game object to inspect and modify map.
  */
 #include <cstdlib>
@@ -14,6 +14,7 @@
 #include <aregion.h>
 #include <gamedata.h>
 #include <gameio.h>
+#include <game.h>
 
 #include <algorithm>    // std::random_shuffle
 #include <vector>       // std::vector
@@ -77,7 +78,7 @@ public:
     /*   CreateWMons(); */
     /* if (Globals->LAIR_MONSTERS_EXIST) */
     /*   CreateLMons(); */
-    
+
     /* if (Globals->LAIR_MONSTERS_EXIST) */
     /*   CreateVMons(); */
 
@@ -151,7 +152,7 @@ public:
 		if (!((mon == -1) ||
 		      (ItemDefs[mon].flags & ItemType::DISABLED)))
 		  avail = 1;
-		
+
 		if (avail)
 		  wanted += TerrainDefs[reg->type].wmonfreq;
 	      }
@@ -175,8 +176,8 @@ public:
 	}
       }
     }
-    
-    
+
+
     _game->regions.numLevels += 1;
   }
   // ******************************************* MapAccess::AddUnderWorldLevel
@@ -257,7 +258,7 @@ public:
 
       try_shaft++;
     }
-    
+
     /* // Now create shafts */
     /* if( underworld_level == 0 ) { */
     /*   // connect as first underworld */
@@ -342,7 +343,7 @@ public:
 		if (!((mon == -1) ||
 		      (ItemDefs[mon].flags & ItemType::DISABLED)))
 		  avail = 1;
-		
+
 		if (avail)
 		  wanted += TerrainDefs[reg->type].wmonfreq;
 	      }
@@ -366,12 +367,12 @@ public:
 	}
       }
     }
-    
+
     // Now add gates
     _game->regions.InitSetupGates( level );
     // And update number of levels
     _game->regions.numLevels += 1;
-  }	  
+  }
   // ******************************************** MapAccess::AddUnderDeepLevel
   void AddUnderDeepLevel( int level, int xSize, int ySize, int wanted_nb_shaft,
 			  int underground_lvl )
@@ -410,7 +411,7 @@ public:
     if (Globals->GROW_RACES)
       _game->regions.GrowRaces( aregarr );
     _game->regions.FinalSetup( aregarr );
-    
+
 
     // Crée un shaft
     // random level above
@@ -437,7 +438,7 @@ public:
 
       try_shaft++;
     }
-    
+
     // // Now create shafts
     // if( level == underground_lvl+1 ) {
     //   // connect as first underdeep
@@ -512,7 +513,7 @@ public:
 		if (!((mon == -1) ||
 		      (ItemDefs[mon].flags & ItemType::DISABLED)))
 		  avail = 1;
-		
+
 		if (avail)
 		  wanted += TerrainDefs[reg->type].wmonfreq;
 	      }
@@ -537,12 +538,12 @@ public:
       }
     }
 
-    
+
     // Underdeep has no gates, only the possible shafts above.
     _game->regions.numLevels += 1;
   }
   // ********************************************** MapAccess::reshuffle_gates
-  /** 
+  /**
    * Every not set gates (-1) is set to a new index
    */
   void reshuffle_gates( int idx_max_init, int nb_new_gates )
@@ -669,7 +670,7 @@ public:
 	if (dotter++%30 == 0) Adot();
       }
     }
-    
+
     Awrite("");
   }
   void GrowTerrainUnderworld(ARegionArray *pArr, int growOcean)
@@ -690,7 +691,7 @@ public:
 	  if (!reg) continue;
 	  if ((j > 0) && (j < 21) && (getrandom(3) < 2)) continue;
 	  if (reg->type == R_NUM) {
-	    
+
 	    // Check for Lakes
 	    if (Globals->LAKES &&
 		(getrandom(100) < (Globals->LAKES/10 + 1))) {
@@ -704,7 +705,7 @@ public:
 		reg->wages = AGetName(0, reg);
 	      break;
 	    }
-	    
+
 	    int init = getrandom(6);
 	    for (int i=0; i<NDIRS; i++) {
 	      ARegion *t = reg->neighbors[(i+init) % NDIRS];
@@ -724,7 +725,7 @@ public:
 	  }
 	}
       }
-      
+
       for (x = 0; x < pArr->x; x++) {
 	for (y = 0; y < pArr->y; y++) {
 	  ARegion *reg = pArr->GetRegion(x, y);
@@ -742,7 +743,7 @@ public:
       for (y = 0; y < pArr->y; y++) {
 	ARegion *reg = pArr->GetRegion(x, y);
 	if (!reg) continue;
-	
+
 	if (reg->type == R_NUM) {
 	  int adjtype = 0;
 	  int adjname = -1;
@@ -777,7 +778,7 @@ public:
       {
 	lat = (7 - lat);
       }
-    
+
 
     // Underdeep region
     int r = getrandom(4);
@@ -819,13 +820,13 @@ public:
     _game->regions.CreateLevels( 1 );
     // Prepare named array... dans world.cpp
     SetupNames();
-    
+
     // All the regions point to 0 (null)
     int xSize = 4;
     int ySize = 4;
     int level = 0;
     //ARegionArray* aregarr = new ARegionArray(xSize, ySize);
-    
+
     // ARegionList::MakeRegions(int level, int xSize, int ySize)
     _game->regions.MakeRegions( 0, xSize, ySize );
     ARegionArray* aregarr = _game->regions.pRegionArrays[0];
@@ -839,14 +840,14 @@ public:
     // 	  ARegion *reg = new ARegion;
     // 	  reg->SetLoc(x, y, level);
     // 	  reg->num = _game->regions.Num();
-	  
+
     // 	  //
     // 	  // Some initial values; these will get reset
     // 	  //
     // 	  reg->type = -1;
-    // 	  reg->race = -1;  
-    // 	  reg->wages = -1; 
-	  
+    // 	  reg->race = -1;
+    // 	  reg->wages = -1;
+
     // 	  _game->regions.Add(reg);
     // 	  aregarr->SetRegion(x, y, reg);
     // 	}
@@ -894,7 +895,7 @@ public:
     if (Globals->GROW_RACES)
       _game->regions.GrowRaces( aregarr );
     _game->regions.FinalSetup( aregarr );
-    
+
   }
   void SetupAnchorsUnderdeep(ARegionArray *ta)
   {
@@ -933,7 +934,7 @@ public:
 	if (dotter++%30 == 0) Adot();
       }
     }
-    
+
     Awrite("");
   }
   void GrowTerrainUnderdeep(ARegionArray *pArr, int growOcean)
@@ -954,7 +955,7 @@ public:
 	  if (!reg) continue;
 	  if ((j > 0) && (j < 21) && (getrandom(3) < 2)) continue;
 	  if (reg->type == R_NUM) {
-	    
+
 	    // Check for Lakes
 	    if (Globals->LAKES &&
 		(getrandom(100) < (Globals->LAKES/10 + 1))) {
@@ -968,8 +969,8 @@ public:
 		reg->wages = AGetName(0, reg);
 	      break;
 	    }
-					
-	    
+
+
 	    int init = getrandom(6);
 	    for (int i=0; i<NDIRS; i++) {
 	      ARegion *t = reg->neighbors[(i+init) % NDIRS];
@@ -989,7 +990,7 @@ public:
 	  }
 	}
       }
-      
+
       for (x = 0; x < pArr->x; x++) {
 	for (y = 0; y < pArr->y; y++) {
 	  ARegion *reg = pArr->GetRegion(x, y);
@@ -1007,7 +1008,7 @@ public:
       for (y = 0; y < pArr->y; y++) {
 	ARegion *reg = pArr->GetRegion(x, y);
 	if (!reg) continue;
-	
+
 	if (reg->type == R_NUM) {
 	  int adjtype = 0;
 	  int adjname = -1;
@@ -1042,7 +1043,7 @@ public:
       {
 	lat = (7 - lat);
       }
-    
+
 
     // Underdeep region
     int r = getrandom(4);
@@ -1067,7 +1068,7 @@ public:
   // **************************************************** MapAccess::attributs
   ARegionList* regions() {return &(_game->regions);}
   Game* _game;
-  
+
   // ********************************************************** MapAccess::str
   std::string str_display( ARegionArray* regarr, bool verb=false )
   {
@@ -1101,7 +1102,7 @@ public:
       disp << nb_gate( regarr ) << " gates and ";
       disp << nb_shaft( regarr ) << " shaft" << std::endl;
     }
-	
+
     return disp.str();
   }
   std::string str_gates( ARegionArray* regarr )
@@ -1135,12 +1136,12 @@ public:
     }
     return disp.str();
   }
-      
+
   std::string str_display( ARegion* reg)
   {
     std::stringstream disp;
     disp << "Reg " << reg->num;
-    if( reg->type >= 0 and reg->type < R_NUM ) 
+    if( reg->type >= 0 and reg->type < R_NUM )
       disp << " : " << TerrainDefs[reg->type].name;
     else
       disp << " : " << reg->type;
@@ -1156,7 +1157,7 @@ public:
 	  disp << " S_" << o->inner;
         }
       }
-  
+
       disp << " =>";
       // neigbors
       for (int i = 0; i < NDIRS; i++) {
@@ -1173,7 +1174,7 @@ public:
   std::string list_regions( ARegionArray* regarr )
   {
     std::stringstream disp;
-    
+
     for( int i=0; i<(regarr->x * regarr->y /2); i++ ) {
       ARegion* reg = regarr->regions[i];
       disp << str_display( reg ) << std::endl;
@@ -1230,5 +1231,20 @@ public:
   {
     return std::rand() % max_val;
   }
+  // *********************************************** MapAccess::recompute_hex
+  void recompute_hex( ARegion* reg )
+  {
+      if (reg->town) delete reg->town;
+            reg->town = NULL;
+
+            reg->products.DeleteAll();
+            reg->SetupProds();
+
+            reg->markets.DeleteAll();
+
+            reg->SetupEditRegion();
+            reg->UpdateEditRegion();
+  }
+
 };
 #endif // MAP_ACCESS_H

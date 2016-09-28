@@ -4,30 +4,46 @@
 /**
  * Edit the various ARegion of Atlantis
  */
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
 #include <model.h>
 
 #include <aregion.h>
+#include <map_access.h>
 
 #include <list>
 #include <string>
+#include <vector>
 
+extern std::vector<int> _terrain_list;
 // ****************************************************************************
 class RegionData : public Model
 {
 public:
     /** Creation */
-    RegionData( ARegionList* regions );
+    RegionData( wxWindow* parent, ARegionList* regions, MapAccess* map_access );
 
     /** Actions */
     void set_name( std::list<ARegion*>& reg_list, const std::string& name);
+    void move_gate( ARegion* reg, int dest_reg_num );
+    void add_shaft( ARegion* reg, int dest_reg_num );
+    void remove_shaft( ARegion* reg );
+    void set_terrain( std::list<ARegion*>& reg_list );
+    void set_race( ARegion* reg );
 
     /** Get data */
     ARegionArray* get_regionarray( int id_level );
+    ARegion* find( int num );
 
     /** Display */
     std::string str_display( ARegionArray* pArr );
 private:
+    wxWindow* _parent;
     ARegionList* _regions;
+    MapAccess* _map_access;
+
 };
 
 #endif // REGIONDATA_H
