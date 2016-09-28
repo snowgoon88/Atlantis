@@ -51,6 +51,11 @@ class EditorFrame: public wxFrame
             idMenuRemoveShaft = 203,
             idMenuSetTerrain = 204,
             idMenuSetRace = 205,
+            idMenuTownAdd = 300,
+            idMenuTownDel = 301,
+            idMenuTownRegenerate = 302,
+            idMenuTownRename = 303,
+            idMenuTownMarket = 304,
             idMenuReload = 500,
             idMenuSave = 501,
             idMenuQuit = 1000,
@@ -70,6 +75,8 @@ class EditorFrame: public wxFrame
         void OnRemoveShaft( wxCommandEvent& event);
         void OnSetTerrain( wxCommandEvent& event);
         void OnSetRace( wxCommandEvent& event);
+
+        void OnTown( wxCommandEvent& event);
         DECLARE_EVENT_TABLE()
 };
 

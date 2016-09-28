@@ -18,6 +18,7 @@
 #include "EditorMain.h"
 
 #include <wx/numdlg.h>
+#include <wx/splitter.h>
 
 //helper functions
 enum wxbuildinfoformat {
@@ -62,10 +63,16 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_MENU(idMenuRemoveShaft, EditorFrame::OnRemoveShaft)
     EVT_MENU(idMenuSetTerrain, EditorFrame::OnSetTerrain)
     EVT_MENU(idMenuSetRace, EditorFrame::OnSetRace)
+
+    EVT_MENU(idMenuTownAdd, EditorFrame::OnTown)
+    EVT_MENU(idMenuTownDel, EditorFrame::OnTown)
+    EVT_MENU(idMenuTownRegenerate, EditorFrame::OnTown)
+    EVT_MENU(idMenuTownRename, EditorFrame::OnTown)
+    EVT_MENU(idMenuTownMarket, EditorFrame::OnTown)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
-    : wxFrame(frame, -1, title)
+    : wxFrame(frame, -1, title, wxDefaultPosition, wxSize(1000,600))
 {
 #if wxUSE_MENUS
     // create a menu bar
@@ -91,6 +98,15 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     actMenu->Append(idMenuSetRace, _("&Set Race"), _("Change la race d'un hex"));
     mbar->Append(actMenu, _("&Action"));
 
+    wxMenu* townMenu = new wxMenu(_T(""));
+    townMenu->Append( idMenuTownAdd, _("Add Town"), _("Ajoute une nouvelle ville"));
+    townMenu->Append( idMenuTownDel, _("Del Town"), _("Enleve une ville"));
+    townMenu->Append( idMenuTownRename, _("Rename Town"), _("Change le nom d'une ville"));
+    townMenu->Append( idMenuTownRegenerate, _("Regenerate Town"), _("Recalcule les donnees d'une ville"));
+    wxMenuItem* marketMenu = townMenu->Append( idMenuTownMarket, _("Edit Market"), _("Edite les produits du marche"));
+    marketMenu->Enable(false);
+    mbar->Append(townMenu, _("&Town"));
+
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
     mbar->Append(helpMenu, _("&Help"));
@@ -114,18 +130,20 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
     load_game();
 
+    wxSplitterWindow* split_win = new wxSplitterWindow( this );
 
-    wxPanel* _main_panel = new wxPanel( this );
-    wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
-    _map_viewer = new MapViewer( _main_panel, *_region_data );
+//    wxPanel* _main_panel = new wxPanel( this );
+//    wxBoxSizer* sizer = new wxBoxSizer(wxHORIZONTAL);
+    _map_viewer = new MapViewer( split_win, *_region_data );
     _region_data->attach_observer( _map_viewer );
-    sizer->Add( _map_viewer, 1, wxEXPAND);
-    _reg_viewer = new RegViewer( _main_panel, *_region_data );
+//    sizer->Add( _map_viewer, 1, wxEXPAND);
+    _reg_viewer = new RegViewer( split_win, *_region_data );
     _region_data->attach_observer( _reg_viewer );
     _map_viewer->attach_regviewer( _reg_viewer );
-    sizer->Add( _reg_viewer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+//    sizer->Add( _reg_viewer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
 
-    _main_panel->SetSizer(sizer);
+//    _main_panel->SetSizer(sizer);
+    split_win->SplitVertically( _map_viewer, _reg_viewer);
     //map_panel->attach( regions->pRegionArrays[1] );
     //frame->SetAutoLayout(true);
 
@@ -290,10 +308,35 @@ void EditorFrame::OnSetTerrain(wxCommandEvent& event)
 }
 void EditorFrame::OnSetRace(wxCommandEvent& event)
 {
-    if( _map_viewer->_selected_list.size() != 1 ) {
-        wxMessageBox("Il faut choisir UNE region ", "Set Race", wxOK, this);
+    if( _map_viewer->_selected_list.size() == 0 ) {
+        wxMessageBox("Il faut choisir au moins une region ", "Set Race", wxOK, this);
     }
     else {
-        _region_data->set_race( _map_viewer->_selected_list.front() );
+        _region_data->set_race( _map_viewer->_selected_list );
+    }
+}
+void EditorFrame::OnTown(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region ", "Town", wxOK, this);
+        return;
+    }
+
+    switch( event.GetId()) {
+    case idMenuTownAdd:
+        _region_data->add_town( _map_viewer->_selected_list.front() );
+        break;
+    case idMenuTownDel:
+        _region_data->del_town( _map_viewer->_selected_list.front() );
+        break;
+    case idMenuTownRename:
+        _region_data->rename_town( _map_viewer->_selected_list.front() );
+        break;
+    case idMenuTownRegenerate:
+        _region_data->add_town( _map_viewer->_selected_list.front() );
+        break;
+    case idMenuTownMarket:
+        wxMessageBox("TODO", "Edit Market", wxOK, this);
+        break;
     }
 }

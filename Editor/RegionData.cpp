@@ -195,7 +195,7 @@ void RegionData::set_terrain( std::list<ARegion*>& reg_list )
         notify_observers();
     }
 }
-void RegionData::set_race( ARegion* reg )
+void RegionData::set_race( std::list<ARegion*>& reg_list )
 {
     // Which kind of race
     int nb_race=0;
@@ -211,20 +211,62 @@ void RegionData::set_race( ARegion* reg )
                         wxString("Set Race"),
                         nb_race, _race_str, _parent);
     if( choice != -1 ) {
-        reg->race = choice;
-        reg->UpdateEditRegion();
+        for( auto& reg : reg_list ) {
+            reg->race = choice;
+            reg->UpdateEditRegion();
+        }
         notify_observers();
     }
-//    if (!(ItemDefs[prace].type & IT_MAN) || (ItemDefs[prace].flags & ItemType::DISABLED) ) {
-//						if (!(*pToken == "none" || *pToken == "None" || *pToken == "0")) {
-//							Awrite( "No such race." );
-//							break;
-//						} else {
-//							prace = -1;
-//						}
-//					}
-//					if (prace != 0) pReg->race = prace;
-//					pReg->UpdateEditRegion();
+}
+void RegionData::add_town( ARegion* reg )
+{
+    if( reg->town ) {
+        int res = wxMessageBox(wxString("ATTENTION, ca va modifier la ville existante!!"),
+                                         "Add Town", wxOK|wxCANCEL, _parent);
+        if( res == wxCANCEL ) {
+            return;
+        }
+    }
+    AString *townname = new AString("town_name");
+    if( reg->town ) {
+        *townname = *reg->town->name;
+        delete reg->town;
+        reg->markets.DeleteAll();
+    }
+    _map_access->add_town(reg,townname);
+//    reg->AddTown(townname);
+
+    reg->UpdateEditRegion(); // financial stuff! Does markets
+    notify_observers();
+}
+void RegionData::del_town( ARegion* reg)
+{
+    if( !reg->town ) {
+        wxMessageBox(wxString("Bon, la ville a deja etee rasee, donc c'est bon..."),
+                                         "Del Town", wxOK, _parent);
+        return;
+    }
+    delete reg->town;
+    reg->town = NULL;
+    reg->markets.DeleteAll();
+    reg->UpdateEditRegion();
+	notify_observers();
+}
+void RegionData::rename_town( ARegion*reg)
+{
+    if( !reg->town ) {
+        wxMessageBox(wxString("Hmmm, y'a pas de ville ici !!!"),
+                                         "Rename Town", wxOK, _parent);
+        return;
+    }
+    // Choose name
+    wxString name = wxGetTextFromUser( wxString("Nouveau nom:"),
+                            wxString("Rename Town"),
+                            wxString(reg->town->name->Str()),
+                            _parent );
+    delete reg->town->name;
+    reg->town->name = new AString( name.c_str() );
+    notify_observers();
 }
 // ************************************************ RegionData::get_regionarray
 ARegionArray* RegionData::get_regionarray( int id_level )

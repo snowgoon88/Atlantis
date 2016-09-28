@@ -38,7 +38,8 @@ wxEND_EVENT_TABLE()
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
 MapViewer::MapViewer(wxWindow* parent, RegionData& model) :
-    wxPanel(parent), _model(model), _pArr(nullptr), _reg_viewer(nullptr),
+    wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(300,-1)),
+    _model(model), _pArr(nullptr), _reg_viewer(nullptr),
     _origin(100,100), _scale(1.0), _cursor_pos(nullptr),
     _action(Action::NONE)
 {
@@ -100,16 +101,16 @@ void MapViewer::attach( ARegionArray* pArr )
     render(dc);
 
     // Neigbors
-    for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
-        ARegion* reg = _pArr->regions[i];
-        std::cout << i << ":" << reg->num << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";
-        std::cout << "  + ";
-        for( int j=0; j<NDIRS; ++j) {
-            if( reg->neighbors[j] == 0 ) std::cout << j << ":nil ";
-            else std::cout << j << ":" << reg->neighbors[j]->num << "=[" << reg->neighbors[j]->xloc << "," << reg->neighbors[j]->yloc << "] ";
-        }
-        std::cout << std::endl;
-    }
+//    for( int i=0; i<(_pArr->x * _pArr->y /2); i++ ) {
+//        ARegion* reg = _pArr->regions[i];
+//        std::cout << i << ":" << reg->num << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";
+//        std::cout << "  + ";
+//        for( int j=0; j<NDIRS; ++j) {
+//            if( reg->neighbors[j] == 0 ) std::cout << j << ":nil ";
+//            else std::cout << j << ":" << reg->neighbors[j]->num << "=[" << reg->neighbors[j]->xloc << "," << reg->neighbors[j]->yloc << "] ";
+//        }
+//        std::cout << std::endl;
+//    }
 
     // reset regview
     if( _reg_viewer ) {

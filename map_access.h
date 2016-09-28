@@ -1245,6 +1245,10 @@ public:
             reg->SetupEditRegion();
             reg->UpdateEditRegion();
   }
+  void add_town( ARegion* reg, AString * name)
+  {
+      reg->AddTown(name);
+  }
 
 };
 #endif // MAP_ACCESS_H

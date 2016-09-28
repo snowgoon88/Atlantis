@@ -8,6 +8,7 @@
 #include <aregion.h>
 #include <observer.h>
 #include <RegionData.h>
+#include <wx/treelist.h>
 
 /**
  * View a ARegion
@@ -38,6 +39,7 @@ private:
     wxStaticText* _town_text;
     wxStaticText* _pop_text;
     wxStaticText* _obj_text;
+    wxTreeListCtrl* _obj_tree;
 
 
     /** Event gestion */

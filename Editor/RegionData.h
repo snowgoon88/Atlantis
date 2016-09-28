@@ -31,7 +31,10 @@ public:
     void add_shaft( ARegion* reg, int dest_reg_num );
     void remove_shaft( ARegion* reg );
     void set_terrain( std::list<ARegion*>& reg_list );
-    void set_race( ARegion* reg );
+    void set_race( std::list<ARegion*>& reg_list );
+    void add_town( ARegion* reg );
+    void del_town( ARegion* reg);
+    void rename_town( ARegion*reg);
 
     /** Get data */
     ARegionArray* get_regionarray( int id_level );
