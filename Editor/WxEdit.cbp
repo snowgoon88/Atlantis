@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="WxEdit" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/WxEdit" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+					<Add directory="../../AtlantisEdit" />
+					<Add directory="../Editor" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libwxmsw30ud_adv.a" />
+					<Add library="libwxmsw30ud_core.a" />
+					<Add library="libwxbase30ud.a" />
+					<Add library="libwxpngd.a" />
+					<Add library="libwxzlibd.a" />
+					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-pipe" />
+			<Add option="-mthreads" />
+			<Add option="-D__GNUWIN32__" />
+			<Add option="-D__WXMSW__" />
+			<Add option="-DwxUSE_UNICODE" />
+			<Add option="-Wall" />
+			<Add directory="F:/Programmes/wxWidgets-3.0.2/include" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="F:/Programmes/wxWidgets-3.0.2/include" />
+		</ResourceCompiler>
+		<Linker>
+			<Add option="-mthreads" />
+			<Add library="libkernel32.a" />
+			<Add library="libuser32.a" />
+			<Add library="libgdi32.a" />
+			<Add library="libwinspool.a" />
+			<Add library="libcomdlg32.a" />
+			<Add library="libadvapi32.a" />
+			<Add library="libshell32.a" />
+			<Add library="libole32.a" />
+			<Add library="liboleaut32.a" />
+			<Add library="libuuid.a" />
+			<Add library="libcomctl32.a" />
+			<Add library="libwsock32.a" />
+			<Add library="libodbc32.a" />
+		</Linker>
+		<Unit filename="../alist.cpp" />
+		<Unit filename="../alist.h" />
+		<Unit filename="../aregion.cpp" />
+		<Unit filename="../aregion.h" />
+		<Unit filename="../army.cpp" />
+		<Unit filename="../army.h" />
+		<Unit filename="../astring.cpp" />
+		<Unit filename="../astring.h" />
+		<Unit filename="../battle.cpp" />
+		<Unit filename="../battle.h" />
+		<Unit filename="../economy.cpp" />
+		<Unit filename="../edit.cpp" />
+		<Unit filename="../faction.cpp" />
+		<Unit filename="../faction.h" />
+		<Unit filename="../fileio.cpp" />
+		<Unit filename="../fileio.h" />
+		<Unit filename="../game.cpp" />
+		<Unit filename="../game.h" />
+		<Unit filename="../gamedata.cpp" />
+		<Unit filename="../gamedata.h" />
+		<Unit filename="../gamedefs.cpp" />
+		<Unit filename="../gamedefs.h" />
+		<Unit filename="../gameio.cpp" />
+		<Unit filename="../gameio.h" />
+		<Unit filename="../genrules.cpp" />
+		<Unit filename="../helper.h" />
+		<Unit filename="../i_rand.cpp" />
+		<Unit filename="../i_rand.h" />
+		<Unit filename="../i_std.h" />
+		<Unit filename="../items.cpp" />
+		<Unit filename="../items.h" />
+		<Unit filename="../map_access.h" />
+		<Unit filename="../market.cpp" />
+		<Unit filename="../market.h" />
+		<Unit filename="../modify.cpp" />
+		<Unit filename="../monthorders.cpp" />
+		<Unit filename="../npc.cpp" />
+		<Unit filename="../object.cpp" />
+		<Unit filename="../object.h" />
+		<Unit filename="../orders.cpp" />
+		<Unit filename="../orders.h" />
+		<Unit filename="../parseorders.cpp" />
+		<Unit filename="../production.cpp" />
+		<Unit filename="../production.h" />
+		<Unit filename="../quests.cpp" />
+		<Unit filename="../quests.h" />
+		<Unit filename="../runorders.cpp" />
+		<Unit filename="../shields.cpp" />
+		<Unit filename="../shields.h" />
+		<Unit filename="../skills.cpp" />
+		<Unit filename="../skills.h" />
+		<Unit filename="../skillshows.cpp" />
+		<Unit filename="../specials.cpp" />
+		<Unit filename="../spells.cpp" />
+		<Unit filename="../spells.h" />
+		<Unit filename="../standard/extra.cpp" />
+		<Unit filename="../standard/map.cpp" />
+		<Unit filename="../standard/monsters.cpp" />
+		<Unit filename="../standard/rules.cpp" />
+		<Unit filename="../standard/world.cpp" />
+		<Unit filename="../template.cpp" />
+		<Unit filename="../unit.cpp" />
+		<Unit filename="../unit.h" />
+		<Unit filename="EditorApp.cpp" />
+		<Unit filename="EditorApp.h" />
+		<Unit filename="EditorMain.cpp" />
+		<Unit filename="EditorMain.h" />
+		<Unit filename="MapViewer.cpp" />
+		<Unit filename="MapViewer.h" />
+		<Unit filename="RegViewer.cpp" />
+		<Unit filename="RegViewer.h" />
+		<Unit filename="RegionData.cpp" />
+		<Unit filename="RegionData.h" />
+		<Unit filename="model.cpp" />
+		<Unit filename="model.h" />
+		<Unit filename="observer.h" />
+		<Unit filename="wx_pch.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

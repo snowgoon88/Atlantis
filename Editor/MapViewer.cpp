@@ -57,7 +57,7 @@ MapViewer::MapViewer(wxWindow* parent, RegionData& model) :
     _selected_list.clear();
 
     // look for proper text scaling
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
     wxSize text_size = dc.GetTextExtent( wxString("[99,99]"));
     std::cout << "text_size=" << text_size.GetWidth() << "x" << text_size.GetHeight() << std::endl;
     float text_scale = (float) HEXSIZE / (float) text_size.GetWidth();
@@ -90,7 +90,7 @@ void MapViewer::attach_regviewer( RegViewer* regview )
 }
 void MapViewer::attach( ARegionArray* pArr )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
 //    wxBufferedDC dc(this);
     _pArr = pArr;
     if( _pArr->strName )
@@ -142,7 +142,7 @@ void MapViewer::paint_event(wxPaintEvent & evt)
 // ********************************************************** MapViewer::update
 void MapViewer::update( int signal )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
     render(dc);
 }
 // ****************************************************************************
@@ -233,7 +233,7 @@ void MapViewer::render(wxDC&  dc)
 // ***************************************************** MapViewer::on_leftxxxx
 void MapViewer::on_leftclick( wxMouseEvent& event )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
 //    wxAutoBufferedPaintDC dc(this);
     wxPoint pos = event.GetLogicalPosition(dc);
 
@@ -278,7 +278,7 @@ void MapViewer::on_leftclick( wxMouseEvent& event )
 // **************************************************** MapViewer::on_rightxxxx
 void MapViewer::on_rightdown( wxMouseEvent& event )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
     wxPoint pos = event.GetLogicalPosition(dc);
     std::cout << "RIGHT_DOWN pos=" << pos.x << ", " << pos.y << std::endl;
     _action = Action::TRANSLATE;
@@ -286,7 +286,7 @@ void MapViewer::on_rightdown( wxMouseEvent& event )
 }
 void MapViewer::on_rightup( wxMouseEvent& event )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
     wxPoint pos = event.GetLogicalPosition(dc);
     std::cout << "RIGHT_UP pos=" << pos.x << ", " << pos.y << std::endl;
     _action = Action::NONE;
@@ -299,7 +299,7 @@ void MapViewer::on_mousemotion( wxMouseEvent& event )
 {
     if( _action == Action::TRANSLATE ) {
         if( event.Dragging() ) {
-            wxPaintDC dc(this);
+            wxClientDC dc(this);
             wxPoint pos = event.GetLogicalPosition(dc);
             _origin.x += round((pos.x - _old_pos.x)/_scale);
             _origin.y += round((pos.y - _old_pos.y)/_scale);
@@ -312,7 +312,7 @@ void MapViewer::on_mousemotion( wxMouseEvent& event )
 // *************************************************** MapViewer::on_mousewheel
 void MapViewer::on_mousewheel( wxMouseEvent& event )
 {
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
 //    wxAutoBufferedPaintDC dc(this);
 
 
@@ -425,7 +425,7 @@ void MapViewer::on_keydown( wxKeyEvent& event )
         }
     }
 
-    wxPaintDC dc(this);
+    wxClientDC dc(this);
     render(dc);
 }
 // ****************************************************************************
@@ -441,10 +441,14 @@ void MapViewer::draw_hex( wxDC& dc, const wxPoint& hexpos, bool select )
     dc.SetBrush( wxNullBrush );
     wxPoint center = hex_coord( hexpos.x, hexpos.y );
     if( select ) {
-        dc.DrawPolygon( 6, _selhex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+        dc.DrawLines( 6, _selhex, _origin.x+center.x, _origin.y+center.y);
+        dc.DrawLine( _selhex[5]+_origin+center, _selhex[0]+_origin+center );
+        //dc.DrawPolygon( 6, _selhex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
     }
     else {
-        dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
+        dc.DrawLines( 6, _hex, _origin.x+center.x, _origin.y+center.y);
+        dc.DrawLine( _hex[5]+_origin+center, _hex[0]+_origin+center );
+        //dc.DrawPolygon( 6, _hex, _origin.x+center.x, _origin.y+center.y, wxODDEVEN_RULE);
     }
 }
 void MapViewer::draw_region( wxDC& dc, ARegion* reg )
