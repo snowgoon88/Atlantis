@@ -1,3 +1,9 @@
+modified:   Editor/EditorMain.cpp
+modified:   Editor/EditorMain.h
+modified:   Editor/RegionData.cpp
+modified:   Editor/RegionData.h
+modified:   map_access.h
+
 * map_editor
 ** [5/5] BUGS
 *** DONE ALH semble ne pas prendre plus d'un underworld

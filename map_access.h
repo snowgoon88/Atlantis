@@ -1218,6 +1218,62 @@ public:
     }
     return nb_gates;
   }
+  /** Ajouter une porte dans ARegion */
+  void add_gate( ARegion* reg )
+  {
+    if( reg->gate == 0 ) {
+      int nb_current = nb_gate();
+      reg->gate = nb_current+1;
+    }
+  }
+  void del_gate( ARegion *reg )
+  {
+    if( reg->gate > 0 ) {
+      int num_gate = reg->gate;
+      // Change all bigger
+      for (int i = 0; i < _game->regions.numLevels; i++) {
+	ARegionArray *pArr = _game->regions.pRegionArrays[i];
+	for( int i=0; i < pArr->x * pArr->y /2; i++) {
+	  ARegion* tmpreg = pArr->regions[i];
+	  if( tmpreg->gate > num_gate ) {
+	    tmpreg->gate = tmpreg->gate -1;
+	  }
+	}
+      }
+      reg->gate = 0;
+    }
+  }
+  void change_gate( ARegion *reg, int new_num )
+  {
+    if( reg->gate > 0 and reg->gate != new_num and new_num <= nb_gate()) {
+      int num_current = reg->gate;
+      // swap number
+      for (int i = 0; i < _game->regions.numLevels; i++) {
+	ARegionArray *pArr = _game->regions.pRegionArrays[i];
+	for( int i=0; i < pArr->x * pArr->y /2; i++) {
+	  ARegion* tmpreg = pArr->regions[i];
+	  if( tmpreg->gate == new_num ) {
+	    tmpreg->gate = num_current;
+	    break;
+	  }
+	}
+      }
+      reg->gate = new_num;
+    }
+  }
+  // // And assign new gates
+  //    // list all the levels
+  //   int idx_new = 0;
+  //   for (int i = 0; i < _game->regions.numLevels; i++) {
+  //     ARegionArray *pArr = _game->regions.pRegionArrays[i];
+  //     for( int i=0; i < pArr->x * pArr->y /2; i++) {
+  // 	ARegion* reg = pArr->regions[i];
+  // 	if( reg->gate == -1 ) {
+  // 	  reg->gate = idx_gate[idx_new];
+  // 	  idx_new ++;
+  // 	}
+  //     }
+  //   }
   // *************************************************** MapAccess::rand_int
   /**
    * Generate a random int with a first seed taken from std::steady_clock

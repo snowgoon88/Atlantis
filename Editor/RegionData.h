@@ -28,6 +28,9 @@ public:
     /** Actions */
     void set_name( std::list<ARegion*>& reg_list, const std::string& name);
     void move_gate( ARegion* reg, int dest_reg_num );
+    void add_gate( ARegion* reg );
+    void del_gate( ARegion* reg );
+    void swap_gate( ARegion* reg, int gate_num );
     void add_shaft( ARegion* reg, int dest_reg_num );
     void remove_shaft( ARegion* reg );
     void set_terrain( std::list<ARegion*>& reg_list );

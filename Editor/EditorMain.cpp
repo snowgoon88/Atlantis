@@ -59,6 +59,9 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
 //    EVT_MENU(idMenuUnderDeep, EditorFrame::OnRegion)
     EVT_MENU(idMenuChangeName, EditorFrame::OnChangeName)
     EVT_MENU(idMenuMoveGate, EditorFrame::OnMoveGate)
+    EVT_MENU(idMenuAddGate, EditorFrame::OnAddGate)
+    EVT_MENU(idMenuDelGate, EditorFrame::OnDelGate)
+    EVT_MENU(idMenuSwapGate, EditorFrame::OnSwapGate)
     EVT_MENU(idMenuAddShaft, EditorFrame::OnAddShaft)
     EVT_MENU(idMenuRemoveShaft, EditorFrame::OnRemoveShaft)
     EVT_MENU(idMenuSetTerrain, EditorFrame::OnSetTerrain)
@@ -92,6 +95,9 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     wxMenu* actMenu = new wxMenu(_T(""));
     actMenu->Append(idMenuChangeName, _("&Change Name"), _("Change le nom de 1 ou plusieurs hex"));
     actMenu->Append(idMenuMoveGate, _("&Move Gate"), _("Change une GATE de place"));
+    actMenu->Append(idMenuAddGate, _("&Add Gate"), _("Ajoute une GATE"));
+    actMenu->Append(idMenuDelGate, _("&Del Gate"), _("Detruit une GATE"));
+    actMenu->Append(idMenuSwapGate, _("&Echange Gate"), _("Echange les no de deux GATE"));
     actMenu->Append(idMenuAddShaft, _("&Add Shaft"), _("Ajoute un SHAFT entre 2 hex"));
     actMenu->Append(idMenuRemoveShaft, _("&Remove Shaft"), _("Enleve un des SHAFT de l'hex"));
     actMenu->Append(idMenuSetTerrain, _("&Set Terrain"), _("Change le type de terrain de 1 ou plusieurs hex"));
@@ -268,12 +274,43 @@ void EditorFrame::OnMoveGate(wxCommandEvent& event)
     }
     else {
         int reg_num = wxGetNumberFromUser( wxString("Numero de la region destinatrice?"),
-		wxString("Prompt"),
-		wxString("Move Gate"),
-		0, 0, 100000, this);
+            wxString("Prompt"),
+            wxString("Move Gate"),
+            0, 0, 100000, this);
 		_region_data->move_gate( _map_viewer->_selected_list.front(), reg_num );
     }
     //wxMessageBox("Tu veux vraiment modifier ce monstre ?? ", "Editer", wxOK | wxCANCEL, this);
+}
+void EditorFrame::OnAddGate(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region", "Add Gate", wxOK, this);
+    }
+    else {
+        _region_data->add_gate( _map_viewer->_selected_list.front() );
+    }
+}
+void EditorFrame::OnDelGate(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region avec GATE ", "Del Gate", wxOK, this);
+    }
+    else {
+        _region_data->del_gate( _map_viewer->_selected_list.front() );
+    }
+}
+void EditorFrame::OnSwapGate(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region avec GATE ", "Move Gate", wxOK, this);
+    }
+    else {
+        int gate_num = wxGetNumberFromUser( wxString("Nouveau numero de la porte ?"),
+            wxString("Prompt"),
+            wxString("Echange Gate"),
+            0, 0, 100000, this);
+		_region_data->swap_gate( _map_viewer->_selected_list.front(), gate_num );
+    }
 }
 void EditorFrame::OnAddShaft(wxCommandEvent& event)
 {

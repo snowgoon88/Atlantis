@@ -68,6 +68,57 @@ void RegionData::move_gate( ARegion* reg, int dest_reg_num )
         }
     }
 }
+void RegionData::add_gate( ARegion* reg )
+{
+    // No Gate
+    if( reg->gate > 0 ) {
+        wxMessageBox("Deja une GATE dans region selectionnee ", "Add Gate", wxOK, _parent);
+    }
+    else {
+        _map_access->add_gate( reg );
+        notify_observers();
+
+        std::stringstream msg;
+        msg << "Creation reussie, beam me up!!";
+        wxMessageBox(wxString(msg.str()), "Add Gate", wxOK, _parent);
+        return;
+    }
+}
+void RegionData::del_gate( ARegion* reg )
+{
+    // No Gate
+    if( reg->gate <= 0 ) {
+        wxMessageBox("Pas de GATE ici.", "Del Gate", wxOK, _parent);
+    }
+    else {
+        _map_access->del_gate( reg );
+        notify_observers();
+
+        std::stringstream msg;
+        msg << "GATE degagee, vive les pieds";
+        wxMessageBox(wxString(msg.str()), "Del Gate", wxOK, _parent);
+        return;
+    }
+}
+void RegionData::swap_gate( ARegion* reg, int gate_num )
+{
+    // No Gate
+    if( reg->gate <= 0 ) {
+        wxMessageBox("Pas de GATE ici.", "Echange Gate", wxOK, _parent);
+        return;
+    }
+    if( gate_num > _map_access->nb_gate() or gate_num < 1) {
+        wxMessageBox("Le nouveau numero n\'est pas valide.", "Echange Gate", wxOK, _parent);
+        return;
+    }
+    _map_access->change_gate( reg, gate_num );
+    notify_observers();
+
+    std::stringstream msg;
+    msg << "Les GATE sont echangees, c\'est magique";
+    wxMessageBox(wxString(msg.str()), "Echange Gate", wxOK, _parent);
+    return;
+}
 void RegionData::add_shaft( ARegion* reg, int dest_reg_num )
 {
     // Region is not ocean

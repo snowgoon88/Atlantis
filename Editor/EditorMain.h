@@ -51,6 +51,9 @@ class EditorFrame: public wxFrame
             idMenuRemoveShaft = 203,
             idMenuSetTerrain = 204,
             idMenuSetRace = 205,
+            idMenuAddGate = 210,
+            idMenuDelGate = 211,
+            idMenuSwapGate = 212,
             idMenuTownAdd = 300,
             idMenuTownDel = 301,
             idMenuTownRegenerate = 302,
@@ -71,6 +74,10 @@ class EditorFrame: public wxFrame
 
         void OnChangeName(wxCommandEvent& event);
         void OnMoveGate(wxCommandEvent& event);
+        void OnAddGate( wxCommandEvent& event);
+        void OnDelGate( wxCommandEvent& event);
+        void OnSwapGate( wxCommandEvent& event);
+
         void OnAddShaft( wxCommandEvent& event);
         void OnRemoveShaft( wxCommandEvent& event);
         void OnSetTerrain( wxCommandEvent& event);
