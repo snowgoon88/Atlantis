@@ -15,6 +15,7 @@
 #include <gamedata.h>
 #include <gameio.h>
 #include <game.h>
+#include <faction.h>
 
 #include <algorithm>    // std::random_shuffle
 #include <vector>       // std::vector
@@ -24,6 +25,9 @@ void SetupNames();
 class MapAccess;
 class Game;
 class ARegionList;
+
+// ******************************************************************* Globals
+using RefItem = std::pair<std::string,int>;
 // ***************************************************************************
 // ***************************************************************** MapAccess
 // ***************************************************************************
@@ -34,7 +38,62 @@ public:
   MapAccess( Game* game ) : _game(game)
   {
     init_random();
+	// Try to read all factions
+	_faction_enum.clear();
+	forlist (&(_game->factions)) {
+	  Faction *fac = (Faction *) elem;
+	  //std::cout << *(fac->name) << std::endl;
+	  std::string fac_name = std::string( fac->name->Str() );
+	  _faction_enum.push_back( {fac_name, fac->num} );
+	}
+
+	// All Items from gamedata.cpp
+	_item_names.clear();
+	for( int id=0; id < NITEMS; ++id ) {
+        ItemType item = ItemDefs[id];
+        if( (item.flags & ItemType::DISABLED) == false ) {
+            std::stringstream stritem;
+            if( item.type & IT_ILLUSION )
+                stritem << "i_";
+            stritem << (item.name);
+            _item_names.push_back( {stritem.str(), id} );
+        }
+	}
+
+	// All Skills from gamedata.cpp
+	_skill_names.clear();
+	for( int id=0; id < NSKILLS; ++id ) {
+        SkillType skill = SkillDefs[id];
+        if( (skill.flags & SkillType::DISABLED) == false) {
+            _skill_names.push_back( {skill.name, id} );
+        }
+	}
+
+	// Unit type
+	_unit_types.clear();
+	_unit_types.push_back( {"NORMAL",0});
+	_unit_types.push_back( {"MAGE",1});
+	_unit_types.push_back( {"GUARD",2});
+	_unit_types.push_back( {"WMON",3});
+	_unit_types.push_back( {"GUARDMAGE",4});
+	_unit_types.push_back( {"APPRENTICE",5});
+
+	// Object Types
+    _object_types.clear();
+    for( int id=0; id < NOBJECTS; ++id ) {
+        ObjectType obj = ObjectDefs[id];
+        if( (obj.flags & ObjectType::DISABLED) == false ) {
+            _object_types.push_back( {obj.name, id} );
+        }
+    }
+
   }
+  // **************************************************** MapAccess::Attributs
+  std::vector<RefItem> _faction_enum;
+  std::vector<RefItem> _item_names;
+  std::vector<RefItem> _skill_names;
+  std::vector<RefItem> _unit_types;
+  std::vector<RefItem> _object_types;
   // ************************************************ MapAccess::AddAbyssLevel
   void AddAbyssLevel( int level )
   {
@@ -1305,6 +1364,49 @@ public:
   {
       reg->AddTown(name);
   }
+  // ************************************************* MapAccess::get_faction
+  Faction* get_faction( int fnum )
+  {
+      Faction* fac = GetFaction( &(_game->factions), fnum );
+      return fac;
+  }
+  // ************************************************* MapAccess::create_unit
+  Unit* create_unit(ARegion* reg, Object* obj )
+  {
+      Faction *fac = get_faction(1);
+      Unit *newunit = _game->GetNewUnit(fac);
+	  newunit->SetMen(I_LEADERS, 1);
+	  newunit->reveal = REVEAL_FACTION;
+	  newunit->MoveUnit( obj );
 
+	  return newunit;
+  }
+  // ******************************************** MapAccess::create_object
+  void create_object( ARegion* reg, int type )
+  {
+	Object *o = new Object(reg);
+	o->num =reg->buildingseq++;
+	o->name = new AString(AString(ObjectDefs[type].name) +
+			" [" + o->num + "]");
+	o->type = type;
+	o->incomplete = 0;
+	o->inner = -1;
+	reg->objects.Add(o);
+	}
+   bool del_object( ARegion* reg, Object *obj )
+   {
+       if( obj->type != 0 ) {
+            Object *dest = reg->GetDummy();
+            forlist(&obj->units) {
+                Unit *u = (Unit *) elem;
+                u->destroy = 0;
+                u->MoveUnit(dest);
+            }
+            reg->objects.Remove(obj);
+            delete obj;
+            return true;
+        }
+        return false;
+    }
 };
 #endif // MAP_ACCESS_H

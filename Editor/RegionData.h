@@ -38,6 +38,14 @@ public:
     void add_town( ARegion* reg );
     void del_town( ARegion* reg);
     void rename_town( ARegion*reg);
+    /** Unit */
+    void create_unit( ARegion* reg );
+    void move_unit( Unit* unit, Object* obj);
+    void edit_unit();
+    void del_unit( Unit* unit );
+    /** Object */
+    void create_object( ARegion* reg, int type);
+    void del_object( Object *obj );
 
     /** Get data */
     ARegionArray* get_regionarray( int id_level );

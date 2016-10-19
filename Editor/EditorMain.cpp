@@ -20,6 +20,10 @@
 #include <wx/numdlg.h>
 #include <wx/splitter.h>
 
+#include <UnitEditorDialog.h>
+#include <LocalisationDialog.h>
+#include <ObjectDialog.h>
+
 //helper functions
 enum wxbuildinfoformat {
     short_f, long_f };
@@ -72,10 +76,18 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_MENU(idMenuTownRegenerate, EditorFrame::OnTown)
     EVT_MENU(idMenuTownRename, EditorFrame::OnTown)
     EVT_MENU(idMenuTownMarket, EditorFrame::OnTown)
+
+    EVT_MENU(idMenuUnitEdit, EditorFrame::OnUnitEdit)
+    EVT_MENU(idMenuUnitAdd, EditorFrame::OnUnitAdd)
+    EVT_MENU(idMenuUnitMove, EditorFrame::OnUnitMove)
+    EVT_MENU(idMenuUnitDel, EditorFrame::OnUnitDel)
+
+    EVT_MENU(idMenuObjectAdd, EditorFrame::OnObjectAdd )
+    EVT_MENU(idMenuObjectDel, EditorFrame::OnObjectDel)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
-    : wxFrame(frame, -1, title, wxDefaultPosition, wxSize(1000,600))
+    : wxFrame(frame, -1, title, wxDefaultPosition, wxSize(1000,600)), LocalisationListener()
 {
 #if wxUSE_MENUS
     // create a menu bar
@@ -112,6 +124,15 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     wxMenuItem* marketMenu = townMenu->Append( idMenuTownMarket, _("Edit Market"), _("Edite les produits du marche"));
     marketMenu->Enable(false);
     mbar->Append(townMenu, _("&Town"));
+
+    wxMenu* treeMenu = new wxMenu(_T(""));
+    _addUnitMenu = treeMenu->Append( idMenuUnitAdd, _("Add Unit"), _("Cree une Unit"));
+    _editUnitMenu = treeMenu->Append( idMenuUnitEdit, _("Edit Unit"), _("Modifie une Unit"));
+    _moveUnitMenu = treeMenu->Append( idMenuUnitMove, _("Move Unit"), _("Deplace une Unit"));
+    _delUnitMenu = treeMenu->Append( idMenuUnitDel, _("Del Unit"), _("Detruit une Unit"));
+    _addObjectMenu = treeMenu->Append( idMenuObjectAdd, _("Add Object"), _("Cree un Object"));
+    _delObjectMenu = treeMenu->Append( idMenuObjectDel, _("Del Object"), _("Detruit un Object (sauf Dummy[None))"));
+    mbar->Append(treeMenu, _("&Objet/Unit"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
@@ -155,7 +176,20 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
 //    frame->Show();
 //    return true;
+    _moveable_unit = nullptr;
+    _selected_reg = nullptr;
+
 }
+void EditorFrame::enable_treeMenu( bool state )
+{
+    _editUnitMenu->Enable( state );
+    _addUnitMenu->Enable( state );
+    _moveUnitMenu->Enable( state );
+    _delUnitMenu->Enable( state );
+    _addObjectMenu->Enable( state );
+    _delObjectMenu->Enable( state );
+}
+
 void EditorFrame::load_game()
 {
     _game = new Game();
@@ -376,4 +410,123 @@ void EditorFrame::OnTown(wxCommandEvent& event)
         wxMessageBox("TODO", "Edit Market", wxOK, this);
         break;
     }
+}
+void EditorFrame::OnUnitEdit(wxCommandEvent& event)
+{
+    Unit* sel_unit = _reg_viewer->getSelUnit();
+    if( sel_unit != nullptr) {
+        std::cout << "OnTree: got Unit" << std::endl;
+        enable_treeMenu( false );
+        UnitEditorDialog* dialog = new UnitEditorDialog( this, sel_unit, _map_access );
+        //int answer = dialog->ShowModal();
+        dialog->Show(true);
+    }
+    else {
+        std::cout << "OnTree: no Unit" << std::endl;
+        wxMessageBox("Il faut choisir UNE unit ", "Edit Unit", wxOK, this);
+        return;
+    }
+}
+void EditorFrame::OnUnitMove( wxCommandEvent& event )
+{
+    Unit* sel_unit = _reg_viewer->getSelUnit();
+    if( sel_unit != nullptr ) {
+        _moveable_unit = sel_unit;
+        enable_treeMenu(false);
+        LocalisationDialog* loc_d = new LocalisationDialog( this, _map_access, this );
+        loc_d->Show(true);
+    }
+    else {
+        _moveable_unit = nullptr;
+        wxMessageBox("Il faut choisir UNE unit ", "Move Unit", wxOK, this);
+        return;
+    }
+}
+void EditorFrame::OnUnitAdd( wxCommandEvent& event )
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region", "Add Unit", wxOK, this);
+        return;
+    }
+    else {
+        _region_data->create_unit( _map_viewer->_selected_list.front() );
+    }
+}
+void EditorFrame::OnUnitDel( wxCommandEvent& event )
+{
+    Unit* sel_unit = _reg_viewer->getSelUnit();
+    if( sel_unit != nullptr ) {
+        int choice = wxMessageBox("Ca va detuire l'unite et ses Items", "Del Unit", wxOK|wxCANCEL, this);
+        if( choice == wxOK ) {
+            _region_data->del_unit( sel_unit );
+        }
+    }
+    else {
+        wxMessageBox("Il faut choisir UNE unit", "Del Unit", wxOK, this);
+        return;
+    }
+}
+//{
+//    enable_treeMenu(false);
+//    LocalisationDialog* loc_d = new LocalisationDialog( this, _map_access, this );
+//    loc_d->Show(true);
+//}
+void EditorFrame::OnObjectAdd( wxCommandEvent& event )
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region", "Add Object", wxOK, this);
+        return;
+    }
+    else {
+        _selected_reg = _map_viewer->_selected_list.front();
+        ObjectDialog* dialog = new ObjectDialog( this, _map_access, _selected_reg, this);
+        dialog->Show( true );
+    }
+}
+void EditorFrame::OnObjectDel( wxCommandEvent& event )
+{
+    Object* sel_object = _reg_viewer->getSelObject();
+    if( sel_object != nullptr ) {
+        int choice = wxMessageBox("Ca va detruire l'object et deplacer ses Units dans O:Dummy[None]",
+                                   "Del Object", wxOK|wxCANCEL, this);
+        if( choice == wxOK ) {
+            _region_data->del_object( sel_object );
+        }
+    }
+    else {
+        wxMessageBox("Il faut choisir UN object", "Del Object", wxOK, this);
+        return;
+    }
+}
+
+void EditorFrame::receive_localisation(Localisation& loc)
+{
+    std::cout << "EditorFrame::receive_localisation" << std::endl;
+    // Check not null
+    if( loc.first != nullptr ) {
+        std::cout << "Received loc => should move Unit there" << std::endl;
+        _region_data->move_unit( _moveable_unit, loc.second );
+//        Unit* newunit = _map_access->create_unit( loc.first, loc.second );
+//        enable_treeMenu( false );
+//        UnitEditorDialog* dialog = new UnitEditorDialog( this, newunit, _map_access );
+//        //int answer = dialog->ShowModal();
+//        dialog->Show(true);
+    }
+    else {
+        std::cout << "Received nullLOC " << std::endl;
+        wxMessageBox("Pas de destination choisie", "Move Unit", wxOK, this);
+        enable_treeMenu(true);
+    }
+}
+void EditorFrame::receive_unitedit()
+{
+    _region_data->edit_unit();
+    enable_treeMenu(true);
+}
+void EditorFrame::receive_object( int type )
+{
+    if( type > 0 ) {
+        _region_data->create_object( _selected_reg, type );
+    }
+    _selected_reg = nullptr;
 }

@@ -226,7 +226,7 @@ ItemType id[] =
 	 -1,0, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
-	{"centaur","centaurs","CTAU",
+	{"centaur","centaurs","CTAU",                // 18 CTAU
 	 ItemType::DISABLED | ItemType::NOTRANSPORT,
 	 NULL,0,0,0, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
@@ -236,7 +236,7 @@ ItemType id[] =
 	 -1,0, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
-	{"silver","silver","SILV",
+	{"silver","silver","SILV",                   // 19 SILV
 	 ItemType::NOMARKET,
 	 NULL,0,0,0, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
@@ -246,7 +246,7 @@ ItemType id[] =
 	 I_HARP,20, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
-	{"grain","grain","GRAI",
+	{"grain","grain","GRAI",                     // 20 GRAI
 	 0,
 	 "FARM",1,1,1, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
@@ -256,7 +256,7 @@ ItemType id[] =
 	 I_BAG,2, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
-	{"livestock","livestock","LIVE",
+	{"livestock","livestock","LIVE",             // 21 LIVE
 	 ItemType::NOTRANSPORT,
 	 "RANC",1,1,1, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
@@ -266,7 +266,7 @@ ItemType id[] =
 	 I_LASSO,1, 0,
 	 0, NULL, 0,
 	 "", { "", "", "", "" }, 0, 0},
-	{"iron","iron","IRON",
+	{"iron","iron","IRON",                       // 22 IRON
 	 0,
 	 "MINI",1,1,1, {{-1,0}, {-1,0},{-1,0},{-1,0}},
 	 NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},

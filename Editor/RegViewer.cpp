@@ -31,8 +31,8 @@ RegViewer::RegViewer(wxWindow* parent, RegionData& model) :
     _obj_tree = new wxTreeListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize(300,-1),
                                    wxTL_DEFAULT_STYLE);
     _obj_tree->AppendColumn( "Nom" );
-    _obj_tree->AppendColumn( "Type" );
-    _obj_tree->AppendColumn( "Faction" );
+    //_obj_tree->AppendColumn( "Type" );
+    //_obj_tree->AppendColumn( "Faction" );
     main_vbox->Add( _obj_tree, 1, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 2 );
 
     this->SetSizer( main_vbox );
@@ -140,74 +140,74 @@ void RegViewer::update_values()
         forlist (&(_reg->objects))
         {
             Object *o = (Object *) elem;
-            std::cout << "[" << o->num << "]";
-            if( o->name) std::cout << " N:" << *(o->name);
-            if( o->describe) std::cout << " D:" << *(o->describe);
-            if( o->region) {
-                std::cout << " R:" << *(o->region->name);
-                std::cout << " (" << o->region->xloc <<","<<o->region->yloc<<","<< o->region->zloc<<")";
-            }
-            if( o->type != -1) std::cout << " T:" << ObjectDefs[o->type].name;
-            std::cout << " U:" << o->units.Num();
-            std::cout << " S:" << o->ships.Num();
-            std::cout << std::endl;
+//            std::cout << "[" << o->num << "]";
+//            if( o->name) std::cout << " N:" << *(o->name);
+//            if( o->describe) std::cout << " D:" << *(o->describe);
+//            if( o->region) {
+//                std::cout << " R:" << *(o->region->name);
+//                std::cout << " (" << o->region->xloc <<","<<o->region->yloc<<","<< o->region->zloc<<")";
+//            }
+//            if( o->type != -1) std::cout << " T:" << ObjectDefs[o->type].name;
+//            std::cout << " U:" << o->units.Num();
+//            std::cout << " S:" << o->ships.Num();
+//            std::cout << std::endl;
             wxString obj_str, type_str;
             if( o->name )
                 obj_str << "O:" << o->name->Str();
             else
                 obj_str << "O:---";
             if( o->type != -1)
-                type_str << ObjectDefs[o->type].name;
+                obj_str << "[" << ObjectDefs[o->type].name << "]";
             else
-                type_str << "???";
+                obj_str << "[????]";
             wxTreeListItem tree_obj = _obj_tree->AppendItem( tree_root, obj_str );
-            _obj_tree->SetItemText( tree_obj, 1, type_str);
+            //_obj_tree->SetItemText( tree_obj, 1, type_str);
             if( o->units.Num() > 0 ) {
                 forlist (&(o->units)) {
                     Unit *u = (Unit *) elem;
-                    std::cout << "  + Unit:" << *u->name << " (" << u->faction->num << ")";
+//                    std::cout << "  + Unit:" << *u->name << " (" << u->faction->num << ")";
                     wxString unit_str, fac_str;
                     if( u->name )
                         unit_str << "U:" << u->name->Str();
                     else
                         unit_str << "U:---";
                     if( u->faction->name)
-                        fac_str << u->faction->name->Str() << " (" << u->faction->num << ")";
+                        fac_str << "(" << u->faction->name->Str() << ")";// (" << u->faction->num << ")";
                     else
-                        fac_str << " (" << u->faction->num << ")";
+                        fac_str << " (????)";
                     wxTreeListItem tree_unit = _obj_tree->AppendItem( tree_obj, unit_str );
-                    _obj_tree->SetItemText( tree_unit, 2, fac_str);
-                    if( u->object ) {
-                        std::cout << " OBJ:";
-                        if( u->object->name) std::cout << " N:" << *(u->object->name);
-                        if( u->object->describe) std::cout << " D:" << *(u->object->describe);
-                        if( u->object->region) {
-                            std::cout << " R:" << *(u->object->region->name);
-                            std::cout << " (" << u->object->region->xloc <<","<<u->object->region->yloc<<","<< u->object->region->zloc<<")";
-                        }
-                        if( u->object->type != -1) std::cout << " T:" << ObjectDefs[u->object->type].name;
-                        std::cout << " U:" << u->object->units.Num();
-                        std::cout << " S:" << u->object->ships.Num();
-                        std::cout << std::endl;
-                    }
+                    //_obj_tree->SetItemText( tree_unit, 2, fac_str);
+//                    if( u->object ) {
+//                        std::cout << " OBJ:";
+//                        if( u->object->name) std::cout << " N:" << *(u->object->name);
+//                        if( u->object->describe) std::cout << " D:" << *(u->object->describe);
+//                        if( u->object->region) {
+//                            std::cout << " R:" << *(u->object->region->name);
+//                            std::cout << " (" << u->object->region->xloc <<","<<u->object->region->yloc<<","<< u->object->region->zloc<<")";
+//                        }
+//                        if( u->object->type != -1) std::cout << " T:" << ObjectDefs[u->object->type].name;
+//                        std::cout << " U:" << u->object->units.Num();
+//                        std::cout << " S:" << u->object->ships.Num();
+//                        std::cout << std::endl;
+//                    }
                     if( u->items.Num() > 0) {
                         Item *it = (Item *) u->items.First();
                         do {
-                            std::cout << "    + I:";
-                            if( it->type >= 0)
-                                std::cout << ItemDefs[it->type].abr;
-                            std::cout << " (" << it->num << ")";
-                            std::cout << std::endl;
+//                            std::cout << "    + I:";
+//                            if( it->type >= 0)
+//                                std::cout << ItemDefs[it->type].abr;
+//                            std::cout << " (" << it->num << ")";
+//                            std::cout << std::endl;
 
                             wxString item_str, itype_str;
                             if( it->type >= 0 )
-                                itype_str << ItemDefs[it->type].abr;
+                                item_str << "I:" << ItemDefs[it->type].abr;
                             else
-                                itype_str << "I:???";
+                                item_str << "I:???";
                             item_str << " (" << it->num << ")";
 
                             wxTreeListItem tree_item = _obj_tree->AppendItem( tree_unit, item_str );
-                            _obj_tree->SetItemText( tree_item, 1, itype_str);
+                            //_obj_tree->SetItemText( tree_item, 1, itype_str);
 
                             it = (Item *) u->items.Next( it );
                         } while( it );
@@ -220,6 +220,57 @@ void RegViewer::update_values()
         }
     }
     //_obj_text->SetLabel( wxString( obj.str() ));
+}
+Unit* RegViewer::getSelUnit()
+{
+    wxTreeListItem sel = _obj_tree->GetSelection();
+    if( sel.IsOk() ) {
+        std::cout << "Tree: sel=" << _obj_tree->GetItemText( sel, 0) << std::endl;
+        wxString selstr = _obj_tree->GetItemText( sel, 0);
+        if( !selstr.StartsWith("U") )
+            return nullptr;
+
+        // Objects
+        forlist (&(_reg->objects))
+        {
+            Object *o = (Object *) elem;
+            // Units
+            if( o->units.Num() > 0 ) {
+                forlist (&(o->units)) {
+                    Unit *u = (Unit *) elem;
+                    wxString unit_str;
+                    if( u->name )
+                        unit_str << "U:" << u->name->Str();
+                    if( selstr.StartsWith( unit_str )) {
+                        return u;
+                    }
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+Object* RegViewer::getSelObject()
+{
+    wxTreeListItem sel = _obj_tree->GetSelection();
+    if( sel.IsOk() ) {
+        std::cout << "Tree: sel=" << _obj_tree->GetItemText( sel, 0) << std::endl;
+        wxString selstr = _obj_tree->GetItemText( sel, 0);
+        if( !selstr.StartsWith("O") )
+            return nullptr;
+
+        // Objects
+        forlist (&(_reg->objects))
+        {
+            Object *o = (Object *) elem;
+            wxString obj_str;
+            obj_str << "O:" << o->name->Str();
+            if( selstr.StartsWith( obj_str )) {
+                return o;
+            }
+        }
+    }
+    return nullptr;
 }
 // ****************************************************************************
 void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title,

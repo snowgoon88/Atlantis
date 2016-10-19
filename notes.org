@@ -1,9 +1,3 @@
-modified:   Editor/EditorMain.cpp
-modified:   Editor/EditorMain.h
-modified:   Editor/RegionData.cpp
-modified:   Editor/RegionData.h
-modified:   map_access.h
-
 * map_editor
 ** [5/5] BUGS
 *** DONE ALH semble ne pas prendre plus d'un underworld
@@ -393,10 +387,24 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [13/18] EDITOR
-** TODO [0/2] Find a given Region Game::EditGameFindRegion()
-*** TODO x,y,z
-*** TODO num
+* [19/23] EDITOR
+** DONE sauvegarde du nom dans l'éditeur d'unité
+Spliter après la parenthèse...
+** TODO refresh de RegViewer après changement d'une unité
+** DONE add Object
+ARegion::MakeLair(int t)
+Setup()->LairCheck()->MakeLair()
+** DONE del Object
+Game::Do1Destroy(ARegion *r, Object *o, Unit *u)
+** DONE del Unit
+Game::DeleteEmptyInRegion(ARegion *region)
+u->MoveUnit(0);
+delete u ???
+** change type Object
+** TODO [2/3] Find a given Region Game::EditGameFindRegion()
+*** TODO Un dialogue existe, il faut juste l'intégrer.
+*** DONE x,y,z
+*** DONE num
 ** TODO Find a given Unit unit->object->region
 ** DONE [/] Sauver
 ** DONE [2/2] déplacer les shafts
@@ -406,8 +414,8 @@ IT_XXXX = Ox0972
 ** DONE [/] Changer de terrain
 ** DONE Changer de race
 ** DONE [/] Renommer, changer les noms
-** TODO [/] créer des unités
-** TODO [/] créer des mobs et les placer
+** DONE [/] créer des unités
+** DONE [/] créer des mobs et les placer
 ** DONE [0/1] Ville
 *** TODO Market
 ** DONE [/] Labyrinthe dans underword
@@ -503,3 +511,44 @@ ATTACHED name=underworld
 ** DONE [/] Décaler les symboles de gate, tow, shaft
 ** DONE Memory for cursor
 ** TODO [/] Mouse => cursor à l'ext de la carte
+* Atlantis editor
+** 1) Find a region (x, y z)
+*** 1) Edit Objects
+Game::EditGameRegionObjects( ARegion *pReg )
+**** [a] [object type] [dir] to add object
+**** [d] [index] to delete object
+**** [n] [index] [name] to rename object
+*** 2) Edit Terrain
+Game::EditGameRegionTerrain( ARegion *pReg )
+**** [t] [terrain type] to modify terrain type
+**** [r] [race] to modify local race (None or0 to unset)
+**** [w] [maxwages] to modify local wages
+**** [p] to regenerate products according to terrain type
+**** [dg] to delete the gate in this region
+**** [ag] to add a gate to this region
+**** [n] [name] to modify region name
+**** [town] to regenerate/add a town
+**** [deltown] to remove a town
+**** [tn] [name] to rename a town
+** 2) Find a Unit (number)
+Game::EditGameUnit(Unit *pUnit)
+*** 1) Edit items...
+Game::EditGameUnitItems(Unit *pUnit)
+**** [item] [number] to update an item. 
+add if item new, remove if number is O
+*** 2) Edit skills...
+Game::EditGameUnitSkills(Unit *pUnit)
+**** [skill] [days] to update a skill.
+add if skill new, remove if number is O
+*** 3) Move unit...
+Game::EditGameUnitMove(Unit *pUnit)
+*** 4) Edit details...
+**** [f] [num] to change the unit's faction
+AList factions;
+Faction *fac = GetFaction(&factions, fnum);
+if (fac) pUnit->faction = fac;
+**** [t] [num] to change the unit's type
+Game::EditGameUnitDetails(Unit *pUnit)
+** 3) Create new Unit
+Game::EditGameCreateUnit()
+**** Fac, LEADER, REGIONS

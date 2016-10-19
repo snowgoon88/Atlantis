@@ -490,6 +490,11 @@ void MapViewer::draw_region( wxDC& dc, ARegion* reg )
         dc.SetBrush( *wxBLACK_BRUSH );
         dc.DrawCircle( _origin+center+wxPoint(0,_hexheight/4), 5);
     }
+    // Objects
+    if( reg->objects.Num() > 1 ) {
+        dc.SetBrush( *wxRED_BRUSH );
+        dc.DrawCircle( _origin+center+wxPoint(HEXSIZE *2/3, 0), 5);
+    }
 
     // Walls
 //    std::cout << i << ":" << reg->num << "=[" << reg->xloc << "," << reg->yloc << "," << reg->zloc << "] ";

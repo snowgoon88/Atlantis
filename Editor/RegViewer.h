@@ -25,6 +25,12 @@ public:
 
     /** Override as Observer */
     void update( int signal=0 );
+
+    /** Tree with selection */
+    wxTreeListCtrl* _obj_tree;
+    /** Get selected Unit* or nullptr */
+    Unit* getSelUnit();
+    Object* getSelObject();
 private:
     /** Model */
     RegionData& _model;
@@ -39,7 +45,7 @@ private:
     wxStaticText* _town_text;
     wxStaticText* _pop_text;
     wxStaticText* _obj_text;
-    wxTreeListCtrl* _obj_tree;
+
 
 
     /** Event gestion */

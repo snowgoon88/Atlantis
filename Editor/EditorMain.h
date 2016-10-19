@@ -19,10 +19,14 @@
 #include <RegViewer.h>
 #include <game.h>
 #include <map_access.h>
+#include <LocalisationListener.h>
+#include <UnitEditListener.h>
+#include <ObjectListener.h>
 
 #define NB_MAX_REGION 20
 
-class EditorFrame: public wxFrame
+class EditorFrame: public wxFrame,
+    public LocalisationListener, public UnitEditListener, public ObjectListener
 {
     public:
         EditorFrame(wxFrame *frame, const wxString& title);
@@ -34,9 +38,22 @@ class EditorFrame: public wxFrame
         RegViewer* _reg_viewer;
         RegionData* _region_data;
 
+        void enable_treeMenu( bool state );
+
+        /** Overide Listeners */
+        virtual void receive_localisation(Localisation& loc);
+        virtual void receive_unitedit();
+        virtual void receive_object( int type );
+
     private:
         wxMenu* _regionMenu;
         wxMenuItem* _subregionMenu[NB_MAX_REGION];
+        wxMenuItem* _editUnitMenu;
+        wxMenuItem* _addUnitMenu;
+        wxMenuItem* _moveUnitMenu;
+        wxMenuItem* _delUnitMenu;
+        wxMenuItem* _addObjectMenu;
+        wxMenuItem* _delObjectMenu;
         void load_game();
         void save_game();
 
@@ -59,6 +76,12 @@ class EditorFrame: public wxFrame
             idMenuTownRegenerate = 302,
             idMenuTownRename = 303,
             idMenuTownMarket = 304,
+            idMenuUnitEdit = 400,
+            idMenuUnitAdd = 401,
+            idMenuUnitMove = 402,
+            idMenuUnitDel = 403,
+            idMenuObjectAdd = 410,
+            idMenuObjectDel= 411,
             idMenuReload = 500,
             idMenuSave = 501,
             idMenuQuit = 1000,
@@ -84,6 +107,16 @@ class EditorFrame: public wxFrame
         void OnSetRace( wxCommandEvent& event);
 
         void OnTown( wxCommandEvent& event);
+
+        void OnUnitEdit( wxCommandEvent& event);
+        void OnUnitAdd( wxCommandEvent& event);
+        void OnUnitMove( wxCommandEvent& event);
+        void OnUnitDel( wxCommandEvent& event);
+        Unit* _moveable_unit;
+
+        void OnObjectAdd( wxCommandEvent& event );
+        void OnObjectDel( wxCommandEvent& event );
+        ARegion* _selected_reg;
         DECLARE_EVENT_TABLE()
 };
 

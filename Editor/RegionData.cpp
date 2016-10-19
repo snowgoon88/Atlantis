@@ -319,6 +319,44 @@ void RegionData::rename_town( ARegion*reg)
     reg->town->name = new AString( name.c_str() );
     notify_observers();
 }
+// Unit
+void RegionData::create_unit( ARegion* reg )
+{
+    Unit* newunit = _map_access->create_unit(reg, reg->GetDummy() );
+    notify_observers();
+}
+void RegionData::move_unit( Unit* unit, Object* obj)
+{
+    unit->MoveUnit( obj );
+    notify_observers();
+}
+void RegionData::edit_unit()
+{
+    notify_observers();
+}
+void RegionData::del_unit( Unit* unit )
+{
+    unit->MoveUnit( 0 );
+    delete unit;
+    notify_observers();
+}
+void RegionData::create_object( ARegion* reg, int type)
+{
+    _map_access->create_object( reg, type );
+    notify_observers();
+}
+void RegionData::del_object( Object *obj )
+{
+    ARegion* reg = obj->region;
+    if( obj->type == 0 ) {
+        wxMessageBox( "Peut pas detruire Object de type [None]", "Del Object");
+        return;
+    }
+    else {
+        _map_access->del_object( reg, obj);
+        notify_observers();
+    }
+}
 // ************************************************ RegionData::get_regionarray
 ARegionArray* RegionData::get_regionarray( int id_level )
 {
