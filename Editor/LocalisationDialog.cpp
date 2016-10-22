@@ -60,13 +60,19 @@ void LocalisationDialog::on_regdef_update( wxCommandEvent& event )
     _reg = nullptr;
     _obj = nullptr;
     if( tokens.size() == 3) { //x, y, z
-        int xloc = std::stoi( tokens[0] );
-        int yloc = std::stoi( tokens[1] );
-        int zloc = std::stoi( tokens[2] );
+        std::stringstream t0(tokens[0]), t1(tokens[1]), t2(tokens[2]);
+        int xloc; t0 >> xloc;
+        int yloc; t1 >> yloc;
+        int zloc; t2 >> zloc;
+        //int xloc = std::stoi( tokens[0] );
+        //int yloc = std::stoi( tokens[1] );
+        //int zloc = std::stoi( tokens[2] );
         _reg = _map_access->regions()->GetRegion( xloc, yloc, zloc );
     }
     else if( tokens.size() == 1 ) { // num}
-        int regnum = std::stoi( tokens[0] );
+        std::stringstream t0(tokens[0]);
+        int regnum; t0 >> regnum;
+        //int regnum = std::stoi( tokens[0] );
         _reg = _map_access->regions()->GetRegion( regnum );
     }
     else {
