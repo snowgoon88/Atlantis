@@ -30,6 +30,7 @@ public:
     /** Attach model */
     void attach_regviewer( RegViewer* regview );
     void attach( ARegionArray* pArr );
+    void FocusOn( ARegion* reg );
 
     /** Selected Regions */
     std::list<ARegion*> _selected_list;

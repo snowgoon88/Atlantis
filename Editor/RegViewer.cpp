@@ -172,9 +172,9 @@ void RegViewer::update_values()
                     else
                         unit_str << "U:---";
                     if( u->faction->name)
-                        fac_str << "(" << u->faction->name->Str() << ")";// (" << u->faction->num << ")";
+                        unit_str << " =>F:" << u->faction->name->Str();// (" << u->faction->num << ")";
                     else
-                        fac_str << " (????)";
+                        unit_str << " =>F:????";
                     wxTreeListItem tree_unit = _obj_tree->AppendItem( tree_obj, unit_str );
                     //_obj_tree->SetItemText( tree_unit, 2, fac_str);
 //                    if( u->object ) {

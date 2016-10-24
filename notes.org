@@ -387,7 +387,7 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [19/23] EDITOR
+* [21/23] EDITOR
 ** DONE sauvegarde du nom dans l'éditeur d'unité
 Spliter après la parenthèse...
 ** TODO refresh de RegViewer après changement d'une unité
@@ -401,11 +401,11 @@ Game::DeleteEmptyInRegion(ARegion *region)
 u->MoveUnit(0);
 delete u ???
 ** change type Object
-** TODO [2/3] Find a given Region Game::EditGameFindRegion()
+** DONE [2/3] Find a given Region Game::EditGameFindRegion()
 *** TODO Un dialogue existe, il faut juste l'intégrer.
 *** DONE x,y,z
 *** DONE num
-** TODO Find a given Unit unit->object->region
+** DONE Find a given Unit unit->object->region
 ** DONE [/] Sauver
 ** DONE [2/2] déplacer les shafts
 *** DONE ADD shaft
@@ -532,6 +532,7 @@ Game::EditGameRegionTerrain( ARegion *pReg )
 **** [tn] [name] to rename a town
 ** 2) Find a Unit (number)
 Game::EditGameUnit(Unit *pUnit)
+Unit *pUnit = GetUnit(num);
 *** 1) Edit items...
 Game::EditGameUnitItems(Unit *pUnit)
 **** [item] [number] to update an item. 

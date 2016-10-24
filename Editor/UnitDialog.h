@@ -1,47 +1,40 @@
-#ifndef LOCALISATIONDIALOG_H
-#define LOCALISATIONDIALOG_H
+#ifndef UNITDIALOG_H
+#define UNITDIALOG_H
 
 /**
- * Return a std::pair<ARegion*,Objet*>.
+ * Return an Unit*.
  */
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
 
-#include <aregion.h>
-#include <object.h>
+#include <unit.h>
 #include <map_access.h>
-#include <vector>
-#include <LocalisationListener.h>
+#include <UnitListener.h>
 
-using Localisation= std::pair<ARegion*,Object*>;
-
-class LocalisationDialog : public wxFrame
+class UnitDialog : public wxFrame
 {
 public:
-    LocalisationDialog( wxWindow* parent, MapAccess* map_access,
-                       LocalisationListener* listener);
+    UnitDialog( wxWindow* parent, MapAccess* map_access,
+                       UnitListener* listener);
 
     /** Attributs */
     wxWindow* _parent;
     MapAccess* _map_access;
-    LocalisationListener* _listener;
-    wxStaticText* _reg_text;
-    wxTextCtrl* _reg_def;
-    wxChoice* _obj_def;
-    std::vector<Object*> _coll_obj;
+    UnitListener* _listener;
+    wxStaticText* _unit_text;
+    wxTextCtrl* _unit_def;
 
     /** Events */
-    void on_regdef_update( wxCommandEvent& event );
+    void on_unitdef_update( wxCommandEvent& event );
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
 private:
-    ARegion* _reg;
+    Unit* _unit;
     Object*  _obj;
-    /** Region to text */
-    std::string region_str(ARegion* reg);
+    std::string unit_str(Unit* unit);
 
     /** Make GUI building easier */
     void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)
@@ -61,4 +54,4 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
-#endif // LOCALISATIONDIALOG_H
+#endif // UNITDIALOG_H

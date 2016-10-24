@@ -22,11 +22,13 @@
 #include <LocalisationListener.h>
 #include <UnitEditListener.h>
 #include <ObjectListener.h>
+#include <UnitListener.h>
 
 #define NB_MAX_REGION 20
 
 class EditorFrame: public wxFrame,
-    public LocalisationListener, public UnitEditListener, public ObjectListener
+    public LocalisationListener, public UnitEditListener, public ObjectListener,
+    public UnitListener
 {
     public:
         EditorFrame(wxFrame *frame, const wxString& title);
@@ -44,6 +46,7 @@ class EditorFrame: public wxFrame,
         virtual void receive_localisation(Localisation& loc);
         virtual void receive_unitedit();
         virtual void receive_object( int type );
+        virtual void receive_unit(Unit* unit);
 
     private:
         wxMenu* _regionMenu;
@@ -54,6 +57,8 @@ class EditorFrame: public wxFrame,
         wxMenuItem* _delUnitMenu;
         wxMenuItem* _addObjectMenu;
         wxMenuItem* _delObjectMenu;
+        wxMenuItem* _findRegMenu;
+        wxMenuItem* _findUnitMenu;
         void load_game();
         void save_game();
 
@@ -82,12 +87,15 @@ class EditorFrame: public wxFrame,
             idMenuUnitDel = 403,
             idMenuObjectAdd = 410,
             idMenuObjectDel= 411,
+            idMenuFindRegion = 450,
+            idMenuFindUnit = 451,
             idMenuReload = 500,
             idMenuSave = 501,
             idMenuQuit = 1000,
             idMenuAbout,
             idRegionBase = 2000, // No id AFTER Need at least NB_MAX_REGION id !!!!!!!
         };
+        wxAcceleratorEntry _accel_entries[9]; // After 20->SetRegion
         void OnReload( wxCommandEvent& event );
         void OnSave( wxCommandEvent& event );
         void OnRegion( wxCommandEvent& event);
@@ -117,6 +125,11 @@ class EditorFrame: public wxFrame,
         void OnObjectAdd( wxCommandEvent& event );
         void OnObjectDel( wxCommandEvent& event );
         ARegion* _selected_reg;
+
+        void OnFindRegion( wxCommandEvent& event );/** uses also _moveable_unit */
+        void OnFindUnit( wxCommandEvent& event );
+
+
         DECLARE_EVENT_TABLE()
 };
 

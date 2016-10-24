@@ -23,6 +23,7 @@
 #include <UnitEditorDialog.h>
 #include <LocalisationDialog.h>
 #include <ObjectDialog.h>
+#include <UnitDialog.h>
 
 //helper functions
 enum wxbuildinfoformat {
@@ -84,11 +85,27 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
 
     EVT_MENU(idMenuObjectAdd, EditorFrame::OnObjectAdd )
     EVT_MENU(idMenuObjectDel, EditorFrame::OnObjectDel)
+
+    EVT_MENU(idMenuFindRegion, EditorFrame::OnFindRegion)
+    EVT_MENU(idMenuFindUnit, EditorFrame::OnFindUnit)
 END_EVENT_TABLE()
 
 EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     : wxFrame(frame, -1, title, wxDefaultPosition, wxSize(1000,600)), LocalisationListener()
 {
+    // Accelerator Key
+    _accel_entries[0].Set( wxACCEL_CTRL, (int) 'U', idMenuUnitAdd );
+    _accel_entries[1].Set( wxACCEL_CTRL, (int) 'K', idMenuUnitDel );
+    _accel_entries[2].Set( wxACCEL_CTRL, (int) 'M', idMenuUnitMove);
+    _accel_entries[3].Set( wxACCEL_CTRL, (int) 'E', idMenuUnitEdit);
+    _accel_entries[4].Set( wxACCEL_CTRL, (int) 'O', idMenuObjectAdd);
+    _accel_entries[5].Set( wxACCEL_CTRL, (int) 'D', idMenuObjectDel);
+
+    _accel_entries[6].Set( wxACCEL_CTRL, (int) 'T', idMenuSetTerrain);
+    _accel_entries[7].Set( wxACCEL_CTRL, (int) 'R', idMenuSetRace );
+
+    _accel_entries[8].Set( wxACCEL_CTRL, (int) 'F', idMenuFindUnit );
+
 #if wxUSE_MENUS
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
@@ -112,8 +129,10 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     actMenu->Append(idMenuSwapGate, _("&Echange Gate"), _("Echange les no de deux GATE"));
     actMenu->Append(idMenuAddShaft, _("&Add Shaft"), _("Ajoute un SHAFT entre 2 hex"));
     actMenu->Append(idMenuRemoveShaft, _("&Remove Shaft"), _("Enleve un des SHAFT de l'hex"));
-    actMenu->Append(idMenuSetTerrain, _("&Set Terrain"), _("Change le type de terrain de 1 ou plusieurs hex"));
-    actMenu->Append(idMenuSetRace, _("&Set Race"), _("Change la race d'un hex"));
+    wxMenuItem* terrainMenu = actMenu->Append(idMenuSetTerrain, _("&Set Terrain"), _("Change le type de terrain de 1 ou plusieurs hex"));
+    terrainMenu->SetAccel( &_accel_entries[6] );
+    wxMenuItem* raceMenu = actMenu->Append(idMenuSetRace, _("&Set Race"), _("Change la race d'un hex"));
+    raceMenu->SetAccel( &_accel_entries[7] );
     mbar->Append(actMenu, _("&Action"));
 
     wxMenu* townMenu = new wxMenu(_T(""));
@@ -127,12 +146,23 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
     wxMenu* treeMenu = new wxMenu(_T(""));
     _addUnitMenu = treeMenu->Append( idMenuUnitAdd, _("Add Unit"), _("Cree une Unit"));
+    _addUnitMenu->SetAccel( &_accel_entries[0] );
     _editUnitMenu = treeMenu->Append( idMenuUnitEdit, _("Edit Unit"), _("Modifie une Unit"));
+    _editUnitMenu->SetAccel( &_accel_entries[3] );
     _moveUnitMenu = treeMenu->Append( idMenuUnitMove, _("Move Unit"), _("Deplace une Unit"));
+    _moveUnitMenu->SetAccel( &_accel_entries[2] );
     _delUnitMenu = treeMenu->Append( idMenuUnitDel, _("Del Unit"), _("Detruit une Unit"));
+    _delUnitMenu->SetAccel( &_accel_entries[1] );
     _addObjectMenu = treeMenu->Append( idMenuObjectAdd, _("Add Object"), _("Cree un Object"));
+    _addObjectMenu->SetAccel( &_accel_entries[4] );
     _delObjectMenu = treeMenu->Append( idMenuObjectDel, _("Del Object"), _("Detruit un Object (sauf Dummy[None))"));
+    _delObjectMenu->SetAccel( &_accel_entries[5] );
     mbar->Append(treeMenu, _("&Objet/Unit"));
+
+    wxMenu* findMenu = new wxMenu(_T(""));
+    _findRegMenu = findMenu->Append( idMenuFindRegion, _("Find Region"), _("Trouve une Region"));
+    _findUnitMenu = findMenu->Append( idMenuFindUnit, _("Find Unit"), _("Trouve une Unit"));
+    mbar->Append( findMenu, _("&Find"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
@@ -179,6 +209,9 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     _moveable_unit = nullptr;
     _selected_reg = nullptr;
 
+    wxAcceleratorTable _accel(9, _accel_entries);
+    this->SetAcceleratorTable(_accel);
+
 }
 void EditorFrame::enable_treeMenu( bool state )
 {
@@ -188,10 +221,13 @@ void EditorFrame::enable_treeMenu( bool state )
     _delUnitMenu->Enable( state );
     _addObjectMenu->Enable( state );
     _delObjectMenu->Enable( state );
+    _findRegMenu->Enable( state );
+    _findUnitMenu->Enable( state );
 }
 
 void EditorFrame::load_game()
 {
+    char chiffres[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
     _game = new Game();
     initIO();
     _game->ModifyTablesPerRuleset();
@@ -499,13 +535,49 @@ void EditorFrame::OnObjectDel( wxCommandEvent& event )
     }
 }
 
+void EditorFrame::OnFindRegion( wxCommandEvent& event )
+{
+    _moveable_unit = nullptr;
+    enable_treeMenu(false);
+    LocalisationDialog* loc_d = new LocalisationDialog( this, _map_access, this );
+    loc_d->Show(true);
+}
+void EditorFrame::OnFindUnit( wxCommandEvent& event )
+{
+    enable_treeMenu(false);
+    UnitDialog* unit_d = new UnitDialog( this, _map_access, this );
+    unit_d->Show(true);
+}
+
 void EditorFrame::receive_localisation(Localisation& loc)
 {
     std::cout << "EditorFrame::receive_localisation" << std::endl;
     // Check not null
     if( loc.first != nullptr ) {
-        std::cout << "Received loc => should move Unit there" << std::endl;
-        _region_data->move_unit( _moveable_unit, loc.second );
+        if( _moveable_unit ) {
+            std::cout << "Received loc => should move Unit there" << std::endl;
+            _region_data->move_unit( _moveable_unit, loc.second );
+            enable_treeMenu(true);
+        }
+        else {
+            std::cout << "Received loc => center on given location" << std::endl;
+            // Set up the right region
+            //    MapAccess map_access = MapAccess( _game );
+            ARegionList* regions = _map_access->regions();
+            ARegionArray *pArr = nullptr;
+            if( loc.first->zloc < regions->numLevels) {
+                pArr = regions->pRegionArrays[loc.first->zloc];
+            }
+            if( pArr ) {
+                if( pArr->strName )
+                    std::cout << "ATTACH name=" << *(pArr->strName) << std::endl;
+            _map_viewer->attach( pArr );
+            }
+            // Focus on given hex
+            _map_viewer->FocusOn( loc.first );
+
+            enable_treeMenu(true);
+        }
 //        Unit* newunit = _map_access->create_unit( loc.first, loc.second );
 //        enable_treeMenu( false );
 //        UnitEditorDialog* dialog = new UnitEditorDialog( this, newunit, _map_access );
@@ -529,4 +601,29 @@ void EditorFrame::receive_object( int type )
         _region_data->create_object( _selected_reg, type );
     }
     _selected_reg = nullptr;
+}
+void EditorFrame::receive_unit(Unit* unit)
+{
+    if( unit != nullptr ) {
+        ARegion* reg = unit->object->region;
+        ARegionList* regions = _map_access->regions();
+        ARegionArray *pArr = nullptr;
+        if( reg->zloc < regions->numLevels) {
+            pArr = regions->pRegionArrays[reg->zloc];
+        }
+        if( pArr ) {
+            if( pArr->strName )
+                std::cout << "ATTACH name=" << *(pArr->strName) << std::endl;
+            _map_viewer->attach( pArr );
+        }
+        // Focus on given hex
+        _map_viewer->FocusOn( reg );
+
+        enable_treeMenu(true);
+    }
+    else {
+        std::cout << "Received nullUnit " << std::endl;
+        wxMessageBox("Pas de Unit trouvee", "Find Unit", wxOK, this);
+        enable_treeMenu(true);
+    }
 }

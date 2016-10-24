@@ -110,6 +110,8 @@
 		<Unit filename="RegViewer.h" />
 		<Unit filename="RegionData.cpp" />
 		<Unit filename="RegionData.h" />
+		<Unit filename="UnitDialog.cpp" />
+		<Unit filename="UnitDialog.h" />
 		<Unit filename="UnitEditListener.h" />
 		<Unit filename="UnitEditorDialog.cpp" />
 		<Unit filename="UnitEditorDialog.h" />

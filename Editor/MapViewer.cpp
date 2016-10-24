@@ -230,6 +230,41 @@ void MapViewer::render(wxDC&  dc)
 
     // Look at the wxDC docs to learn how to draw other stuff
 }
+// *********************************************************** MapViewer::focus
+void MapViewer::FocusOn( ARegion* reg)
+{
+    wxClientDC dc(this);
+
+    //std::cout << "Pos =" << xloc << ", " << yloc << std::endl;
+    // middle Point
+    wxPoint mid = wxPoint( dc.GetSize().GetWidth()/2, dc.GetSize().GetHeight()/2 );
+//    std::cout << "Mid =" << mid.x << ", " << mid.y << std::endl;
+//    std::cout << "Scale = " << _scale << std::endl;
+//    wxPoint logdev = wxPoint( dc.DeviceToLogicalX(mid.x), dc.DeviceToLogicalY(mid.y));
+//    std::cout << "Dev =" << logdev.x << ", " << logdev.y << std::endl;
+//
+//    wxPoint logical = wxPoint( round((double) mid.x / _scale), round((double) mid.y / _scale));
+//    std::cout << "Log =" << logical.x << ", " << logical.y << std::endl;
+//    wxPoint hexcoord = wxPoint( xloc * (_hexwidth * 3/4), yloc * (_hexheight / 2));
+//    std::cout << "Hex =" << hexcoord.x << ", " << hexcoord.y << std::endl;
+    _origin.x = round((double) mid.x / _scale) - (reg->xloc) * (_hexwidth * 3/4);
+    _origin.y = round((double) mid.y / _scale) - (reg->yloc) * (_hexheight / 2);
+    std::cout << "Ori =" << _origin.x << ", " << _origin.y << std::endl;
+
+    // Only one selected
+    _selected_list.clear();
+    _selected_list.push_back( reg );
+    if( _cursor_pos ) { _cursor_pos->x = mid.x; _cursor_pos->y = mid.y;}
+    else { _cursor_pos = new wxPoint(mid);}
+
+    if( _reg_viewer ) _reg_viewer->attach( reg );
+
+    render(dc);
+// Inverser
+//    int x = pt.x / (_hexwidth * 3/4);
+//    int y = pt.y / (_hexheight / 2 );
+
+}
 // ***************************************************** MapViewer::on_leftxxxx
 void MapViewer::on_leftclick( wxMouseEvent& event )
 {

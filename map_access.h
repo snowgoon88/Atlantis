@@ -1370,6 +1370,11 @@ public:
       Faction* fac = GetFaction( &(_game->factions), fnum );
       return fac;
   }
+  Unit* get_unit( int unum )
+  {
+      Unit* unit = _game->GetUnit( unum );
+      return unit;
+  }
   // ************************************************* MapAccess::create_unit
   Unit* create_unit(ARegion* reg, Object* obj )
   {
