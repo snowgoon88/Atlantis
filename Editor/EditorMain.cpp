@@ -162,6 +162,7 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     wxMenu* findMenu = new wxMenu(_T(""));
     _findRegMenu = findMenu->Append( idMenuFindRegion, _("Find Region"), _("Trouve une Region"));
     _findUnitMenu = findMenu->Append( idMenuFindUnit, _("Find Unit"), _("Trouve une Unit"));
+    _findUnitMenu->SetAccel( &_accel_entries[8] );
     mbar->Append( findMenu, _("&Find"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
