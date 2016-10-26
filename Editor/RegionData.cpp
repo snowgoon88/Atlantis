@@ -269,6 +269,22 @@ void RegionData::set_race( std::list<ARegion*>& reg_list )
         notify_observers();
     }
 }
+void RegionData::renew_products( ARegion* reg )
+{
+    _map_access->renew_products( reg );
+    notify_observers();
+}
+void RegionData::set_wages( ARegion* reg, int val )
+{
+    std::cout << "RegionData::set_wages at " << val << std::endl;
+    int change = val - reg->maxwages;
+    reg->maxwages = val;
+    reg->wages += change;
+
+    reg->UpdateEditRegion();
+
+    notify_observers();
+}
 void RegionData::add_town( ARegion* reg )
 {
     if( reg->town ) {

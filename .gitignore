@@ -25,9 +25,18 @@ QuestEditor/atlantis
 worldedit
 monsters.data
 quest.zip
-Editor/game.*
+Editor/game*.out
+Editor/game*.in*
+Editor/*.zip
 QuestEditor/my*
 QuestEditor/new_*
+
+# Gtags
+GPATH
+GRTAGS
+GSYMS
+GTAGS
+
 
 # local to Mac
 .DS_Store

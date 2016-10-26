@@ -35,6 +35,8 @@ public:
     void remove_shaft( ARegion* reg );
     void set_terrain( std::list<ARegion*>& reg_list );
     void set_race( std::list<ARegion*>& reg_list );
+    void renew_products( ARegion* reg );
+    void set_wages( ARegion* reg, int wages );
     void add_town( ARegion* reg );
     void del_town( ARegion* reg);
     void rename_town( ARegion*reg);

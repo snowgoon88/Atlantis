@@ -71,6 +71,8 @@ BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
     EVT_MENU(idMenuRemoveShaft, EditorFrame::OnRemoveShaft)
     EVT_MENU(idMenuSetTerrain, EditorFrame::OnSetTerrain)
     EVT_MENU(idMenuSetRace, EditorFrame::OnSetRace)
+    EVT_MENU(idMenuRenewProduct, EditorFrame::OnRenewProducts)
+    EVT_MENU(idMenuSetWages, EditorFrame::OnSetWages)
 
     EVT_MENU(idMenuTownAdd, EditorFrame::OnTown)
     EVT_MENU(idMenuTownDel, EditorFrame::OnTown)
@@ -106,6 +108,9 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
 
     _accel_entries[8].Set( wxACCEL_CTRL, (int) 'F', idMenuFindUnit );
 
+    _accel_entries[9].Set( wxACCEL_CTRL, (int) 'P', idMenuRenewProduct);
+    //_accel_entries[10].Set( wxACCEL_CTRL, (int) 'P', idMenuRenewProduct);
+
 #if wxUSE_MENUS
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
@@ -133,6 +138,10 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     terrainMenu->SetAccel( &_accel_entries[6] );
     wxMenuItem* raceMenu = actMenu->Append(idMenuSetRace, _("&Set Race"), _("Change la race d'un hex"));
     raceMenu->SetAccel( &_accel_entries[7] );
+    wxMenuItem* prodMenu = actMenu->Append(idMenuRenewProduct, _("&Generate Prod"), _("Regenere les productions"));
+    prodMenu->SetAccel( &_accel_entries[9] );
+    wxMenuItem* wagesMenu = actMenu->Append( idMenuSetWages, _("&Set Wages"), _("Change le Wages max"));
+    wagesMenu->Enable(false);
     mbar->Append(actMenu, _("&Action"));
 
     wxMenu* townMenu = new wxMenu(_T(""));
@@ -195,7 +204,7 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     _map_viewer = new MapViewer( split_win, *_region_data );
     _region_data->attach_observer( _map_viewer );
 //    sizer->Add( _map_viewer, 1, wxEXPAND);
-    _reg_viewer = new RegViewer( split_win, *_region_data );
+    _reg_viewer = new RegViewer( split_win, *_region_data, _map_access, this );
     _region_data->attach_observer( _reg_viewer );
     _map_viewer->attach_regviewer( _reg_viewer );
 //    sizer->Add( _reg_viewer, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
@@ -210,7 +219,7 @@ EditorFrame::EditorFrame(wxFrame *frame, const wxString& title)
     _moveable_unit = nullptr;
     _selected_reg = nullptr;
 
-    wxAcceleratorTable _accel(9, _accel_entries);
+    wxAcceleratorTable _accel(10, _accel_entries);
     this->SetAcceleratorTable(_accel);
 
 }
@@ -422,6 +431,30 @@ void EditorFrame::OnSetRace(wxCommandEvent& event)
     else {
         _region_data->set_race( _map_viewer->_selected_list );
     }
+}
+void EditorFrame::OnRenewProducts(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region", "Regenere Products", wxOK, this);
+    }
+    else {
+        _region_data->renew_products( _map_viewer->_selected_list.front() );
+    }
+}
+void EditorFrame::OnSetWages(wxCommandEvent& event)
+{
+    if( _map_viewer->_selected_list.size() != 1 ) {
+        wxMessageBox("Il faut choisir UNE region", "Set Wages", wxOK, this);
+    }
+    else {
+        ARegion* reg = _map_viewer->_selected_list.front();
+        int wages = wxGetNumberFromUser( wxString("Wages Max (x10) ?"),
+            wxString("Val"),
+            wxString("Set Wages"),
+            reg->maxwages, 0, 100000, this);
+		_region_data->set_wages( reg, wages );
+    }
+    //wxMessageBox("Tu veux vraiment modifier ce monstre ?? ", "Editer", wxOK | wxCANCEL, this);
 }
 void EditorFrame::OnTown(wxCommandEvent& event)
 {

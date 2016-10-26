@@ -1386,6 +1386,18 @@ public:
 
 	  return newunit;
   }
+  // ****************************************** MapAccess::renew_products
+  void renew_products( ARegion* reg )
+  {
+    forlist((&reg->products)) {
+        Production * p = ((Production *) elem);
+        if (p->itemtype!=I_SILVER) {
+            reg->products.Remove(p);
+            delete p;
+        }
+    }
+    reg->SetupProds();
+  }
   // ******************************************** MapAccess::create_object
   void create_object( ARegion* reg, int type )
   {

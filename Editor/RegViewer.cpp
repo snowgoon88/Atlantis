@@ -8,26 +8,46 @@
 
 #include <RegViewer.h>
 #include <sstream>
+#include <ProductDialog.h>
+#include <EditorMain.h>
 
 wxBEGIN_EVENT_TABLE(RegViewer, wxPanel)
 wxEND_EVENT_TABLE()
 
 // ****************************************************************************
 // ******************************************************** MapViewer::creation
-RegViewer::RegViewer(wxWindow* parent, RegionData& model) :
-    wxPanel(parent), _model(model), _reg(nullptr)
+RegViewer::RegViewer(wxWindow* parent, RegionData& model, MapAccess* map_access, EditorFrame* frame) :
+    wxPanel(parent), _parent(frame), _model(model), _map_access(map_access), _reg(nullptr)
 {
     // main Vertical
     wxBoxSizer *main_vbox = new wxBoxSizer( wxVERTICAL );
+    mk_title( this, main_vbox, "Region XXX [-,-,-] Name: ", _info_text);
+    //mk_title( this, reg_hbox, "NAME:", _name_text );
+    mk_title( this, main_vbox, "TERRAIN: - POP: -", _terrain_text);
+    //mk_title( this, ter_hbox, "basePOP:", _pop_text);
+    mk_title( this, main_vbox, "GATE: - SHAFT:-", _gate_text);
+    //mk_title( this, port_hbox, "SHAFT:", _shaft_text);
+    mk_title( this, main_vbox, "Wages: - (max) ENTERTAIN: -", _earn_text);
 
-    mk_title( this, main_vbox, "Region XXX [-,-,-]", _info_text);
-    mk_title( this, main_vbox, "NAME:", _name_text );
-    mk_title( this, main_vbox, "TERRAIN:", _terrain_text);
-    mk_title( this, main_vbox, "GATE:", _gate_text);
-    mk_title( this, main_vbox, "SHAFT:", _shaft_text);
+    wxBoxSizer* prod_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( this, prod_hbox, "Prod: ", _prod_text);
+    wxButton* rnd_btn = new wxButton( this, wxID_ANY, "Rand");
+    rnd_btn->Bind( wxEVT_BUTTON, &RegViewer::OnRenewProducts, this);
+    prod_hbox->Add( rnd_btn, 0, wxALIGN_CENTER_VERTICAL, 0);
+    wxButton* edit_btn = new wxButton( this, wxID_ANY, "Edit");
+    edit_btn->Bind( wxEVT_BUTTON, &RegViewer::OnEditProducts, this);
+    prod_hbox->Add( edit_btn, 0, wxALIGN_CENTER_VERTICAL, 0);
+    main_vbox->Add( prod_hbox, 0, wxALIGN_CENTER_VERTICAL, 2);
+
+    _prod_scrollpane = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+                    wxTAB_TRAVERSAL|wxVSCROLL);
+    _prod_scrollpane->SetMinSize( wxSize(50,100));
+    _prod_vbox = new wxBoxSizer( wxVERTICAL );
+    _prod_scrollpane->SetSizer( _prod_vbox );
+
+    _prod_scrollpane->SetScrollRate(5, 5);
+    main_vbox->Add( _prod_scrollpane, 0, wxEXPAND | wxLEFT, 25);
     mk_title( this, main_vbox, "TOWN:", _town_text);
-    mk_title( this, main_vbox, "POP:", _pop_text);
-    mk_title( this, main_vbox, "OBJ:", _obj_text);
     _obj_tree = new wxTreeListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize(300,-1),
                                    wxTL_DEFAULT_STYLE);
     _obj_tree->AppendColumn( "Nom" );
@@ -45,14 +65,17 @@ void RegViewer::update( int signal )
 // *********************************************************** RegViewer::reset
 void RegViewer::reset()
 {
-    _info_text->SetLabel( wxString("Region XXX [-,-,-]"));
-    _name_text->SetLabel( wxString("NAME:"));
-    _terrain_text->SetLabel( wxString("TERRAIN:"));
-    _gate_text->SetLabel( wxString("GATE:"));
-    _shaft_text->SetLabel( wxString("SHAFT:"));
+    _info_text->SetLabel( wxString("Region XXX [-,-,-] Name: "));
+    //_name_text->SetLabel( wxString("NAME:"));
+    _terrain_text->SetLabel( wxString("TERRAIN: - POP: -"));
+    _gate_text->SetLabel( wxString("GATE: - SHAFT:-"));
+    //_shaft_text->SetLabel( wxString("SHAFT:"));
+    _earn_text->SetLabel( wxString("Wages: - (max) ENTERTAIN: -"));
+    //_prod_text->SetLabel( wxString("Prod: -"));
+    _prod_vbox->Clear( true );
     _town_text->SetLabel( wxString("TOWN:"));
-    _pop_text->SetLabel( wxString("POP:"));
-    _obj_text->SetLabel( wxString("OBJ:"));
+    //_pop_text->SetLabel( wxString("POP:"));
+    //_obj_text->SetLabel( wxString("OBJ:"));
     _obj_tree->DeleteAllItems();
 }
 // ********************************************************** RegViewer::attach
@@ -68,14 +91,24 @@ void RegViewer::update_values()
         std::stringstream info;
         info << "Region " << _reg->num << " ";
         info << "[" << _reg->xloc << "," << _reg->yloc << "," << _reg->zloc << "]";
+        info << " Name: " << *(_reg->name);
         _info_text->SetLabel( wxString(info.str() ));
 
-        std::stringstream name;
-        name << "NAME: " <<  *(_reg->name);
-        _name_text->SetLabel( wxString(name.str() ));
+//        std::stringstream name;
+//        name << "NAME: " <<  *(_reg->name);
+//        _name_text->SetLabel( wxString(name.str() ));
 
         std::stringstream terrain;
         terrain << "TERRAIN: " << TerrainDefs[_reg->type].type;
+        terrain << " POP: ";
+        if( _reg->race != -1 and _reg->population > 0 )
+        {
+            terrain << _reg->population << " "<< ItemDefs[_reg->race].names << "(" << _reg->race << ")";
+        }
+        else
+        {
+            terrain << "-";
+        }
         _terrain_text->SetLabel( wxString(terrain.str() ));
 
         std::stringstream gate;
@@ -88,10 +121,7 @@ void RegViewer::update_values()
         {
             gate << "no";
         }
-        _gate_text->SetLabel( wxString( gate.str() ));
-
-        std::stringstream shaft;
-        shaft << "SHAFT: ";
+        gate << " SHAFT: ";
         if( _reg->HasShaft() )
         {
             // Any Shaft ? (only object with inner != -1)
@@ -100,15 +130,66 @@ void RegViewer::update_values()
                 Object *o = (Object *) elem;
                 if (o->inner != -1)
                 {
-                    shaft << " S_" << o->inner;
+                    gate << " S_" << o->inner;
                 }
             }
         }
         else
         {
-            shaft << "no";
+            gate << "no";
         }
-        _shaft_text->SetLabel( wxString( shaft.str() ));
+        _gate_text->SetLabel( wxString( gate.str() ));
+
+//        std::stringstream shaft;
+//        shaft << "SHAFT: ";
+//        if( _reg->HasShaft() )
+//        {
+//            // Any Shaft ? (only object with inner != -1)
+//            forlist (&(_reg->objects))
+//            {
+//                Object *o = (Object *) elem;
+//                if (o->inner != -1)
+//                {
+//                    shaft << " S_" << o->inner;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            shaft << "no";
+//        }
+//        _shaft_text->SetLabel( wxString( shaft.str() ));
+
+        std::stringstream wages;
+        wages << "Wages: " << _reg->WagesForReport();
+
+        _prod_vbox->Clear( true );
+        forlist( &(_reg->products)) {
+			Production * p = ((Production *) elem);
+			if (ItemDefs[p->itemtype].type & IT_ADVANCED) {
+			    std::stringstream prod;
+                prod << p->WriteReport();
+                wxStaticText* p_text;
+                mk_title( _prod_scrollpane, _prod_vbox, prod.str(), p_text );
+			} else {
+				if (p->itemtype == I_SILVER) {
+					if (p->skill == S_ENTERTAINMENT) {
+                        wages << " ENTERTAIN: " << p->amount << "$";
+					}
+				} else {
+					std::stringstream prod;
+                prod << p->WriteReport();
+                wxStaticText* p_text;
+                mk_title( _prod_scrollpane, _prod_vbox, prod.str(), p_text );
+				}
+			}
+		}
+		this->Layout();
+        this->FitInside();
+    //_elem_vbox->Fit(this);
+        this->PostSizeEvent();
+		_earn_text->SetLabel( wxString( wages.str() ));
+		//_prod_text->SetLabel( wxString( prod.str() ));
 
         std::stringstream town;
         town << "TOWN: ";
@@ -120,24 +201,27 @@ void RegViewer::update_values()
         {
             town << "no";
         }
+        if (_reg->town) {
+            town << " [Pop: " << _reg->town->pop << " " << ItemDefs[_reg->race].names << "]";
+        }
         _town_text->SetLabel( wxString( town.str() ));
 
-        std::stringstream pop;
-        pop << "POP: ";
-        if( _reg->race != -1 and _reg->population > 0 )
-        {
-            pop << _reg->population << " "<< ItemDefs[_reg->race].names << "(" << _reg->race << ")";
-        }
-        else
-        {
-            pop << "-";
-        }
-        _pop_text->SetLabel( wxString( pop.str() ));
+//        std::stringstream pop;
+//        pop << "POP: ";
+//        if( _reg->race != -1 and _reg->population > 0 )
+//        {
+//            pop << _reg->population << " "<< ItemDefs[_reg->race].names << "(" << _reg->race << ")";
+//        }
+//        else
+//        {
+//            pop << "-";
+//        }
+//        _pop_text->SetLabel( wxString( pop.str() ));
 
         //std::stringstream obj;
         _obj_tree->DeleteAllItems();
         wxTreeListItem tree_root = _obj_tree->GetRootItem();
-        forlist (&(_reg->objects))
+        forlist_reuse (&(_reg->objects))
         {
             Object *o = (Object *) elem;
 //            std::cout << "[" << o->num << "]";
@@ -220,6 +304,21 @@ void RegViewer::update_values()
         }
     }
     //_obj_text->SetLabel( wxString( obj.str() ));
+}
+
+void RegViewer::OnRenewProducts(wxCommandEvent& event)
+{
+    if( _reg )
+        _model.renew_products( _reg );
+}
+void RegViewer::OnEditProducts( wxCommandEvent& event )
+{
+    if( _reg ) {
+        _parent->enable_treeMenu( false );
+        ProductDialog* pdiag = new ProductDialog( _parent, _reg, _map_access );
+        pdiag->Show(true);
+    }
+
 }
 Unit* RegViewer::getSelUnit()
 {

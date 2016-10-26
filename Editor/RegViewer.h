@@ -5,19 +5,22 @@
     #include <wx/wx.h>
 #endif
 
+#include <map_access.h>
 #include <aregion.h>
 #include <observer.h>
 #include <RegionData.h>
 #include <wx/treelist.h>
 
+
 /**
  * View a ARegion
  */
+class EditorFrame;
 class RegViewer : public wxPanel, public Observer
 {
 public:
     /** Creation */
-    RegViewer( wxWindow *parent, RegionData& model );
+    RegViewer( wxWindow *parent, RegionData& model, MapAccess* map_access, EditorFrame* frame );
 
     /** Attach model */
     void attach( ARegion* reg);
@@ -33,20 +36,27 @@ public:
     Object* getSelObject();
 private:
     /** Model */
+    EditorFrame* _parent;
     RegionData& _model;
+    MapAccess* _map_access;
     ARegion* _reg;
 
     /** Widgets */
     wxStaticText* _info_text;
-    wxStaticText* _name_text;
+    //wxStaticText* _name_text;
     wxStaticText* _terrain_text;
     wxStaticText* _gate_text;
-    wxStaticText* _shaft_text;
+    //wxStaticText* _shaft_text;
+    wxStaticText* _earn_text;
+    wxScrolledWindow* _prod_scrollpane;
+    wxBoxSizer* _prod_vbox;
+    wxStaticText* _prod_text;
     wxStaticText* _town_text;
     wxStaticText* _pop_text;
     wxStaticText* _obj_text;
 
-
+    void OnRenewProducts(wxCommandEvent& event);
+    void OnEditProducts( wxCommandEvent& event);
 
     /** Event gestion */
     void update_values();

@@ -106,6 +106,8 @@
 		<Unit filename="ObjectDialog.cpp" />
 		<Unit filename="ObjectDialog.h" />
 		<Unit filename="ObjectListener.h" />
+		<Unit filename="ProductDialog.cpp" />
+		<Unit filename="ProductDialog.h" />
 		<Unit filename="RegViewer.cpp" />
 		<Unit filename="RegViewer.h" />
 		<Unit filename="RegionData.cpp" />
@@ -115,6 +117,7 @@
 		<Unit filename="UnitEditListener.h" />
 		<Unit filename="UnitEditorDialog.cpp" />
 		<Unit filename="UnitEditorDialog.h" />
+		<Unit filename="UnitListener.h" />
 		<Unit filename="model.cpp" />
 		<Unit filename="model.h" />
 		<Unit filename="observer.h" />

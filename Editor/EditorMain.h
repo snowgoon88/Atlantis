@@ -73,6 +73,8 @@ class EditorFrame: public wxFrame,
             idMenuRemoveShaft = 203,
             idMenuSetTerrain = 204,
             idMenuSetRace = 205,
+            idMenuRenewProduct = 206,
+            idMenuSetWages = 207,
             idMenuAddGate = 210,
             idMenuDelGate = 211,
             idMenuSwapGate = 212,
@@ -95,7 +97,7 @@ class EditorFrame: public wxFrame,
             idMenuAbout,
             idRegionBase = 2000, // No id AFTER Need at least NB_MAX_REGION id !!!!!!!
         };
-        wxAcceleratorEntry _accel_entries[9]; // After 20->SetRegion
+        wxAcceleratorEntry _accel_entries[11]; // After 20->SetRegion
         void OnReload( wxCommandEvent& event );
         void OnSave( wxCommandEvent& event );
         void OnRegion( wxCommandEvent& event);
@@ -113,6 +115,8 @@ class EditorFrame: public wxFrame,
         void OnRemoveShaft( wxCommandEvent& event);
         void OnSetTerrain( wxCommandEvent& event);
         void OnSetRace( wxCommandEvent& event);
+        void OnRenewProducts( wxCommandEvent& event );
+        void OnSetWages( wxCommandEvent& event);
 
         void OnTown( wxCommandEvent& event);
 
