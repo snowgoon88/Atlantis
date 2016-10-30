@@ -520,6 +520,13 @@ Game::EditGameRegionObjects( ARegion *pReg )
 **** [n] [index] [name] to rename object
 *** 2) Edit Terrain
 Game::EditGameRegionTerrain( ARegion *pReg )
+Pb with void ARegion::SetIncome()
+called from 
+ - void ARegion::UpdateEditRegion()
+ - void ARegion::SetupEditRegion()
+   - void Game::EditGameRegionTerrain( ARegion *pReg ) 
+   - [map_access.h]
+ - void ARegion::PostTurn(ARegionList *pRegs)
 **** [t] [terrain type] to modify terrain type
 **** [r] [race] to modify local race (None or0 to unset)
 **** [w] [maxwages] to modify local wages
