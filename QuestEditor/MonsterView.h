@@ -65,6 +65,7 @@
         // escape
         wxCheckBox *_escape_check;
         wxPanel* _escape_panel;
+        wxPanel *_esc_opt_panel;
         wxCheckBox *_loselinked_check, *_hasskill_check, *_losschance_check,
                 *_esclinear_check, *_escsquare_check, *_esccube_check, *_escquad_check;
 //        wxRadioButton  *_esclinear_radio,

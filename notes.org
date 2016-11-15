@@ -346,23 +346,28 @@ class Quest : public AListElem
 		AList	rewards;
 };
 * MONSTER
-** [6/12] Item
+** [7/12] Item
 *** TODO Faire une doc pour expliquer
 *** TODO Lire ../gamedata.h/cpp et sauver dans new_gamedata.h/cpp
 *** DONE str_enum : I_XXXX
-Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
+	Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
 *** name, names : pas d'incidence. Singulier et pluriel.
 *** DONE abr : 4 lettre max (3 existe). Pas de doublons
 *** DONE Production magique
+mSkill, mLevel,
 Vérifier que c'est un skill (??) qui existe
 mLevel : le niveau du skill nécessaire pour l'invocation.
+**** DONE Vérifier que utilisable dans le programme
+=> non! modifier/ajouter dans spell.cpp et skill.cpp
 *** Mouvement : encombrement maxi pour ce type de mouvement
 *** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
 *** TODO Escape => changer les widget quand on fait set monster
 *** TODO Escape => comment on write quand no-escape
-*** TODO Escape. => exclusif flags !!!!!!
+*** DONE Escape. => exclusif flags !!!!!!
 Voir items.h pour exclusif
 Voir game.cpp pour calcul de chances
+void Game::MonsterCheck(ARegion *r, Unit *u)
+**** DONE si LIN/SQUARE/.../ => pas les autres flags
 **** LOSS_CHANCE ( + HAS_SKILL)
 losses = (monster->num + random(esc_val)) / esc_val => nb monstres perdus
 losses vaut 0 si a le bon skill au bon niveau
@@ -378,6 +383,8 @@ si level :
 si LOSE_LINKED, peut perdre autres objets du même type (IT_UNDEAD), la chance sera la plus grande de tous ce genre d'objets
 perte si chance > random(10000)
 Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
+**** DONE si choisi skill NULL alors que ESC_LEV_LINEAR (and level=0)
+**** DONE enable/disable LOSE_LINKED and NUM si pas esc_lev_xxx
 *** TODO write with new escape
 *** DONE special : list parmi ce qui existe
 *** DONE spoil : exclusif (??)

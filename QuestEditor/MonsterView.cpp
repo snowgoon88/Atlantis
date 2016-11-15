@@ -11,6 +11,7 @@
 #include <skills.h>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 
 wxBEGIN_EVENT_TABLE(MonsterView, wxPanel)
     EVT_COMBOBOX(idAbbrCombo, MonsterView::on_cbox_update)
@@ -222,20 +223,23 @@ MonsterView::MonsterView(wxWindow *parent, MonsterData& data)
     esc_way_hbox->Add( _eSkill_combo, 0, wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 20 );
     //magic_hbox->Add( _mSkill_combo, 0, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
 
-    mk_spin( _escape_panel, wxID_ANY, esc_way_hbox, "Level/Val:", _esc_spin, 0, 10, 50);
+    mk_spin( _escape_panel, wxID_ANY, esc_way_hbox, "Level/Val:", _esc_spin, 1, 10, 50);
     _esc_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_escspin_update, this);
     _esc_spin->Bind( wxEVT_TEXT, &MonsterView::on_escspin_updateenter, this);
     _esc_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_escspin_updateenter, this);
     esc_vbox->Add( esc_way_hbox );
 
-    wxBoxSizer *esc_opt_hbox = new wxBoxSizer( wxHORIZONTAL );
+    _esc_opt_panel = new wxPanel( _escape_panel, wxID_ANY );
+    wxBoxSizer * esc_opt_hbox = new wxBoxSizer( wxHORIZONTAL );
     esc_opt_hbox->AddSpacer(30);
-    mk_title( _escape_panel, esc_opt_hbox, "Escape options:");
-    mk_check( _escape_panel, idEscLinked, esc_opt_hbox, "Lose Linked", _loselinked_check );
+    mk_title( _esc_opt_panel, esc_opt_hbox, "Escape options:");
+    mk_check( _esc_opt_panel, idEscLinked, esc_opt_hbox, "Lose Linked", _loselinked_check );
     _loselinked_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_esccheck_update, this);
-    mk_check( _escape_panel, idEscNumSquare, esc_opt_hbox, "Esc num square", _escnum_check );
+    mk_check( _esc_opt_panel, idEscNumSquare, esc_opt_hbox, "Esc num square", _escnum_check );
     _escnum_check->Bind( wxEVT_CHECKBOX, &MonsterView::on_esccheck_update, this);
-    esc_vbox->Add( esc_opt_hbox );
+    _esc_opt_panel->SetSizer( esc_opt_hbox );
+    _esc_opt_panel->Enable( false );
+    esc_vbox->Add( _esc_opt_panel );
 
     wxBoxSizer *esc_effet_hbox = new wxBoxSizer( wxHORIZONTAL );
     esc_effet_hbox->AddSpacer(30);
@@ -665,6 +669,7 @@ void MonsterView::on_esccheck_update( wxCommandEvent& event )
             _escsquare_check->SetValue( false );
             _esccube_check->SetValue( false );
             _escquad_check->SetValue( false );
+            _esc_opt_panel->Enable( false );
         }
         break;
     case idEscHasSkill:
@@ -673,34 +678,47 @@ void MonsterView::on_esccheck_update( wxCommandEvent& event )
             _escsquare_check->SetValue( false );
             _esccube_check->SetValue( false );
             _escquad_check->SetValue( false );
+            _esc_opt_panel->Enable( false );
         }
         break;
     case idEscLinear:
         if( _esclinear_check->GetValue()) {
+            _losschance_check->SetValue( false );
+            _hasskill_check->SetValue( false );
             _escsquare_check->SetValue( false );
             _esccube_check->SetValue( false );
             _escquad_check->SetValue( false );
+            _esc_opt_panel->Enable( true );
         }
         break;
     case idEscSquare:
         if( _escsquare_check->GetValue()) {
+            _losschance_check->SetValue( false );
+            _hasskill_check->SetValue( false );
             _esclinear_check->SetValue( false );
             _esccube_check->SetValue( false );
             _escquad_check->SetValue( false );
+            _esc_opt_panel->Enable( true );
         }
         break;
     case idEscCube:
         if( _esccube_check->GetValue()) {
+            _losschance_check->SetValue( false );
+            _hasskill_check->SetValue( false );
             _esclinear_check->SetValue( false );
             _escsquare_check->SetValue( false );
             _escquad_check->SetValue( false );
+            _esc_opt_panel->Enable( true );
         }
         break;
     case idEscQuad:
         if( _escquad_check->GetValue()) {
+            _losschance_check->SetValue( false );
+            _hasskill_check->SetValue( false );
             _esclinear_check->SetValue( false );
             _esccube_check->SetValue( false );
             _escsquare_check->SetValue( false );
+            _esc_opt_panel->Enable( true );
         }
         break;
     }
@@ -750,7 +768,7 @@ void MonsterView::on_esccheck_update( wxCommandEvent& event )
 //    std::cout << "LOSS AFTER escape=" << _monster->_item->escape << std::endl;
 //    }
     std::cout << "FINAL escape = " << _monster->_item->escape << std::endl;
-
+    _monster->_item->esc_val = _esc_spin->GetValue();
     _esc_text->SetLabel( wxString( compute_escape() ));
 }
 void MonsterView::on_eSkillcombo_update( wxCommandEvent& event )
@@ -772,6 +790,7 @@ void MonsterView::on_eSkillcombo_update( wxCommandEvent& event )
             strcpy( (char *) _monster->_item->esc_skill, SkillDefs[id_skill].abbr );
         }
     }
+    _monster->_item->esc_val = _esc_spin->GetValue();
     _esc_text->SetLabel( wxString( compute_escape() ));
 }
 void MonsterView::on_escspin_update( wxSpinEvent& event)
@@ -1273,9 +1292,11 @@ std::string MonsterView::compute_escape()
                 chance[lvl] = ( chance[lvl] * 10000) / bottom;
             }
 
-            msg << "lvl(" << _monster->_item->esc_skill << ")=chance sur 10000 : ";
+            msg << "lvl(" << _monster->_item->esc_skill << ")=proba echapper : ";
             for( int lvl=0; lvl<6; ++lvl ) {
-                msg << "  " << lvl << "=" << chance[lvl];
+                float proba = (float) chance[lvl] / 100.0f;
+                if( proba > 100.f ) proba = 100.f;
+                msg << "  " << lvl << "=" << std::setprecision(3) << proba << "%";
             }
             return msg.str();
         }

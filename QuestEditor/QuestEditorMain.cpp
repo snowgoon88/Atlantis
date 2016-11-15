@@ -135,6 +135,10 @@ void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
                                 wxString("Nouveau Monstre"),
                                 _("I_BIDULE"),
                                this );
+    // detect Cancel
+    if( unique_str.IsEmpty() ) {
+        return;
+    }
     bool fg_valid = false;
     while( fg_valid == false ) {
         if( unique_str.substr(0,2).compare("I_") != 0 ) {
