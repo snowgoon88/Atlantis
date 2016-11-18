@@ -346,9 +346,12 @@ class Quest : public AListElem
 		AList	rewards;
 };
 * MONSTER
-** [7/12] Item
+** [10/13] Item
 *** TODO Faire une doc pour expliquer
-*** TODO Lire ../gamedata.h/cpp et sauver dans new_gamedata.h/cpp
+*** DONE Lire ../gamedata.h/cpp et sauver dans gamedata.h/cpp_new
+*** TODO Pourquoi pas relu par Editor ???
+*** TODO write with new escape
+
 *** DONE str_enum : I_XXXX
 	Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
 *** name, names : pas d'incidence. Singulier et pluriel.
@@ -361,8 +364,8 @@ mLevel : le niveau du skill nécessaire pour l'invocation.
 => non! modifier/ajouter dans spell.cpp et skill.cpp
 *** Mouvement : encombrement maxi pour ce type de mouvement
 *** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
-*** TODO Escape => changer les widget quand on fait set monster
-*** TODO Escape => comment on write quand no-escape
+*** DONE Escape => changer les widget quand on fait set monster
+*** DONE Escape => comment on write quand no-escape
 *** DONE Escape. => exclusif flags !!!!!!
 Voir items.h pour exclusif
 Voir game.cpp pour calcul de chances
@@ -385,7 +388,6 @@ perte si chance > random(10000)
 Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
 **** DONE si choisi skill NULL alors que ESC_LEV_LINEAR (and level=0)
 **** DONE enable/disable LOSE_LINKED and NUM si pas esc_lev_xxx
-*** TODO write with new escape
 *** DONE special : list parmi ce qui existe
 *** DONE spoil : exclusif (??)
 *** DONE abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion

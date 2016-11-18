@@ -50,9 +50,10 @@ wxString wxbuildinfo(wxbuildinfoformat format)
 
 BEGIN_EVENT_TABLE(QuestEditorFrame, wxFrame)
     EVT_CLOSE(QuestEditorFrame::OnClose)
-    EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
+    //EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
     EVT_MENU(idMenuMonsterAdd, QuestEditorFrame::OnMonsterAdd)
-    EVT_MENU(idMenuMonsterDebug, QuestEditorFrame::OnMonsterDebug)
+    //EVT_MENU(idMenuMonsterDebug, QuestEditorFrame::OnMonsterDebug)
+    EVT_MENU(idMenuMonsterSave, QuestEditorFrame::OnWriteMonster)
     EVT_MENU(idMenuQuit, QuestEditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, QuestEditorFrame::OnAbout)
 END_EVENT_TABLE()
@@ -64,13 +65,14 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     // create a menu bar
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
-    fileMenu->Append(idMenuFileOpen, _("&Open\tCtrl-O"), _("Open a game file"));
+    //fileMenu->Append(idMenuFileOpen, _("&Open\tCtrl-O"), _("Open a game file"));
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
     wxMenu* monsterMenu = new wxMenu(_T(""));
     monsterMenu->Append( idMenuMonsterAdd, _("&Add Monster"), ("Ajoute un nouveau Monstre... brrrr....") );
-    monsterMenu->Append( idMenuMonsterDebug, _("&Debug Monster"), ("Denude le Monstre :o)") );
+    //monsterMenu->Append( idMenuMonsterDebug, _("&Debug Monster"), ("Denude le Monstre :o)") );
+    monsterMenu->Append( idMenuMonsterSave, _("&Write Monsters"), ("Sauvegarde les Monstres dans gamedata.cpp.new") );
     mbar->Append(monsterMenu, _("&Monster"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
@@ -105,7 +107,17 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     // Read data about monsters
     read_itemtype_enum();
     //parse_gamedata();
-    _monster_data.parse_gamedata();
+    wxString path = "..";
+    /** Look for proper path */
+    std::cout << "Path=" << path << std::endl;
+    while( !path.IsEmpty() && !wxFileExists( path+"/gamedata.h")) {
+        path = wxDirSelector( "Dans quel repertoire est le code source d'Atlantis ?" );
+        std::cout << "Path=" << path << std::endl;
+    }
+    if( path.IsEmpty() ) {
+        exit(1);
+    }
+    _monster_data.parse_gamedata( path.ToStdString() );
 
     _monster_view = new MonsterView( _panel, _monster_data );
     vbox->Add( _monster_view );
@@ -168,6 +180,10 @@ void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
 void QuestEditorFrame::OnMonsterDebug(wxCommandEvent& event)
 {
     _monster_view->_monster->write_debug();
+}
+void QuestEditorFrame::OnWriteMonster(wxCommandEvent& even)
+{
+    _monster_data.write_gamedata();
 }
 void QuestEditorFrame::OnClose(wxCloseEvent &event)
 {

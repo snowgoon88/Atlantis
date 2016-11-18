@@ -318,7 +318,7 @@ MonsterView::MonsterView(wxWindow *parent, MonsterData& data)
 
     // special
     wxBoxSizer *special_hbox = new wxBoxSizer( wxHORIZONTAL );
-    //mk_field( this, wxID_ANY, special_hbox, "Special:", _special_text, 0, 200);
+    mk_title( _monster_panel, special_hbox, "Special attack:" );
     _special_combo = new wxComboBox(_monster_panel, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize,
                                 0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
     _special_combo->Append( wxString("NULL"));
@@ -996,6 +996,8 @@ void MonsterView::on_mdefnametext_update( wxCommandEvent& event )
 void MonsterView::set_monster( AMonster* monster )
 {
     _monster = monster;
+    _edit_check->SetValue( false );
+    _monster_panel->Enable( false );
     // abr, name, names
     _abbr_text->Clear();
     _abbr_text->AppendText( wxString( monster->_item->abr));
@@ -1068,6 +1070,12 @@ void MonsterView::set_monster( AMonster* monster )
     _escquad_check->SetValue( monster->_item->escape & ItemType::ESC_LEV_QUAD );
     _losschance_check->SetValue( monster->_item->escape & ItemType::LOSS_CHANCE );
     _escnum_check->SetValue( monster->_item->escape & ItemType::ESC_NUM_SQUARE );
+    if( monster->_item->escape & ItemType::ESC_LEV_LINEAR ||
+       monster->_item->escape & ItemType::ESC_LEV_SQUARE ||
+       monster->_item->escape & ItemType::ESC_LEV_CUBE ||
+       monster->_item->escape & ItemType::ESC_LEV_QUAD) {
+        _esc_opt_panel->Enable( true );
+    }
 
 //        if( monster->_item->esc_skill != NULL ) {
 //            _eSkill_text->Clear();

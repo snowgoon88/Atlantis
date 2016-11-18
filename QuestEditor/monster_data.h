@@ -56,7 +56,7 @@ public:
   AMonster* find_monster( const std::string& item_enum );
 
   /** Parse gamedata for I_MONSTER and MonDefs */
-  void parse_gamedata();
+  void parse_gamedata( const std::string& path );
   void write_gamedata();
 
   /** Add AMonster defined by its I_ITEMS and id_item */
@@ -65,6 +65,8 @@ public:
   AMonster* make_new( const std::string& item_str = "I_BIDULE" );
 
  private:
+  /** name of input path */
+  std::string _input_path;
   /** parse gamedata.cpp looking for next item */
   std::string parse_to_next_item( std::istream& in, std::ostream& out,
 				  const std::string& startstr,

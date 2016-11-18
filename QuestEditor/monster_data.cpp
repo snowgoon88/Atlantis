@@ -196,9 +196,10 @@ void AMonster::write_debug( std::ostream& out )
 // ***************************************************************************
 // ***************************************************************************
 // ********************************************* MonsterData::parse_gamedata()
-void MonsterData::parse_gamedata()
+void MonsterData::parse_gamedata( const std::string& path )
 {
-  std::ifstream h_in( "mygamedata.h" );
+  _input_path = path;
+  std::ifstream h_in( path+"/gamedata.h" );
   //std::ifstream cpp_in( "mygamedata.cpp" );
 
   std::string line;
@@ -219,11 +220,11 @@ void MonsterData::parse_gamedata()
 // ********************************************* MonsterData::write_gamedata()
 void MonsterData::write_gamedata()
 {
-  std::ifstream h_in( "mygamedata.h" );
-  std::ifstream cpp_in( "mygamedata.cpp" );
+  std::ifstream h_in( _input_path+"/gamedata.h" );
+  std::ifstream cpp_in( _input_path+"/gamedata.cpp" );
 
-  std::ofstream h_out( "new_gamedata.h" );
-  std::ofstream cpp_out( "new_gamedata.cpp" );
+  std::ofstream h_out( "gamedata.h.new" );
+  std::ofstream cpp_out( "gamedata.cpp.new" );
 
   bool must_copy = true;
   int idx_monster = 0;
