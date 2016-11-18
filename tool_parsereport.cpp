@@ -12,6 +12,7 @@
 #include <sstream>                   // std::istringstream
 #include <fstream>                   // std::files
 #include <cstdio>
+#include <stdlib.h>                  // exit
 
 // ***************************************************************************
 // ******************************************************************* GLOBALS
