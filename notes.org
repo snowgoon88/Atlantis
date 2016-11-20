@@ -346,12 +346,16 @@ class Quest : public AListElem
 		AList	rewards;
 };
 * MONSTER
-** [10/13] Item
+** [12/14] Item
 *** TODO Faire une doc pour expliquer
 *** DONE Lire ../gamedata.h/cpp et sauver dans gamedata.h/cpp_new
-*** TODO Pourquoi pas relu par Editor ???
+*** DONE Pourquoi pas relu par Editor ???
+=> il faut recompiler
+=> compile avec make clean ou rebuild
+*** DONE DJIN transformé en UNDEAD dans CRYPT !!
+=> compile avec make clean ou rebuild
 *** TODO write with new escape
-
+*** Bizarrerie dans Write
 *** DONE str_enum : I_XXXX
 	Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
 *** name, names : pas d'incidence. Singulier et pluriel.
@@ -393,6 +397,8 @@ Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
 *** DONE abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion
 ** WANDERING Monster
 unit->type = U_WMON.
+** Reading and Running the game
+*** Read Faction => OK
 
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype

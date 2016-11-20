@@ -57,7 +57,7 @@ public:
 
   /** Parse gamedata for I_MONSTER and MonDefs */
   void parse_gamedata( const std::string& path );
-  void write_gamedata();
+  void write_gamedata( bool fg_debug = false );
 
   /** Add AMonster defined by its I_ITEMS and id_item */
   void add( const std::string& str_enum, int id_item );
@@ -73,7 +73,7 @@ public:
 				  bool fg_copy );
   /** copy a monster from in to out */
   void copy_item( std::istream& in, std::ostream& out,
-		  const std::string& first_line );
+		  const std::string& first_line, bool fg_copy );
 };
 // ******************************************************** end of MonsterData
 
