@@ -4,7 +4,7 @@
  * Author:    Snow ()
  * Created:   2016-09-14
  * Copyright: Snow ()
- * License:   
+ * License:
  **************************************************************/
 
 #ifndef WX_PCH_H_INCLUDED

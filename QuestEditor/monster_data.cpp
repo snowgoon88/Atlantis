@@ -5,6 +5,7 @@
  */
 #include <monster_data.h>
 #include <utils.h>
+#include <stdlib.h>
 
 // ******************************************************** AMonster::AMonster
 AMonster::AMonster() :

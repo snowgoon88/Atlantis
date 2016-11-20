@@ -6,6 +6,7 @@
 #include <utils.h>
 
 #include <fstream>
+#include <sstream>
 
 // ******************************************************************* Globals
 std::map<std::string,int> _map_itype;
@@ -23,7 +24,9 @@ void read_itemtype_enum()
     if( line[0] == '\t' && line[1] == 'I' && line[2] == 'T' && line[3] == '_' ) {
       auto tokens = split( line );
       std::string tok = tokens[0];
-      int id = std::stoi( tokens[2], nullptr, 0 );
+      std::stringstream t2(tokens[2]);
+      int id; t2 >> id;
+      //int id = std::stoi( tokens[2], nullptr, 0 );
       //std::cout << "enum " << tok << ":" << id << " (" << tokens[2] << ")" << std::endl;
       _map_itype[tok] = id;
     }
