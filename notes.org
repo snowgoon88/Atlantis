@@ -400,9 +400,38 @@ unit->type = U_WMON.
 ** Reading and Running the game
 *** Read Faction => OK
 
+* STEAL/ASSASS
+*** target != GUARD, WMONSTAR or GUARDMAGE
+*** 1 man unit
+*** personne peut voir de Faction(target), Ally or Guard
+
+** steal u vers tar
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
+* ITEMS
+** as ItemDefs
+*** CANTGIVE = False
+*** IT_MAN = False
+*** IT_MONSTER = False
+*** IT_ILLUSION = False
+*** IT_UNDEAD = False
+*** IT_DEMON = False
+*** IT_LEADER = False
+*** IT_MONEY = False
+*** IT_ANIMAL = False
+*** IT_ALWAYS_SPOIL = False
+*** LOSE_LINKED = False
+*** HAS_SKILL = False
+*** ESC_* = False
+*** esc_skill = NULL
+*** esc_val = 0
+** Table of Weapons : WeaponDefs
+** Table of Armor : ArmorDefs
+** MountDefs
+** BattleItemDefs
+
+
 * [21/23] EDITOR
 ** DONE sauvegarde du nom dans l'éditeur d'unité
 Spliter après la parenthèse...

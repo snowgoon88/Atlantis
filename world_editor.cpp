@@ -6,7 +6,8 @@
  * - List existing elements
  */
 #include <game.h>
-#include <map_access.h>
+#include <gamedata.h>
+//#include <map_access.h>
 #include <stdlib.h>     /* exit, EXIT_FAILURE */
 #include <string.h>
 #include <sstream>
@@ -310,6 +311,184 @@ void list_monsters()
 
   ofile.close();
 }
+/** print all items */
+void print_items()
+{
+  std::ofstream ofile( "items.data" );
+  
+  std::cout << head_item << std::endl;
+  ofile << head_item << std::endl;
+
+
+  
+  for( int i=0; i < NITEMS; ++i ) {
+    std::cout << "FOUND " << ItemDefs[i].name;
+	std::cout << std::endl;
+	    
+	// Prepare string
+	stringstream line;
+	line << ItemDefs[i].name << "\t";
+	line << ItemDefs[i].names << "\t";
+	line << ItemDefs[i].abr << "\t";
+	if( ItemDefs[i].flags & ItemType::CANTGIVE )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].flags & ItemType::DISABLED )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].flags & ItemType::NOMARKET )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].flags & ItemType::ORINPUTS )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].flags & ItemType::SKILLOUT )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].flags & ItemType::NOTRANSPORT )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].pSkill ) {
+	  line << ItemDefs[i].pSkill << "\t";
+	}
+	else line << "NULL\t";
+	line << ItemDefs[i].pLevel << "\t";
+	line << ItemDefs[i].pMonths << "\t";
+	line << ItemDefs[i].pOut << "\t";
+	for( int k=0; k<4; ++k ) {
+	  line << ItemDefs[i].pInput[k].item << "\t" << ItemDefs[i].pInput[k].amt << "\t";
+	}
+	if( ItemDefs[i].mSkill ) {
+	  line << ItemDefs[i].mSkill << "\t";
+	}
+	else line << "NULL\t";
+	line << ItemDefs[i].mLevel << "\t";
+	line << ItemDefs[i].mOut << "\t";
+	for( int k=0; k<4; ++k ) {
+	  line << ItemDefs[i].mInput[k].item << "\t" << ItemDefs[i].mInput[k].amt << "\t";
+	}
+	line << ItemDefs[i].weight << "\t";
+	if( ItemDefs[i].type & IT_NORMAL )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_ADVANCED )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_TRADE )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_MAN )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_MONSTER )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_MAGIC )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_WEAPON )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_ARMOR )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_MOUNT )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_BATTLE )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_SPECIAL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_TOOL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_FOOD )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_ILLUSION )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_UNDEAD )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_DEMON )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_LEADER )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_MONEY )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_ANIMAL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_SHIP )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_MAGEONLY )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].type & IT_ALWAYS_SPOIL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].type & IT_NEVER_SPOIL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	line << ItemDefs[i].baseprice << "\t";
+	line << ItemDefs[i].combat << "\t";
+	line << ItemDefs[i].walk << "\t";
+	line << ItemDefs[i].ride << "\t";
+	line << ItemDefs[i].fly << "\t";
+	line << ItemDefs[i].swim << "\t";
+	line << ItemDefs[i].speed << "\t";
+	line << ItemDefs[i].hitchItem << "\t";
+	line << ItemDefs[i].hitchwalk << "\t";
+	line << ItemDefs[i].mult_item << "\t";
+	line << ItemDefs[i].mult_val << "\t";
+	line << ItemDefs[i].max_inventory << "\t";
+	if( ItemDefs[i].escape & ItemType::LOSE_LINKED )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].escape & ItemType::HAS_SKILL )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].escape & ItemType::ESC_LEV_LINEAR )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].escape & ItemType::ESC_LEV_SQUARE )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].escape & ItemType::ESC_LEV_CUBE )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].escape & ItemType::ESC_LEV_QUAD )
+	  line << "Y\t";
+	else  line << "N\t";	    
+	if( ItemDefs[i].escape & ItemType::LOSS_CHANCE )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].escape & ItemType::ESC_NUM_SQUARE )
+	  line << "Y\t";
+	else  line << "N\t";
+	if( ItemDefs[i].esc_skill ) {
+	  line << ItemDefs[i].esc_skill << "\t";
+	}
+	else line << "NULL\t";
+	line << ItemDefs[i].esc_val << "\t";
+	line << ItemDefs[i].grantSkill << "\t";
+	for( int k=0; k<4; ++k ) {
+	  line << ItemDefs[i].fromSkills[k] << "\t";
+	}
+	line << ItemDefs[i].minGrant << "\t";
+	line << ItemDefs[i].maxGrant;
+	
+	ofile << line.str() << std::endl;
+  }
+  ofile.close();
+}
 
 
 void list_items()
@@ -385,12 +564,13 @@ void list_elements()
 
     _game.ModifyTablesPerRuleset();
 
-  MapAccess mapAccess = MapAccess( &_game );
+	//MapAccess mapAccess = MapAccess( &_game );
 
   // list_skills();
   // list_objects();
   //list_terrain();
-  list_monsters();
+  //list_monsters();
+  print_items();
 }
 int main(int argc, char *argv[])
 {
