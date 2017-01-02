@@ -1,7 +1,8 @@
 /* -*- coding: utf-8 -*- */
 
 /**
- * TODO
+ * _map_itypes = map<IT_XXX::string,IT_XXX::value>
+ * split a string according to c
  */
 #include <utils.h>
 
@@ -13,9 +14,9 @@ std::map<std::string,int> _map_itype;
 int _max_item_id = -1;
 int _max_mtype_id = -2;
 // ******************************************************** read_itemtype_enum
-void read_itemtype_enum()
+void read_itemtype_enum( const std::string& path)
 {
-  std::ifstream in( "myitems.h" );
+  std::ifstream in( path+"items.h" );
 
   std::string line;
   int idx_monster = 0;

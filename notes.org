@@ -430,7 +430,7 @@ IT_XXXX = Ox0972
 ** Table of Armor : ArmorDefs
 ** MountDefs
 ** BattleItemDefs
-
+** weapon XOR armor XOR mount
 
 * [21/23] EDITOR
 ** DONE sauvegarde du nom dans l'éditeur d'unité
