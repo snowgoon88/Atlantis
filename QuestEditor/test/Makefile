@@ -1,13 +1,18 @@
 
 ## The object files to be tested
+APATH = ../..
 BPATH = ..
 TEST_OBJECTS = utils.o \
-	enum_data.o
+	enum_data.o \
+	item_data.o \
+
+ENGINE_OBJECTS = gamedata.o \
 
 OBJECTS := $(patsubst %.o,obj/%.o,$(TEST_OBJECTS)) \
+	$(patsubst %.o,obj/%.o,$(ENGINE_OBJECTS)) \
 
 
-CXXFLAGS = -std=c++11 -g -I.. 
+CXXFLAGS = -std=c++11 -g -I.. -I../..
 
 ## A directory to store objects
 OBJDIR = obj
@@ -45,6 +50,9 @@ POSTCOMPILE = mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d
 	$(COMPILE.cc) $(OUTPUT_OPTION) $<
 	$(POSTCOMPILE)
 obj/%.o : %.cpp $(DEPDIR)/%.d
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	$(POSTCOMPILE)
+obj/%.o : $(APATH)/%.cpp $(DEPDIR)/%.d
 	$(COMPILE.cc) $(OUTPUT_OPTION) $<
 	$(POSTCOMPILE)
 obj/%.o : $(BPATH)/%.cpp $(DEPDIR)/%.d

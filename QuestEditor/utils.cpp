@@ -13,6 +13,7 @@
 std::map<std::string,int> _map_itype;
 int _max_item_id = -1;
 int _max_mtype_id = -2;
+int _max_wtype_id = -3;
 // ******************************************************** read_itemtype_enum
 void read_itemtype_enum( const std::string& path)
 {
@@ -33,6 +34,16 @@ void read_itemtype_enum( const std::string& path)
     }
   }
   in.close();
+}
+// ***************************************************************** find_byid
+std::string find_itype_byid( int id )
+{
+  for( auto& elem: _map_itype) {
+    if( elem.second == id ) {
+	  return elem.first;
+	}
+  }
+  return "UNKNOWN";
 }
 // ********************************************************************* split
 std::vector<std::string> split(const std::string& str, char c)

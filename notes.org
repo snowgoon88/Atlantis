@@ -406,10 +406,18 @@ unit->type = U_WMON.
 *** personne peut voir de Faction(target), Ally or Guard
 
 ** steal u vers tar
+* TODO Gerer la création/desruction de nouveaux ITEMS pour ses enums
+=> enum_data.h/cpp
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* ITEMS
+* [1/3] ITEMS
+** TODO read items
+** TODO write items
+** DONE read weapons
+** read armors
+** read mount
+** read battle
 ** as ItemDefs
 *** CANTGIVE = False
 *** IT_MAN = False
