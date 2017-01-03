@@ -411,11 +411,11 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [1/3] ITEMS
+* [2/4] ITEMS
 ** TODO read items
 ** TODO write items
 ** DONE read weapons
-** read armors
+** DONE read armors
 ** read mount
 ** read battle
 ** as ItemDefs

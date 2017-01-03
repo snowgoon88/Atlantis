@@ -10,7 +10,8 @@
 // ******************************************************** AMonster::AMonster
 AItem::AItem() :
   _fg_edited(false), _item_enum(""), _item_id(-1), _item(nullptr),
-  _wtype_id(-1), _wtype(nullptr)
+  _wtype_id(-1), _wtype(nullptr),
+  _atype_id(-1), _atype(nullptr)
 {}
 // ****************************************************** AMonster::write_item
 void AItem::write_item( std::ostream& out )
@@ -395,7 +396,31 @@ void AItem::write_type_weapon( std::ostream& out )
   // bonuses
   out << "\t" << _wtype->attackBonus << ", " << _wtype->defenseBonus << ", " << _wtype->mountBonus << "}," << std::endl;
 }
-
+// *************************************************** AItem::write_type_armor
+ void AItem::write_type_armor( std::ostream& out )
+ {
+   // abbr
+   if( _atype->abbr ) {
+	 out << "\t{ \"" << _atype->abbr << "\", ";
+   }
+   else out << "\t{ NULL , ";
+   // flags
+   if( _atype->flags > 0 ) {
+	 out << "ArmorType::USEINASSASSINATE, ";
+   }
+   else {
+	 out << "0, ";
+   }
+   // from
+   out << _atype->from << ", ";
+   // chances
+   out << "{";
+   for( unsigned int i = 0; i < NUM_WEAPON_CLASSES; ++i) {
+	 out << _atype->saves[i];
+	 if( i < (NUM_WEAPON_CLASSES-1) ) out << ", ";
+   }
+   out << "}}," << std::endl;
+ }
 // // ****************************************************** AMonster::write_type
 // void AMonster::write_type( std::ostream& out )
 // {
@@ -458,6 +483,10 @@ void AItem::write_debug( std::ostream& out )
   if( _wtype ) {
 	out << "  --WEAPON--" << std::endl;
 	write_type_weapon( out );
+  }
+  if( _atype ) {
+	out << "  --ARMOR---" << std::endl;
+	write_type_armor( out );
   }
 }
 
@@ -732,7 +761,18 @@ void ItemData::add( const std::string& str_enum, int id_item )
 	  }
 	}
   }
-  
+  // Look for armor if needed
+  if( item._item->type & IT_ARMOR ) {
+	for( unsigned int i = 0; i < NUMARMORS; ++i) {
+	  if( ArmorDefs[i].abbr == NULL ) continue;
+	  if( item._item->abr == ArmorDefs[i].abbr ) {
+		item._atype_id = i;
+		item._atype = &(ArmorDefs[i]);
+		break;
+	  }
+	}
+  }
+
   // Add
   _map_item[id_item] = item;
 }

@@ -35,10 +35,14 @@ public:
   //std::string _weapon_enum;
   int _wtype_id;
   WeaponType* _wtype;
-
+  /** ref to Armor */
+  int _atype_id;
+  ArmorType* _atype;
+  
   /** Write functions */
   void write_item( std::ostream& out );
   void write_type_weapon( std::ostream& out );
+  void write_type_armor( std::ostream& out );
   void write_debug( std::ostream& out = std::cout );
 };
 // ************************************************************** end of AItem
