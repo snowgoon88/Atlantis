@@ -11,7 +11,9 @@
 AItem::AItem() :
   _fg_edited(false), _item_enum(""), _item_id(-1), _item(nullptr),
   _wtype_id(-1), _wtype(nullptr),
-  _atype_id(-1), _atype(nullptr)
+  _atype_id(-1), _atype(nullptr),
+  _mtype_id(-1), _mtype(nullptr),
+  _btype_id(-1), _btype(nullptr)
 {}
 // ****************************************************** AMonster::write_item
 void AItem::write_item( std::ostream& out )
@@ -395,7 +397,7 @@ void AItem::write_type_weapon( std::ostream& out )
 
   // bonuses
   out << "\t" << _wtype->attackBonus << ", " << _wtype->defenseBonus << ", " << _wtype->mountBonus << "}," << std::endl;
-}
+ }
 // *************************************************** AItem::write_type_armor
  void AItem::write_type_armor( std::ostream& out )
  {
@@ -420,6 +422,62 @@ void AItem::write_type_weapon( std::ostream& out )
 	 if( i < (NUM_WEAPON_CLASSES-1) ) out << ", ";
    }
    out << "}}," << std::endl;
+ }
+// *************************************************** AItem::write_type_mount
+ void AItem::write_type_mount( std::ostream& out )
+ {
+   // abbr
+   if( _mtype->abbr ) {
+	 out << "\t{ \"" << _mtype->abbr << "\", ";
+   }
+   else out << "\t{ NULL , ";
+   // skill
+   if( _mtype->skill ) {
+	 out << "\"" << _mtype->skill << "\", ";
+   }
+   else out << "NULL , ";
+   // min/max bonus
+   out << _mtype->minBonus << ", " << _mtype->maxBonus << ", " << _mtype->maxHamperedBonus << ", ";
+   // special
+   if( _mtype->mountSpecial ) {
+	 out << "\"" << _mtype->mountSpecial << "\", ";
+   }
+   else out << "NULL , ";
+   out << _mtype->specialLev << "}," << std::endl;
+ }
+// ************************************************** AItem::write_type_battle
+ void AItem::write_type_battle( std::ostream&out )
+ {
+   // abbr
+   if( _btype->abbr ) {
+	 out << "\t{ \"" << _btype->abbr << "\", ";
+   }
+   else out << "\t{ NULL , ";
+   // flags
+   bool fg_before = false;
+   if( _btype->flags & BattleItemType::MAGEONLY ) {
+	 if( fg_before ) out << "| ";
+	 out << "BattleItemType::MAGEONLY ";
+	 fg_before = true;
+   }
+   if( _btype->flags & BattleItemType::SPECIAL ) {
+	 if( fg_before ) out << "| ";
+	 out << "BattleItemType::SPECIAL ";
+	 fg_before = true;
+   }
+   if( _btype->flags & BattleItemType::SHIELD ) {
+	 if( fg_before ) out << "| ";
+	 out << "BattleItemType::SHIELD ";
+	 fg_before = true;
+   }
+   if( _btype->flags & BattleItemType::EXCLUSIVE ) {
+	 if( fg_before ) out << "| ";
+	 out << "BattleItemType::EXCLUSIVE ";
+	 fg_before = true;
+   }
+   out << "," << std::endl;
+   // special and level
+   out << "\t\"" << _btype->special << ", " << _btype->skillLevel << " }," << std::endl;
  }
 // // ****************************************************** AMonster::write_type
 // void AMonster::write_type( std::ostream& out )
@@ -487,6 +545,14 @@ void AItem::write_debug( std::ostream& out )
   if( _atype ) {
 	out << "  --ARMOR---" << std::endl;
 	write_type_armor( out );
+  }
+  if( _mtype ) {
+	out << "  --MOUNT---" << std::endl;
+	write_type_mount( out );
+  }
+  if( _btype ) {
+	out << "  --BATTLE--" << std::endl;
+	write_type_battle( out );
   }
 }
 
@@ -768,6 +834,28 @@ void ItemData::add( const std::string& str_enum, int id_item )
 	  if( item._item->abr == ArmorDefs[i].abbr ) {
 		item._atype_id = i;
 		item._atype = &(ArmorDefs[i]);
+		break;
+	  }
+	}
+  }
+  // Look for mount if needed
+  if( item._item->type & IT_MOUNT ) {
+	for( unsigned int i = 0; i < NUMMOUNTS; ++i) {
+	  if( MountDefs[i].abbr == NULL ) continue;
+	  if( item._item->abr == MountDefs[i].abbr ) {
+		item._mtype_id = i;
+		item._mtype = &(MountDefs[i]);
+		break;
+	  }
+	}
+  }
+  // Look for battle if needed
+  if( item._item->type & IT_BATTLE ) {
+	for( unsigned int i = 0; i < NUMBATTLEITEMS; ++i) {
+	  if( BattleItemDefs[i].abbr == NULL ) continue;
+	  if( item._item->abr == BattleItemDefs[i].abbr ) {
+		item._btype_id = i;
+		item._btype = &(BattleItemDefs[i]);
 		break;
 	  }
 	}

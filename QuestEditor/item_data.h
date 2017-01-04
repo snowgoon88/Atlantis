@@ -38,11 +38,19 @@ public:
   /** ref to Armor */
   int _atype_id;
   ArmorType* _atype;
+  /** ref to Mount */
+  int _mtype_id;
+  MountType* _mtype;
+  /** ref to BattleItem */
+  int _btype_id;
+  BattleItemType* _btype;
   
   /** Write functions */
   void write_item( std::ostream& out );
   void write_type_weapon( std::ostream& out );
   void write_type_armor( std::ostream& out );
+  void write_type_mount( std::ostream& out );
+  void write_type_battle( std::ostream&out );
   void write_debug( std::ostream& out = std::cout );
 };
 // ************************************************************** end of AItem
