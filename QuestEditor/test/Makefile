@@ -3,8 +3,9 @@
 APATH = ../..
 BPATH = ..
 TEST_OBJECTS = utils.o \
-	enum_data.o \
 	item_data.o \
+	monster_data.o \
+	all_data.o \
 
 ENGINE_OBJECTS = gamedata.o \
 

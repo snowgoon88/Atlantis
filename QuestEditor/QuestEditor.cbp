@@ -46,16 +46,22 @@
 		<Unit filename="../items.h" />
 		<Unit filename="../object.h" />
 		<Unit filename="../skills.h" />
+		<Unit filename="ItemView.cpp" />
+		<Unit filename="ItemView.h" />
 		<Unit filename="MonsterView.cpp" />
 		<Unit filename="MonsterView.h" />
 		<Unit filename="QuestEditorApp.cpp" />
 		<Unit filename="QuestEditorApp.h" />
 		<Unit filename="QuestEditorMain.cpp" />
 		<Unit filename="QuestEditorMain.h" />
+		<Unit filename="item_data.cpp" />
+		<Unit filename="item_data.h" />
 		<Unit filename="monster_data.cpp" />
 		<Unit filename="monster_data.h" />
 		<Unit filename="utils.cpp" />
 		<Unit filename="utils.h" />
+		<Unit filename="wx_utils.cpp" />
+		<Unit filename="wx_utils.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

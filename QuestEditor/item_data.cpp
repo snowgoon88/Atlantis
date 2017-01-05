@@ -376,7 +376,7 @@ void AItem::write_type_weapon( std::ostream& out )
   else out << "NULL," << std::endl;
 
   // weapClass
-  out << "\t" << ItemData::attack_enum[_wtype->weapClass] << ", " << ItemData::attack_type[_wtype->attackType] << ", ";
+  out << "\t" << AItem::attack_enum[_wtype->weapClass] << ", " << AItem::attack_type[_wtype->attackType] << ", ";
   // Num ATTACK
   if( _wtype->numAttacks >= WeaponType::NUM_ATTACKS_SKILL ) {
 	out << "WeaponType::NUM_ATTACKS_SKILL";
@@ -479,58 +479,6 @@ void AItem::write_type_weapon( std::ostream& out )
    // special and level
    out << "\t\"" << _btype->special << ", " << _btype->skillLevel << " }," << std::endl;
  }
-// // ****************************************************** AMonster::write_type
-// void AMonster::write_type( std::ostream& out )
-// {
-//   // Already written a flag on this line ?
-//   bool fg_before = false;
-
-//   // attack level
-//   out << "\t{" << _mtype->attackLevel << ",";
-//   // defenses
-//   out << "{";
-//   int idx_def = 0;
-//   out << _mtype->defense[idx_def++] << ",";
-//   out << _mtype->defense[idx_def++] << ",";
-//   out << _mtype->defense[idx_def++] << ",";
-//   out << _mtype->defense[idx_def++] << ",";
-//   out << _mtype->defense[idx_def++] << ",";
-//   out << _mtype->defense[idx_def++] << "}";
-//   out << "," << std::endl;
-//   // numAttacks, hits, regen
-//   out << "\t" << _mtype->numAttacks << "," << _mtype->hits << "," << _mtype->regen << ',' << std::endl;
-//   // tactics, steal, obs
-//   out << "\t" << _mtype->tactics << "," << _mtype->stealth << "," << _mtype->obs << "," << std::endl;
-//   // special, specialLevel
-//   if( _mtype->special == NULL ) {
-//     out << "\tNULL,0," << std::endl;
-//   }
-//   else {
-//     out << "\t\"" << _mtype->special << "\", " << _mtype->specialLevel << "," << std::endl;
-//   }
-//   // silver
-//   out << "\t" << _mtype->silver << ",";
-//   // spoilType
-//   //out << "TODO,";
-//   if( _mtype->spoiltype < 0 ) {
-//      out << "-1";
-//   }
-//   else {
-//     fg_before = false;
-//     for( auto& itype : _map_itype ) {
-//       if( _mtype->spoiltype & itype.second ) {
-// 	if( fg_before ) out << "| ";
-// 	out << " " << itype.first;
-// 	fg_before = true;
-//       }
-//     }
-//   }
-//   out << ",";
-//   // hostile, number
-//   out << _mtype->hostile << "," << _mtype->number << ",";
-//   // name, abbr
-//   out << "\"" << _mtype->name << "\", \"" << _mtype->abbr << "\"}," << std::endl;
-// }
 // ******************************************************** AItem::write_debug
 void AItem::write_debug( std::ostream& out )
 {
@@ -558,35 +506,35 @@ void AItem::write_debug( std::ostream& out )
 
 // ***************************************************************************
 // ***************************************************************************
-std::string ItemData::attack_enum[] = {"SLASHING","PIERCING","CRUSHING","CLEAVING","ARMORPIERCING","MAGIC_ENERGY","MAGIC_SPIRIT","MAGIC_WEATHER","NUM_WEAPON_CLASSES"};
-std::string ItemData::attack_type[] = {"ATTACK_COMBAT", "ATTACK_ENERGY", "ATTACK_SPIRIT", "ATTACK_WEATHER", "ATTACK_RIDING", "ATTACK_RANGED", "NUM_ATTACK_TYPES"}; 
-// ************************************************ ItemData::parse_gamedata()
-void ItemData::parse_gamedata( const std::string& path )
-{
-  _input_path = path;
-  std::ifstream h_in( path+"/gamedata.h" );
-  if( not h_in.is_open() ) {
-	std::cerr << "ERROR: file " << path+"/gamedata.h" << " not open" << std::endl;
-	exit(2);
-  }
+std::string AItem::attack_enum[] = {"SLASHING","PIERCING","CRUSHING","CLEAVING","ARMORPIERCING","MAGIC_ENERGY","MAGIC_SPIRIT","MAGIC_WEATHER","NUM_WEAPON_CLASSES"};
+std::string AItem::attack_type[] = {"ATTACK_COMBAT", "ATTACK_ENERGY", "ATTACK_SPIRIT", "ATTACK_WEATHER", "ATTACK_RIDING", "ATTACK_RANGED", "NUM_ATTACK_TYPES"}; 
+// // ************************************************ ItemData::parse_gamedata()
+// void ItemData::parse_gamedata( const std::string& path )
+// {
+//   _input_path = path;
+//   std::ifstream h_in( path+"/gamedata.h" );
+//   if( not h_in.is_open() ) {
+// 	std::cerr << "ERROR: file " << path+"/gamedata.h" << " not open" << std::endl;
+// 	exit(2);
+//   }
   
-  std::string line;
-  int idx_item = 0;
-  while( std::getline( h_in, line )) {
-    if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
-	  if( ((ItemDefs[idx_item].type & IT_MONSTER) == false ) &&
-		  ((ItemDefs[idx_item].type & IT_MAN) == false ) &&
-		  ((ItemDefs[idx_item].type & IT_MONEY) == false ) )
-		{
-		  //std::cout << "  + found monster " << line.substr( 1, line.size()-2 ) << ":" << ItemDefs[idx_monster].abr << std::endl;
-		  add( line.substr( 1, line.size()-2 ), idx_item );
-      }
-      idx_item ++;
-    }
-  }
-  _max_item_id = NITEMS;
-  _max_wtype_id = NUMWEAPONS;
-}
+//   std::string line;
+//   int idx_item = 0;
+//   while( std::getline( h_in, line )) {
+//     if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
+// 	  if( ((ItemDefs[idx_item].type & IT_MONSTER) == false ) &&
+// 		  ((ItemDefs[idx_item].type & IT_MAN) == false ) &&
+// 		  ((ItemDefs[idx_item].type & IT_MONEY) == false ) )
+// 		{
+// 		  //std::cout << "  + found monster " << line.substr( 1, line.size()-2 ) << ":" << ItemDefs[idx_monster].abr << std::endl;
+// 		  add( line.substr( 1, line.size()-2 ), idx_item );
+//       }
+//       idx_item ++;
+//     }
+//   }
+//   _max_item_id = NITEMS;
+//   _max_wtype_id = NUMWEAPONS;
+// }
 // // ********************************************* MonsterData::write_gamedata()
 // void MonsterData::write_gamedata( bool fg_debug )
 // {
@@ -805,65 +753,65 @@ void ItemData::parse_gamedata( const std::string& path )
 //   }
 //   return;
 // }
-// ********************************************************** MonsterData::add
-void ItemData::add( const std::string& str_enum, int id_item )
-{
-  ItemType* item_item = &(ItemDefs[id_item]);
+// // ********************************************************** MonsterData::add
+// void ItemData::add( const std::string& str_enum, int id_item )
+// {
+//   ItemType* item_item = &(ItemDefs[id_item]);
 
-  AItem item;
-  item._fg_edited = false;
-  item._item_enum = str_enum;
-  item._item_id = id_item;
-  item._item = item_item;
+//   AItem item;
+//   item._fg_edited = false;
+//   item._item_enum = str_enum;
+//   item._item_id = id_item;
+//   item._item = item_item;
 
-  // Look for weapon if needed
-  if( item._item->type & IT_WEAPON ) {
-	for( unsigned int i = 0; i < NUMWEAPONS; ++i) {
-	  if( WeaponDefs[i].abbr == NULL ) continue;
-	  if( item._item->abr == WeaponDefs[i].abbr ) {
-		item._wtype_id = i;
-		item._wtype = &(WeaponDefs[i]);
-		break;
-	  }
-	}
-  }
-  // Look for armor if needed
-  if( item._item->type & IT_ARMOR ) {
-	for( unsigned int i = 0; i < NUMARMORS; ++i) {
-	  if( ArmorDefs[i].abbr == NULL ) continue;
-	  if( item._item->abr == ArmorDefs[i].abbr ) {
-		item._atype_id = i;
-		item._atype = &(ArmorDefs[i]);
-		break;
-	  }
-	}
-  }
-  // Look for mount if needed
-  if( item._item->type & IT_MOUNT ) {
-	for( unsigned int i = 0; i < NUMMOUNTS; ++i) {
-	  if( MountDefs[i].abbr == NULL ) continue;
-	  if( item._item->abr == MountDefs[i].abbr ) {
-		item._mtype_id = i;
-		item._mtype = &(MountDefs[i]);
-		break;
-	  }
-	}
-  }
-  // Look for battle if needed
-  if( item._item->type & IT_BATTLE ) {
-	for( unsigned int i = 0; i < NUMBATTLEITEMS; ++i) {
-	  if( BattleItemDefs[i].abbr == NULL ) continue;
-	  if( item._item->abr == BattleItemDefs[i].abbr ) {
-		item._btype_id = i;
-		item._btype = &(BattleItemDefs[i]);
-		break;
-	  }
-	}
-  }
+//   // Look for weapon if needed
+//   if( item._item->type & IT_WEAPON ) {
+// 	for( unsigned int i = 0; i < NUMWEAPONS; ++i) {
+// 	  if( WeaponDefs[i].abbr == NULL ) continue;
+// 	  if( item._item->abr == WeaponDefs[i].abbr ) {
+// 		item._wtype_id = i;
+// 		item._wtype = &(WeaponDefs[i]);
+// 		break;
+// 	  }
+// 	}
+//   }
+//   // Look for armor if needed
+//   if( item._item->type & IT_ARMOR ) {
+// 	for( unsigned int i = 0; i < NUMARMORS; ++i) {
+// 	  if( ArmorDefs[i].abbr == NULL ) continue;
+// 	  if( item._item->abr == ArmorDefs[i].abbr ) {
+// 		item._atype_id = i;
+// 		item._atype = &(ArmorDefs[i]);
+// 		break;
+// 	  }
+// 	}
+//   }
+//   // Look for mount if needed
+//   if( item._item->type & IT_MOUNT ) {
+// 	for( unsigned int i = 0; i < NUMMOUNTS; ++i) {
+// 	  if( MountDefs[i].abbr == NULL ) continue;
+// 	  if( item._item->abr == MountDefs[i].abbr ) {
+// 		item._mtype_id = i;
+// 		item._mtype = &(MountDefs[i]);
+// 		break;
+// 	  }
+// 	}
+//   }
+//   // Look for battle if needed
+//   if( item._item->type & IT_BATTLE ) {
+// 	for( unsigned int i = 0; i < NUMBATTLEITEMS; ++i) {
+// 	  if( BattleItemDefs[i].abbr == NULL ) continue;
+// 	  if( item._item->abr == BattleItemDefs[i].abbr ) {
+// 		item._btype_id = i;
+// 		item._btype = &(BattleItemDefs[i]);
+// 		break;
+// 	  }
+// 	}
+//   }
 
-  // Add
-  _map_item[id_item] = item;
-}
+//   // Add
+//   _map_item[id_item] = item;
+// }
 // // ***************************************************** MonsterData::make_new
 // AMonster* MonsterData::make_new( const std::string& item_str )
 // {
@@ -897,23 +845,24 @@ void ItemData::add( const std::string& str_enum, int id_item )
 
 //   return &(_map_item[monster._item_id]);
 // }
-// **************************************************** ItemData::find_monster
-AItem* ItemData::find_item_weapon( int id_wtype )
-{
-  for( auto& elem : _map_item ) {
-    if( elem.second._wtype_id == id_wtype ) {
-      return &(elem.second);
-    }
-  }
-  return nullptr;
-}
-AItem* ItemData::find_item( const std::string& item_enum )
-{
-    for( auto& elem : _map_item ) {
-    if( elem.second._item_enum.compare(item_enum) == 0 ) {
-      return &(elem.second);
-    }
-  }
-  return nullptr;
-}
+											   
+// // **************************************************** ItemData::find_monster
+// AItem* ItemData::find_item_weapon( int id_wtype )
+// {
+//   for( auto& elem : _map_item ) {
+//     if( elem.second._wtype_id == id_wtype ) {
+//       return &(elem.second);
+//     }
+//   }
+//   return nullptr;
+// }
+// AItem* ItemData::find_item( const std::string& item_enum )
+// {
+//     for( auto& elem : _map_item ) {
+//     if( elem.second._item_enum.compare(item_enum) == 0 ) {
+//       return &(elem.second);
+//     }
+//   }
+//   return nullptr;
+// }
 
