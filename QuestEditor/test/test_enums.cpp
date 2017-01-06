@@ -5,6 +5,7 @@
  */
 #include <all_data.h>
 #include <iostream>
+#include <utils.h>
 
 // ************************************************************ test_enumitems
 void test_enumitems()
@@ -29,6 +30,47 @@ void test_items()
 	std::cout << std::endl;
   }
 }
+// ************************************************************* test_new_item
+void test_new_item()
+{
+  AllData _data;
+  _data.parse_gamedata( "../.." );
+
+  // Create new Item
+  auto item = _data.make_new_item();
+  //assert( item != nullptr );
+  if( item == nullptr ) {
+	std::cout << "ERROR: test_new_item not created" << std::endl;
+	exit(1);
+  }
+  item->write_debug( std::cout );
+  for( auto& elem: _data._all_enumitems ) {
+    std::cout << elem.first << " = " << elem.second  << std::endl;
+  }
+
+  // Create duplicate
+  item = _data.make_new_item();
+  if( item != nullptr ) {
+	std::cout << "ERROR: test_new_item should not created" << std::endl;
+	exit(1);
+  }
+  else {
+	std::cout << "OK, duplicate are detected" << std::endl;
+  }
+
+  // Create different
+  item = _data.make_new_item( "I_MACHIN2" );
+  //assert( item != nullptr );
+  if( item == nullptr ) {
+	std::cout << "ERROR: test_new_item not created" << std::endl;
+	exit(1);
+  }
+  item->write_debug( std::cout );
+  for( auto& elem: _data._all_enumitems ) {
+    std::cout << elem.first << " = " << elem.second  << std::endl;
+  }
+}
+
 // ************************************************************* test_monsters
 void test_monsters()
 {
@@ -82,14 +124,35 @@ void test_new_monster()
     std::cout << elem.first << " = " << elem.second  << std::endl;
   }
 }
+// **************************************************************** test_write
+void test_write()
+{
+  AllData _data;
+  _data.parse_gamedata( "../.." );
+
+  // Create Monster, then Item, then Monster
+  auto m1 = _data.make_new_monster( "I_MONSTRE1" );
+  auto i1 = _data.make_new_item( "I_ITEM1" );
+  // its a weapon
+  i1->switch_weapon();
+  auto i2 = _data.make_new_item( "I_ITEM2" );
+  // its a weapon
+  i2->switch_weapon();
+  i2->switch_armor();
+  auto m2 = _data.make_new_monster( "I_MONSTRE2" );
+
+  _data.write_gamedata( true );
+}
 // ***************************************************************************
 // ********************************************************************** main
 int main(int argc, char *argv[])
 {
   // test_enumitems();
   // test_items();
+  // test_new_item();
   // test_monsters();
-  test_new_monster();
+  // test_new_monster();
+  test_write();
   
   return 0;
 }

@@ -47,6 +47,7 @@ void AllData::parse_gamedata( const std::string& path )
   _max_item_id = NITEMS;
   _max_mtype_id = NUMMONSTERS;
   _max_wtype_id = NUMWEAPONS;
+  _max_atype_id = NUMARMORS;
 }
 // ***************************************************************************
 // ****************************************************** AllData::add_monster
@@ -186,8 +187,59 @@ void AllData::add_item( const std::string& str_enum, int id_item )
   // Add
   _all_items[id_item] = item;
 }
+// **************************************************** AllData::make_new_item
+AItem* AllData::make_new_item( const std::string& item_str )
+{
+  // Check unique enum_str
+  if( exist_enum( item_str )) {
+	std::cout << "ERROR: make_new_item, enum " << item_str << " already exists" << std::endl;
+	return nullptr;
+  }
+  
+  AItem item;
+  item._fg_edited = true;
+  item._item_enum = item_str;
+  item._item = new ItemType
+    {"new item", "new items", "TODO",
+	 0,
+     NULL,0,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+     NULL,0,0, {{-1,0},{-1,0},{-1,0},{-1,0}},
+     1, IT_NORMAL, 10,0,
+     0,0,0,0,0,
+     -1,0,
+     -1,0,0,
+     0, NULL, 0,
+     "", { "", "", "", "" }, 0, 0};
+  item._item_id = _max_item_id++;
+
+  _all_items[item._item_id] = item;
+  _all_enumitems[item_str] = item._item_id;
+
+  //item.write_debug();
+
+  return &(_all_items[item._item_id]);
+}
+// ****************************************************** AllData::find_weapon
+AItem* AllData::find_weapon( int id_wtype )
+{
+  for( auto& item : _all_items ) {
+    if( item.second._wtype_id == id_wtype ) {
+      return &(item.second);
+    }
+  }
+  return nullptr;
+}
+AItem* AllData::find_armor( int id_atype )
+{
+  for( auto& item : _all_items ) {
+    if( item.second._atype_id == id_atype ) {
+      return &(item.second);
+    }
+  }
+  return nullptr;
+}
 // ***************************************************************************
-// ********************************************* MonsterData::write_gamedata()
+// ************************************************* AllData::write_gamedata()
 void AllData::write_gamedata( bool fg_debug )
 {
     std::ifstream h_in( _input_path+"/gamedata.h" );
@@ -198,10 +250,11 @@ void AllData::write_gamedata( bool fg_debug )
 
     bool must_copy = true;
     int idx_monster = 0;
+	int idx_our_items = 0;
     int idx_item = 0;
     std::string line;
 
-    // Parse cpp_in to first struct
+    // Parse cpp_in to first item struct
     if( fg_debug) cpp_out << "// DEBUG parse to first struct" << std::endl;
     std::string item_line = parse_to_next_item( cpp_in, cpp_out,
 						  "{", must_copy );
@@ -214,59 +267,96 @@ void AllData::write_gamedata( bool fg_debug )
     if( line[0] == '\t' && line[1] == 'I' && line[2] == '_' ) {
       // found an Item in .h
       std::cout << "ITEM " << idx_item << "/" << NITEMS << std::endl;
-      //cpp_out << "// DEBUG parse to next item" << std::endl;
-//      std::string item_line = parse_to_next_item( cpp_in, cpp_out,
-//						  "{", must_copy );
+      // cpp_out << "// DEBUG parse to next item" << std::endl;
+	  // std::string item_line = parse_to_next_item( cpp_in, cpp_out,
+	  //						  "{", must_copy );
       // Is it a monster ?
       if( ItemDefs[idx_item].type & IT_MONSTER ) {
         if( _all_monsters[idx_item]._fg_edited ) {
-            // // Write new version if edited
-            std::cout << "write_gamedata: write new version of monster " << ItemDefs[idx_item].abr << std::endl;
-            if( fg_debug) cpp_out << "// DEBUG new version of monster " << std::endl;
-            _all_monsters[idx_item].write_item( cpp_out );
-            copy_item( cpp_in, cpp_out, "", false );
-            must_copy = false;
+		  // // Write new version if edited
+		  std::cout << "write_gamedata: write new version of monster " << ItemDefs[idx_item].abr << std::endl;
+		  if( fg_debug) cpp_out << "// DEBUG new version of monster " << std::endl;
+		  _all_monsters[idx_item].write_item( cpp_out );
+		  copy_item( cpp_in, cpp_out, "", false );
+		  must_copy = false;
         }
         else {
-            // Else copy this monster
-            std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
-            std::cout << "      with : " << item_line << std::endl;
-            if( fg_debug) cpp_out << "// DEBUG copy monster" << std::endl;
-            // parse_to_next will do the job
-            copy_item( cpp_in, cpp_out, item_line, true );
-            must_copy = true;
+		  // Else copy this monster
+		  std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
+		  std::cout << "      with : " << item_line << std::endl;
+		  if( fg_debug) cpp_out << "// DEBUG copy monster" << std::endl;
+		  // parse_to_next will do the job
+		  copy_item( cpp_in, cpp_out, item_line, true );
+		  must_copy = true;
         }
         idx_monster++;
       }
-    else {
+	  // Is it a real item (not man)?
+	  else if( ((ItemDefs[idx_item].type & IT_MONSTER) == false ) &&
+			   ((ItemDefs[idx_item].type & IT_MAN) == false ) &&
+			   ((ItemDefs[idx_item].type & IT_MONEY) == false ) ) {
+		if( _all_items[idx_item]._fg_edited ) {
+		  // Write new version as edited
+		  std::cout << "write_gamedata: write new version of item " << ItemDefs[idx_item].abr << std::endl;
+		  if( fg_debug) cpp_out << "// DEBUG new version of item " << std::endl;
+		  _all_items[idx_item].write_item( cpp_out );
+		  copy_item( cpp_in, cpp_out, "", false );
+		  must_copy = false;
+		}
+		else {
+		  // Else copy this monster
+		  std::cout << "write_gamedata: copy current version of " << ItemDefs[idx_item].abr << std::endl;
+		  std::cout << "      with : " << item_line << std::endl;
+		  if( fg_debug) cpp_out << "// DEBUG copy item" << std::endl;
+		  // parse_to_next will do the job
+		  copy_item( cpp_in, cpp_out, item_line, true );
+		  must_copy = true;
+        }
+        idx_our_items++;
+	  }
+	  else {
         // copy
         //cpp_out << item_line << std::endl;
-        if( fg_debug) cpp_out << "// DEBUG pas un monstre" << std::endl;
+        if( fg_debug) cpp_out << "// DEBUG pas un monstre ou item" << std::endl;
         // parse to next will do the job
         copy_item( cpp_in, cpp_out, item_line, true );
         must_copy = true;
-    }
-    // if( item_line.compare( "" ) != 0 ) {
-    // 	// Check if edited :o)
-    // }
+	  }
+	  // if( item_line.compare( "" ) != 0 ) {
+	  // 	// Check if edited :o)
+	  // }
 
-    idx_item++;
-    // if last item...
-    if( idx_item >= NITEMS ) {
-	std::cout << "write_gamedata: add new monsters with id_item >= " << NITEMS << std::endl;
-	for( auto& monster : _all_monsters ) {
-	  if( monster.second._item_id >= NITEMS ) {
-	    std::cout << "Write new monster " << monster.second._item_id << std::endl;
-	    h_out << "\t" << monster.second._item_enum << "," << std::endl;
-	    if( fg_debug) cpp_out << "// DEBUG new monster" << std::endl;
-	    monster.second.write_item( cpp_out );
+	  idx_item++;
+	  // if last item...
+	  if( idx_item >= NITEMS ) {
+		// MUST write monsters and items in the right order...
+		for (; idx_item < _max_item_id; ++idx_item) {
+		  // Write element id=idx_item
+		  for( auto& monster: _all_monsters) {
+			if( monster.first == idx_item ) {
+			  std::cout << "Write new monster " << monster.second._item_id << std::endl;
+			  h_out << "\t" << monster.second._item_enum << "," << std::endl;
+			  if( fg_debug) cpp_out << "// DEBUG new monster" << std::endl;
+			  monster.second.write_item( cpp_out );
+			  break;
+			}
+		  }
+		  for( auto& item: _all_items) {
+			if( item.first == idx_item ) {
+			  std::cout << "Write new item " << item.second._item_id << std::endl;
+			  h_out << "\t" << item.second._item_enum << "," << std::endl;
+			  if( fg_debug) cpp_out << "// DEBUG new item" << std::endl;
+			  item.second.write_item( cpp_out );
+			  break;
+			}
+		  }
+		}
+		// get out of this while-loop
+		break;
 	  }
 	}
-	// get out of this while-loop
-	break;
-      }
-    }
   }
+  
   // Copy to end of h_in
   std::string last_line = parse_to_next_item( h_in, h_out, "#endif", true);
   h_out << last_line << std::endl;
@@ -322,6 +412,111 @@ void AllData::write_gamedata( bool fg_debug )
   }
   cpp_out << monster_line << std::endl;
 
+  // copy to WeaponType
+  if( fg_debug) cpp_out << "// DEBUG copy to WeaponType" << std::endl;
+  std::string weapon_line = parse_to_next_item( cpp_in, cpp_out,
+												"WeaponType wepd[]", true);
+  cpp_out << weapon_line << std::endl;
+  // copy Weapon None
+  weapon_line = parse_to_next_item( cpp_in, cpp_out,
+									"{", true);
+  cpp_out << weapon_line << std::endl;
+  idx_ittype = 1;
+  must_copy = true;
+  while( idx_ittype < NUMWEAPONS ) {
+    // read to beginning
+    weapon_line = parse_to_next_item( cpp_in, cpp_out,
+									  "{", must_copy );
+	AItem* a_item = find_weapon( idx_ittype );
+    if( a_item ) {
+      if( a_item->_fg_edited ) {
+		std::cout << "write_gamedata: check if WeaponType is modified" << std::endl;
+		if( fg_debug) cpp_out << "// DEBUG WeaponType is modified" << std::endl;
+		a_item->write_type_weapon( cpp_out );
+		must_copy = false;
+      }
+      else {
+		// copy
+		if( fg_debug) cpp_out << "// DEBUG WeaponType is copied" << std::endl;
+		cpp_out << weapon_line << std::endl;
+		must_copy = true;
+      }
+    }
+    else {
+      std::cerr << "write_gamedata : Error WeaponType id=" << idx_ittype << " not found" << std::endl;
+      exit(1);
+    }
+    idx_ittype++;
+  }
+  // last weapon
+  if( fg_debug) cpp_out << "// DEBUG last WeaponType" << std::endl;
+  weapon_line = parse_to_next_item( cpp_in, cpp_out,
+									"};", must_copy );
+  // New Weapons
+  std::cout << "write_gamedata: copy new WeaponType " << std::endl;
+  for( auto& item : _all_items ) {
+    if( item.second._wtype_id >= NUMWEAPONS ) {
+      std::cout << "Write new weapon " << item.second._wtype_id << std::endl;
+      if( fg_debug) cpp_out << "// DEBUG new WeaponType" << std::endl;
+      item.second.write_type_weapon( cpp_out );
+    }
+  }
+  cpp_out << weapon_line << std::endl;
+
+  // copy to ArmorType
+  if( fg_debug) cpp_out << "// DEBUG copy to ArmorType" << std::endl;
+  std::string armor_line = parse_to_next_item( cpp_in, cpp_out,
+											   "ArmorType armd[]", true);
+  cpp_out << armor_line << std::endl;
+  // copy Armor None
+  armor_line = parse_to_next_item( cpp_in, cpp_out,
+								   "{", true);
+  cpp_out << armor_line << std::endl;
+  idx_ittype = 1;
+  must_copy = true;
+  while( idx_ittype < NUMARMORS ) {
+    // read to beginning
+    armor_line = parse_to_next_item( cpp_in, cpp_out,
+									 "{", must_copy );
+	AItem* a_item = find_armor( idx_ittype );
+    if( a_item ) {
+      if( a_item->_fg_edited ) {
+		std::cout << "write_gamedata: check if ArmorType is modified" << std::endl;
+		if( fg_debug) cpp_out << "// DEBUG ArmorType is modified" << std::endl;
+		a_item->write_type_armor( cpp_out );
+		must_copy = false;
+      }
+      else {
+		// copy
+		if( fg_debug) cpp_out << "// DEBUG ArmorType is copied" << std::endl;
+		cpp_out << armor_line << std::endl;
+		must_copy = true;
+      }
+    }
+    else {
+      std::cerr << "write_gamedata : Error ArmorType id=" << idx_ittype << " not found" << std::endl;
+      exit(1);
+    }
+    idx_ittype++;
+  }
+  // last armor
+  if( fg_debug) cpp_out << "// DEBUG last ArmorType" << std::endl;
+  armor_line = parse_to_next_item( cpp_in, cpp_out,
+								   "};", must_copy );
+  // New Armors
+  std::cout << "write_gamedata: copy new ArmorType " << std::endl;
+  for( auto& item : _all_items ) {
+    if( item.second._atype_id >= NUMARMORS ) {
+      std::cout << "Write new armor " << item.second._atype_id << std::endl;
+      if( fg_debug) cpp_out << "// DEBUG new ArmorType" << std::endl;
+      item.second.write_type_armor( cpp_out );
+    }
+  }
+  cpp_out << armor_line << std::endl;
+  // copy to MountType
+
+  // copy to BattleItemType
+  
   // Copy to end of cpp_in
   std::cout << "write_gamedata: copier fin de cpp_in dans cpp_out" << std::endl;
   if( fg_debug) cpp_out << "// DEBUG to end of cpp_in" << std::endl;

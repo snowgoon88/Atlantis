@@ -44,6 +44,10 @@ public:
   /** ref to BattleItem */
   int _btype_id;
   BattleItemType* _btype;
+
+  /** Set type, creating structure */
+  void switch_weapon();
+  void switch_armor();
   
   /** Write functions */
   void write_item( std::ostream& out );

@@ -38,7 +38,10 @@ public:
 
   /** Add AItem defined by its I_ITEMS and id_item */
   void add_item( const std::string& str_enum, int id_item );
-
+  AItem* make_new_item( const std::string& item_str = "I_MACHIN" );
+  AItem* find_weapon( int id_wtype );
+  AItem* find_armor( int id_atype );
+  
   
 public:
   std::map<std::string,int> _all_enumitems;

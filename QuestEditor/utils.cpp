@@ -14,6 +14,7 @@ std::map<std::string,int> _map_itype;
 int _max_item_id = -1;
 int _max_mtype_id = -2;
 int _max_wtype_id = -3;
+int _max_atype_id = -4;
 // ******************************************************** read_itemtype_enum
 void read_itemtype_enum( const std::string& path)
 {

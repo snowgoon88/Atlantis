@@ -26,6 +26,7 @@ void AItem::write_item( std::ostream& out )
   // flags
   out << "\t";
   fg_before = false;
+  if( _item->flags == 0 ) out << "0";
   if( _item->flags & ItemType::CANTGIVE ) {
 	if( fg_before ) out << " | ";
     out << "ItemType::CANTGIVE";
@@ -96,6 +97,7 @@ void AItem::write_item( std::ostream& out )
   out << "\t" << _item->weight << ",";
   // type
   fg_before = false;
+  if( _item->type == 0 ) out << " 0";
   if( _item->type & IT_NORMAL ) {
     if( fg_before ) out << " |";
     out << " IT_NORMAL";
@@ -308,6 +310,7 @@ void AItem::write_type_weapon( std::ostream& out )
   // flags
   out << "\t";
   fg_before = false;
+  if( _wtype->flags == 0 ) out << "0";
   if( _wtype->flags & WeaponType::NEEDSKILL ) {
 	if( fg_before ) out << "| ";
 	out << "WeaponType::NEEDSKILL ";
@@ -865,4 +868,33 @@ std::string AItem::attack_type[] = {"ATTACK_COMBAT", "ATTACK_ENERGY", "ATTACK_SP
 //   }
 //   return nullptr;
 // }
+// ******************************************************** AItem::switch_type
+void AItem::switch_weapon()
+{
+  if( _wtype == nullptr ) {
+	_wtype_id = _max_wtype_id;
+	_max_wtype_id++;
+	_wtype = new WeaponType { _item->abr, 0, nullptr, nullptr, SLASHING,
+							  ATTACK_COMBAT, 1, 0, 0, 0 };
+  }
+  // remove flags IT_MOUNT, IT_ARMOR
+  _item->type &= !IT_MOUNT;
+  _item->type &= !IT_ARMOR;
+  // add IT_WEAPON
+  _item->type |= IT_WEAPON;
+}
+void AItem::switch_armor()
+{
+  if( _atype == nullptr ) {
+	_atype_id = _max_atype_id;
+	_max_atype_id++;
+	_atype = new ArmorType { _item->abr, 0, 100, {0, 0, 0, 0, 0, 0, 0, 0}};
+  }
 
+  // remove flags IT_MOUNT, IT_WEAPON
+  _item->type &= !IT_MOUNT;
+  _item->type &= !IT_WEAPON;
+  // add IT_ARMOR
+  _item->type |= IT_ARMOR;
+}
+// ***************************************************************************

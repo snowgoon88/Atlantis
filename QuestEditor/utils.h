@@ -20,6 +20,7 @@ extern std::map<std::string,int> _map_itype;
 extern int _max_item_id;
 extern int _max_mtype_id;
 extern int _max_wtype_id;
+extern int _max_atype_id;
 
 // ******************************************************** read_itemtype_enum
 void read_itemtype_enum( const std::string& path = "..");
