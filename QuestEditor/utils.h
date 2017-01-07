@@ -21,6 +21,8 @@ extern int _max_item_id;
 extern int _max_mtype_id;
 extern int _max_wtype_id;
 extern int _max_atype_id;
+extern int _max_mounttype_id;
+extern int _max_battle_id;
 
 // ******************************************************** read_itemtype_enum
 void read_itemtype_enum( const std::string& path = "..");

@@ -480,7 +480,12 @@ void AItem::write_type_weapon( std::ostream& out )
    }
    out << "," << std::endl;
    // special and level
-   out << "\t\"" << _btype->special << ", " << _btype->skillLevel << " }," << std::endl;
+   out << "\t";
+   if( _btype->special ) {
+	 out << "\"" << _btype->special << "\", ";
+   }
+   else out << "NULL, ";
+   out << _btype->skillLevel << " }," << std::endl;
  }
 // ******************************************************** AItem::write_debug
 void AItem::write_debug( std::ostream& out )
@@ -490,19 +495,19 @@ void AItem::write_debug( std::ostream& out )
   out << "   edited=" << (_fg_edited ? "true" : "false") << std::endl;
   write_item( out );
   if( _wtype ) {
-	out << "  --WEAPON--" << std::endl;
+	out << "  --WEAPON--[" << _wtype_id << "]" << std::endl;
 	write_type_weapon( out );
   }
   if( _atype ) {
-	out << "  --ARMOR---" << std::endl;
+	out << "  --ARMOR---[" << _atype_id << "]" <<  std::endl;
 	write_type_armor( out );
   }
   if( _mtype ) {
-	out << "  --MOUNT---" << std::endl;
+	out << "  --MOUNT---[" << _mtype_id << "]" << std::endl;
 	write_type_mount( out );
   }
   if( _btype ) {
-	out << "  --BATTLE--" << std::endl;
+	out << "  --BATTLE--[" << _btype_id << "]" << std::endl;
 	write_type_battle( out );
   }
 }
@@ -896,5 +901,32 @@ void AItem::switch_armor()
   _item->type &= !IT_WEAPON;
   // add IT_ARMOR
   _item->type |= IT_ARMOR;
+}
+void AItem::switch_mount()
+{
+  if( _mtype == nullptr ) {
+	_mtype_id = _max_mounttype_id;
+	_max_mounttype_id++;
+	_mtype = new MountType { _item->abr, "RIDI", 0, 0, 0, nullptr, 0};
+  }
+
+  // remove flags IT_ARMOR, IT_WEAPON
+  _item->type &= !IT_ARMOR;
+  _item->type &= !IT_WEAPON;
+  // add IT_MOUNT
+  _item->type |= IT_MOUNT;
+}
+void AItem::switch_battle( bool fg_on )
+{
+  if( fg_on ) {
+   if( _btype == nullptr ) {
+	 _btype_id = _max_battle_id;
+	 _max_battle_id++;
+	 _btype = new BattleItemType { _item->abr, 0, NULL, 0};
+   }
+  }
+  
+  // switch IT_BATTLE
+  _item->type ^= IT_BATTLE;
 }
 // ***************************************************************************

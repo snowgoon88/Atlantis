@@ -48,6 +48,8 @@ void AllData::parse_gamedata( const std::string& path )
   _max_mtype_id = NUMMONSTERS;
   _max_wtype_id = NUMWEAPONS;
   _max_atype_id = NUMARMORS;
+  _max_mounttype_id = NUMMOUNTS;
+  _max_battle_id = NUMBATTLEITEMS;
 }
 // ***************************************************************************
 // ****************************************************** AllData::add_monster
@@ -233,6 +235,24 @@ AItem* AllData::find_armor( int id_atype )
 {
   for( auto& item : _all_items ) {
     if( item.second._atype_id == id_atype ) {
+      return &(item.second);
+    }
+  }
+  return nullptr;
+}
+AItem* AllData::find_mount( int id_mtype )
+{
+  for( auto& item : _all_items ) {
+    if( item.second._mtype_id == id_mtype ) {
+      return &(item.second);
+    }
+  }
+  return nullptr;
+}
+AItem* AllData::find_battle( int id_btype )
+{
+  for( auto& item : _all_items ) {
+    if( item.second._btype_id == id_btype ) {
       return &(item.second);
     }
   }
@@ -442,10 +462,13 @@ void AllData::write_gamedata( bool fg_debug )
 		must_copy = true;
       }
     }
-    else {
-      std::cerr << "write_gamedata : Error WeaponType id=" << idx_ittype << " not found" << std::endl;
-      exit(1);
-    }
+	else {
+	  // copy
+	  if( fg_debug) cpp_out << "// DEBUG WeaponType is copied" << std::endl;
+	  cpp_out << weapon_line << std::endl;
+	  must_copy = true;
+	}
+
     idx_ittype++;
   }
   // last weapon
@@ -493,10 +516,13 @@ void AllData::write_gamedata( bool fg_debug )
 		must_copy = true;
       }
     }
-    else {
-      std::cerr << "write_gamedata : Error ArmorType id=" << idx_ittype << " not found" << std::endl;
-      exit(1);
-    }
+	else {
+	  // copy
+	  if( fg_debug) cpp_out << "// DEBUG ArmorType is copied" << std::endl;
+	  cpp_out << armor_line << std::endl;
+	  must_copy = true;
+	}
+
     idx_ittype++;
   }
   // last armor
@@ -513,9 +539,114 @@ void AllData::write_gamedata( bool fg_debug )
     }
   }
   cpp_out << armor_line << std::endl;
+
   // copy to MountType
+  if( fg_debug) cpp_out << "// DEBUG copy to MountType" << std::endl;
+  std::string mount_line = parse_to_next_item( cpp_in, cpp_out,
+											   "MountType mountd[]", true);
+  cpp_out << mount_line << std::endl;
+  // copy Mount None
+  mount_line = parse_to_next_item( cpp_in, cpp_out,
+								   "{", true);
+  cpp_out << mount_line << std::endl;
+  idx_ittype = 1;
+  must_copy = true;
+  while( idx_ittype < NUMMOUNTS ) {
+    // read to beginning
+    mount_line = parse_to_next_item( cpp_in, cpp_out,
+									 "{", must_copy );
+	AItem* a_item = find_mount( idx_ittype );
+    if( a_item ) {
+      if( a_item->_fg_edited ) {
+		std::cout << "write_gamedata: check if MountType is modified" << std::endl;
+		if( fg_debug) cpp_out << "// DEBUG MountType is modified" << std::endl;
+		a_item->write_type_mount( cpp_out );
+		must_copy = false;
+      }
+	  else {
+	  // copy
+	  if( fg_debug) cpp_out << "// DEBUG MountType is copied" << std::endl;
+	  cpp_out << mount_line << std::endl;
+	  must_copy = true;
+	  }
+	}
+	else {
+	  // copy
+	  if( fg_debug) cpp_out << "// DEBUG MountType is copied" << std::endl;
+	  cpp_out << mount_line << std::endl;
+	  must_copy = true;
+	}
+
+    idx_ittype++;
+  }
+  // last ount
+  if( fg_debug) cpp_out << "// DEBUG last MountType" << std::endl;
+  mount_line = parse_to_next_item( cpp_in, cpp_out,
+								   "};", must_copy );
+  // New Mounts
+  std::cout << "write_gamedata: copy new MountType " << std::endl;
+  for( auto& item : _all_items ) {
+    if( item.second._mtype_id >= NUMMOUNTS ) {
+      std::cout << "Write new mount " << item.second._mtype_id << std::endl;
+      if( fg_debug) cpp_out << "// DEBUG new MountType" << std::endl;
+      item.second.write_type_mount( cpp_out );
+    }
+  }
+  cpp_out << mount_line << std::endl;
 
   // copy to BattleItemType
+  if( fg_debug) cpp_out << "// DEBUG copy to BattleItemType" << std::endl;
+  std::string battle_line = parse_to_next_item( cpp_in, cpp_out,
+											   "BattleItemType bitd[]", true);
+  cpp_out << battle_line << std::endl;
+  // copy BATTLE None
+  battle_line = parse_to_next_item( cpp_in, cpp_out,
+								   "{", true);
+  cpp_out << battle_line << std::endl;
+  idx_ittype = 1;
+  must_copy = true;
+  while( idx_ittype < NUMBATTLEITEMS ) {
+    // read to beginning
+    battle_line = parse_to_next_item( cpp_in, cpp_out,
+									 "{", must_copy );
+	AItem* a_item = find_battle( idx_ittype );
+    if( a_item ) {
+      if( a_item->_fg_edited ) {
+		std::cout << "write_gamedata: check if BattleType is modified" << std::endl;
+		if( fg_debug) cpp_out << "// DEBUG BattleType is modified" << std::endl;
+		a_item->write_type_battle( cpp_out );
+		must_copy = false;
+      }
+	  else {
+		// copy
+		if( fg_debug) cpp_out << "// DEBUG BattleType is copied" << std::endl;
+		cpp_out << battle_line << std::endl;
+		must_copy = true;
+	  }
+	}
+	else {
+	  // copy
+	  if( fg_debug) cpp_out << "// DEBUG BattleType is copied" << std::endl;
+	  cpp_out << battle_line << std::endl;
+	  must_copy = true;
+	}
+
+    idx_ittype++;
+  }
+  // last BattleItem
+  if( fg_debug) cpp_out << "// DEBUG last BattleItemType" << std::endl;
+  battle_line = parse_to_next_item( cpp_in, cpp_out,
+								   "};", must_copy );
+  // New BattleItems
+  std::cout << "write_gamedata: copy new BattleItemType " << std::endl;
+  for( auto& item : _all_items ) {
+    if( item.second._btype_id >= NUMBATTLEITEMS ) {
+      std::cout << "Write new battle " << item.second._btype_id << std::endl;
+      if( fg_debug) cpp_out << "// DEBUG new BattleItemType" << std::endl;
+      item.second.write_type_battle( cpp_out );
+    }
+  }
+  cpp_out << battle_line << std::endl;
   
   // Copy to end of cpp_in
   std::cout << "write_gamedata: copier fin de cpp_in dans cpp_out" << std::endl;

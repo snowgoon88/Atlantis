@@ -48,6 +48,8 @@ public:
   /** Set type, creating structure */
   void switch_weapon();
   void switch_armor();
+  void switch_mount();
+  void switch_battle( bool fg_on );
   
   /** Write functions */
   void write_item( std::ostream& out );

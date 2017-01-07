@@ -411,12 +411,12 @@ unit->type = U_WMON.
 * [1/1] parse_gamedata.cpp
 ** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [9/12] ITEMS
+* [10/12] ITEMS
 ** DONE nouvelle classe to build gamedata.h/cpp
 ** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
 ** DONE read items
 ** DONE add item
-** TODO add_weapon to item if needed
+** DONE add_weapon to item if needed
 ** DONE switch flag (weapon to armor)
 ** TODO clean up item (del weapon if not flags)
 ** TODO write items

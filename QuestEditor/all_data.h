@@ -41,7 +41,8 @@ public:
   AItem* make_new_item( const std::string& item_str = "I_MACHIN" );
   AItem* find_weapon( int id_wtype );
   AItem* find_armor( int id_atype );
-  
+  AItem* find_mount( int id_mtype );
+  AItem* find_battle( int id_mtype );
   
 public:
   std::map<std::string,int> _all_enumitems;
