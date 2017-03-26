@@ -1,6 +1,6 @@
 /* -*- coding: utf-8 -*- */
 
-/** 
+/**
  * Reading, Storing and Writing gamedata.h/.cpp
  */
 #include <all_data.h>
@@ -40,10 +40,10 @@ void AllData::parse_gamedata( const std::string& path )
 		//std::cout << "  + found monster " << line.substr( 1, line.size()-2 ) << ":" << ItemDefs[idx_monster].abr << std::endl;
 		add_item( line.substr( 1, line.size()-2 ), idx_item );
 	  }
-	idx_item ++;	  
+	idx_item ++;
 	}
   }
-  
+
   _max_item_id = NITEMS;
   _max_mtype_id = NUMMONSTERS;
   _max_wtype_id = NUMWEAPONS;
@@ -88,7 +88,7 @@ AMonster* AllData::make_new_monster( const std::string& item_str )
 	std::cout << "ERROR: make_new_monster, enum " << item_str << " already exists" << std::endl;
 	return nullptr;
   }
-  
+
   AMonster monster;
   monster._fg_edited = true;
   monster._item_enum = item_str;
@@ -128,6 +128,15 @@ AMonster* AllData::find_monster( int id_mtype )
     }
   }
   return nullptr;
+}
+AMonster* AllData::find_monster( const std::string& item_enum )
+{
+    for( auto& monster : _all_monsters ) {
+     if( monster.second._item_enum.compare(item_enum) == 0 ) {
+       return &(monster.second);
+     }
+   }
+   return nullptr;
 }
 // ***************************************************************************
 // ********************************************************* AllData::add_item
@@ -197,7 +206,7 @@ AItem* AllData::make_new_item( const std::string& item_str )
 	std::cout << "ERROR: make_new_item, enum " << item_str << " already exists" << std::endl;
 	return nullptr;
   }
-  
+
   AItem item;
   item._fg_edited = true;
   item._item_enum = item_str;
@@ -220,6 +229,16 @@ AItem* AllData::make_new_item( const std::string& item_str )
   //item.write_debug();
 
   return &(_all_items[item._item_id]);
+}
+// ******************************************************** AllData::find_item
+AItem* AllData::find_item( const std::string& item_enum )
+{
+    for( auto& item : _all_items ) {
+     if( item.second._item_enum.compare(item_enum) == 0 ) {
+       return &(item.second);
+     }
+   }
+   return nullptr;
 }
 // ****************************************************** AllData::find_weapon
 AItem* AllData::find_weapon( int id_wtype )
@@ -376,7 +395,7 @@ void AllData::write_gamedata( bool fg_debug )
 	  }
 	}
   }
-  
+
   // Copy to end of h_in
   std::string last_line = parse_to_next_item( h_in, h_out, "#endif", true);
   h_out << last_line << std::endl;
@@ -656,7 +675,7 @@ void AllData::write_gamedata( bool fg_debug )
     }
   }
   cpp_out << battle_line << std::endl;
-  
+
   // Copy to end of cpp_in
   std::cout << "write_gamedata: copier fin de cpp_in dans cpp_out" << std::endl;
   if( fg_debug) cpp_out << "// DEBUG to end of cpp_in" << std::endl;
@@ -764,4 +783,4 @@ bool AllData::exist_enum( const std::string& strenum )
   }
   return false;
 }
-  
+

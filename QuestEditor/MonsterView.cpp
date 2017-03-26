@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <wx_utils.h>
 
 wxBEGIN_EVENT_TABLE(MonsterView, wxPanel)
     EVT_COMBOBOX(idAbbrCombo, MonsterView::on_cbox_update)
@@ -19,7 +20,7 @@ wxBEGIN_EVENT_TABLE(MonsterView, wxPanel)
     EVT_TEXT_ENTER(idAbbrCombo, MonsterView::on_cbox_update)
 wxEND_EVENT_TABLE()
 
-MonsterView::MonsterView(wxWindow *parent, MonsterData& data)
+MonsterView::MonsterView(wxWindow *parent, AllData& data)
     : wxPanel( parent ), _data(data), _monster(nullptr)
 {
     // read file
@@ -42,7 +43,7 @@ MonsterView::MonsterView(wxWindow *parent, MonsterData& data)
 //            }
 //    }
     // add all labels
-    for( auto& monster : _data._map_item ) {
+    for( auto& monster : _data._all_monsters ) {
         _abbr_combo->Append( wxString( monster.second._item_enum ));
     }
 //    std::map<std::string,int>::iterator it;
@@ -1204,41 +1205,41 @@ void MonsterView::set_monster( AMonster* monster )
 }
 
 // ******************************************************************** mk_field
-void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxTextCtrl*& wxtext, int proportionnal, int width )
-{
-    wxStaticText *label = new wxStaticText( parent, wxID_ANY, _(title));
-    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2 );
-    wxtext = new wxTextCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1), wxTE_PROCESS_ENTER);
-    sizer->Add( wxtext, proportionnal, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
-}
-void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxCheckBox*& wxcheck )
-{
-    wxcheck = new wxCheckBox( parent, id, _(title));
-    sizer->Add( wxcheck, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
-}
-void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxRadioButton*& wxradio )
-{
-    wxradio = new wxRadioButton( parent, id, _(title));
-    sizer->Add( wxradio, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
-}
-void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)
-{
-    wxStaticText *label = new wxStaticText( parent, -1, _(title));
-    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2 );
-}
-void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
-             wxSpinCtrl*& wxspin, int rmin, int rmax, int width)
-{
-    wxStaticText *label = new wxStaticText( parent, -1, _(title));
-    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2);
-    wxspin = new wxSpinCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1), wxTE_PROCESS_ENTER);
-    wxspin->SetRange(rmin,rmax);
-    wxspin->SetValue( 0 );
-    sizer->Add( wxspin, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
-}
+//void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxTextCtrl*& wxtext, int proportionnal, int width )
+//{
+//    wxStaticText *label = new wxStaticText( parent, wxID_ANY, _(title));
+//    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2 );
+//    wxtext = new wxTextCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1), wxTE_PROCESS_ENTER);
+//    sizer->Add( wxtext, proportionnal, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+//}
+//void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxCheckBox*& wxcheck )
+//{
+//    wxcheck = new wxCheckBox( parent, id, _(title));
+//    sizer->Add( wxcheck, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+//}
+//void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxRadioButton*& wxradio )
+//{
+//    wxradio = new wxRadioButton( parent, id, _(title));
+//    sizer->Add( wxradio, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+//}
+//void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)
+//{
+//    wxStaticText *label = new wxStaticText( parent, -1, _(title));
+//    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2 );
+//}
+//void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
+//             wxSpinCtrl*& wxspin, int rmin, int rmax, int width)
+//{
+//    wxStaticText *label = new wxStaticText( parent, -1, _(title));
+//    sizer->Add( label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 2);
+//    wxspin = new wxSpinCtrl( parent, id, "", wxDefaultPosition, wxSize(width,-1), wxTE_PROCESS_ENTER);
+//    wxspin->SetRange(rmin,rmax);
+//    wxspin->SetValue( 0 );
+//    sizer->Add( wxspin, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+//}
 
 // ******************************************************************** mk_field
 // ************************************************************** compute_escape

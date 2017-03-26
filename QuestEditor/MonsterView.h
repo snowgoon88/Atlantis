@@ -13,6 +13,7 @@
 #include <string>
 #include <map>
 #include <monster_data.h>
+#include <all_data.h>
 
 /**
  * View/edit a Monster.
@@ -20,7 +21,7 @@
  class MonsterView : public wxPanel
  {
     public:
-        MonsterView( wxWindow *parent, MonsterData& data );
+        MonsterView( wxWindow *parent, AllData& data );
 
         /** Parse files */
         //void parse_gamedata();
@@ -29,7 +30,7 @@
         void set_monster( AMonster* monster );
         void add_monster( AMonster* new_monster );
 
-        MonsterData& _data;
+        AllData& _data;
         AMonster* _monster;
         std::map<std::string,int> _map_abbr;
         std::map<std::string,int> _map_mSkill;
@@ -211,14 +212,14 @@
 
  };
 
-void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxTextCtrl*& wxtext, int proportionnal, int width );
-void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxCheckBox*& wxcheck );
-void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
-              wxRadioButton*& wxradio );
-void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title);
-void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
-             wxSpinCtrl*& wxspin, int rmin, int rmax, int width);
+//void mk_field(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxTextCtrl*& wxtext, int proportionnal, int width );
+//void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxCheckBox*& wxcheck );
+//void mk_radio(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+//              wxRadioButton*& wxradio );
+//void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title);
+//void mk_spin(wxWindow *parent, int id, wxBoxSizer* sizer, std::string title,
+//             wxSpinCtrl*& wxspin, int rmin, int rmax, int width);
 
 #endif // MONSTERVIEW_H_INCLUDED

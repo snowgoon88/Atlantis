@@ -3,7 +3,7 @@
 #ifndef ALLDATA_H
 #define ALLDATA_H
 
-/** 
+/**
  * Gather all game data from gamedata.h/cpp and
  * build new files from structures.
  */
@@ -12,6 +12,7 @@
 
 #include <monster_data.h>
 #include <item_data.h>
+#include <utils.h>
 #include <map>
 
 
@@ -21,7 +22,7 @@
 class AllData
 {
 public:
-  /** 
+  /**
    * Parse gamedata for:
    *   - I_MONSTER and MonDefs,
    *   - I_ITEMS ans (WeaponsDefs or ArmorDefs or MountDefs)
@@ -35,15 +36,17 @@ public:
   AMonster* make_new_monster( const std::string& item_str = "I_BIDULE" );
   /** find a Monster with its id of MonDefs */
   AMonster* find_monster( int id_mtype );
+  AMonster* find_monster( const std::string& item_enum );
 
   /** Add AItem defined by its I_ITEMS and id_item */
   void add_item( const std::string& str_enum, int id_item );
   AItem* make_new_item( const std::string& item_str = "I_MACHIN" );
+  AItem* find_item( const std::string& item_enum );
   AItem* find_weapon( int id_wtype );
   AItem* find_armor( int id_atype );
   AItem* find_mount( int id_mtype );
   AItem* find_battle( int id_mtype );
-  
+
 public:
   std::map<std::string,int> _all_enumitems;
   std::map<int,AMonster> _all_monsters;

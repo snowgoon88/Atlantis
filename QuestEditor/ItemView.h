@@ -15,6 +15,7 @@
 #include <string>
 #include <map>
 #include <item_data.h>
+#include <all_data.h>
 
 
 /**
@@ -23,13 +24,13 @@
  class ItemView : public wxPanel
  {
     public:
-        ItemView( wxWindow *parent, ItemData& data );
+        ItemView( wxWindow *parent, AllData& data );
 
         /** set to an existing Item */
         void set_item( AItem* item );
         void add_item( AItem* new_item );
 
-        ItemData& _data;
+        AllData& _data;
         AItem* _item;
         std::map<std::string,int> _map_abbr;
         std::map<std::string,int> _map_mSkill;
@@ -57,7 +58,10 @@
         // weight, baseprice
         wxSpinCtrl *_weight_spin, *_baseprice_spin;
         // type
+        wxCheckBox *_normal_check, *_advanced_check, *_trade_check, *_magic_check;
         wxCheckBox *_weapon_check, *_armor_check, *_mount_check, *_battle_check;
+        wxCheckBox *_special_check, *_tool_check, *_food_check, *_ship_check;
+        wxCheckBox *_mageonly_check, *_neverspoil_check;
         // movements
         wxSpinCtrl *_walk_spin, *_ride_spin, *_fly_spin, *_swim_spin, *_speed_spin;
         // max inventory
@@ -79,10 +83,23 @@
         void on_weightspin_updateenter( wxCommandEvent& event);
         void on_basepricespin_update( wxSpinEvent& event);
         void on_basepricespin_updateenter( wxCommandEvent& event);
+        // type IT_NORMAL, IT_ADVANCED, IT_TRADE, IT_MAGIC, IT_WEAPON, IT_ARMOR, IT_MOUNT
+    //       IT_BATTLE, IT_SPECIAL, IT_TOOL, IT_FOOD, IT_SHIP, MAGEONLY, IT_NEVER_SPOIL
+        void on_normal_update( wxCommandEvent& event );
+        void on_advanced_update( wxCommandEvent& event );
+        void on_trade_update( wxCommandEvent& event );
+        void on_magic_update( wxCommandEvent& event );
         void on_weapon_update( wxCommandEvent& event );
         void on_armor_update( wxCommandEvent& event );
         void on_mount_update( wxCommandEvent& event );
         void on_battle_update( wxCommandEvent& event );
+        void on_special_update( wxCommandEvent& event );
+        void on_tool_update( wxCommandEvent& event );
+        void on_food_update( wxCommandEvent& event );
+        void on_ship_update( wxCommandEvent& event );
+        void on_mageonly_update( wxCommandEvent& event );
+        void on_neverspoil_update( wxCommandEvent& event );
+
         void on_walkspin_update( wxSpinEvent& event);
         void on_walkspin_updateenter( wxCommandEvent& event);
         void on_ridespin_update( wxSpinEvent& event);

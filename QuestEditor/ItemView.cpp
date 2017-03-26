@@ -19,7 +19,7 @@ wxBEGIN_EVENT_TABLE(ItemView, wxPanel)
     EVT_TEXT_ENTER(idAbbrCombo, ItemView::on_cbox_update)
 wxEND_EVENT_TABLE()
 
-ItemView::ItemView(wxWindow *parent, ItemData& data)
+ItemView::ItemView(wxWindow *parent, AllData& data)
     : wxPanel( parent ), _data(data), _item(nullptr)
 {
     // main Vertical
@@ -32,7 +32,7 @@ ItemView::ItemView(wxWindow *parent, ItemData& data)
                                 0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
 
     // add all labels
-    for( auto& item : _data._map_item ) {
+    for( auto& item : _data._all_items ) {
         _abbr_combo->Append( wxString( item.second._item_enum ));
     }
     id_hbox->Add( _abbr_combo, 0, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
@@ -103,19 +103,39 @@ ItemView::ItemView(wxWindow *parent, ItemData& data)
     _baseprice_spin->Bind( wxEVT_TEXT_ENTER, &ItemView::on_basepricespin_updateenter, this);
     item_vbox->Add( weight_hbox, 0, wxEXPAND, 0 );
 
-    // type
-    TODO
+    // type IT_NORMAL, IT_ADVANCED, IT_TRADE, IT_MAGIC, IT_WEAPON, IT_ARMOR, IT_MOUNT
+    //       IT_BATTLE, IT_SPECIAL, IT_TOOL, IT_FOOD, IT_SHIP, MAGEONLY, IT_NEVER_SPOIL
     wxBoxSizer *type_hbox = new wxBoxSizer( wxHORIZONTAL );
-    mk_title( _monster_panel, type_hbox, "Type:");
-    mk_check( _monster_panel, wxID_ANY, type_hbox, "Animal", _animal_check );
-    _animal_check->Bind( wxEVT_CHECKBOX, &ItemView::on_animal_update, this);
-    mk_check( _monster_panel, wxID_ANY, type_hbox, "Demon", _demon_check );
-    _demon_check->Bind( wxEVT_CHECKBOX, &ItemView::on_demon_update, this);
-    mk_check( _monster_panel, wxID_ANY, type_hbox, "Illusion", _illusion_check );
-    _illusion_check->Bind( wxEVT_CHECKBOX, &ItemView::on_illusion_update, this);
-    mk_check( _monster_panel, wxID_ANY, type_hbox, "Undead", _undead_check );
-    _undead_check->Bind( wxEVT_CHECKBOX, &ItemView::on_undead_update, this);
-    monster_vbox->Add( type_hbox, 0, wxEXPAND, 0 );
+    mk_title( _item_panel, type_hbox, "Type:");
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Normal", _normal_check );
+    _normal_check->Bind( wxEVT_CHECKBOX, &ItemView::on_normal_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Advanced", _advanced_check );
+    _advanced_check->Bind( wxEVT_CHECKBOX, &ItemView::on_advanced_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Trade", _trade_check );
+    _trade_check->Bind( wxEVT_CHECKBOX, &ItemView::on_trade_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Magic", _magic_check );
+    _magic_check->Bind( wxEVT_CHECKBOX, &ItemView::on_magic_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Weapon", _weapon_check );
+    _weapon_check->Bind( wxEVT_CHECKBOX, &ItemView::on_weapon_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Armor", _armor_check );
+    _armor_check->Bind( wxEVT_CHECKBOX, &ItemView::on_armor_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Mount", _mount_check );
+    _mount_check->Bind( wxEVT_CHECKBOX, &ItemView::on_mount_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Battle", _battle_check );
+    _battle_check->Bind( wxEVT_CHECKBOX, &ItemView::on_battle_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Special", _special_check );
+    _special_check->Bind( wxEVT_CHECKBOX, &ItemView::on_special_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Tool", _tool_check );
+    _tool_check->Bind( wxEVT_CHECKBOX, &ItemView::on_tool_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Food", _food_check );
+    _food_check->Bind( wxEVT_CHECKBOX, &ItemView::on_food_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Ship", _ship_check );
+    _ship_check->Bind( wxEVT_CHECKBOX, &ItemView::on_ship_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Mage Only", _mageonly_check );
+    _mageonly_check->Bind( wxEVT_CHECKBOX, &ItemView::on_mageonly_update, this);
+    mk_check( _item_panel, wxID_ANY, type_hbox, "Never Spoil", _neverspoil_check );
+    _neverspoil_check->Bind( wxEVT_CHECKBOX, &ItemView::on_neverspoil_update, this);
+    item_vbox->Add( type_hbox, 0, wxEXPAND, 0 );
 
     // Movements
     wxBoxSizer *move_hbox = new wxBoxSizer( wxHORIZONTAL );
@@ -144,7 +164,7 @@ ItemView::ItemView(wxWindow *parent, ItemData& data)
 
     // Max Inventory
     wxBoxSizer *inventory_hbox = new wxBoxSizer( wxHORIZONTAL );
-    mk_spin( _i_paneltem, wxID_ANY, inventory_hbox, "Max Inventory:", _maxinventory_spin, 0, 1000, 150);
+    mk_spin( _item_panel, wxID_ANY, inventory_hbox, "Max Inventory:", _maxinventory_spin, 0, 1000, 150);
     _maxinventory_spin->Bind( wxEVT_SPINCTRL, &ItemView::on_maxinventoryspin_update, this);
     _maxinventory_spin->Bind( wxEVT_TEXT, &ItemView::on_maxinventoryspin_updateenter, this);
     _maxinventory_spin->Bind( wxEVT_TEXT_ENTER, &ItemView::on_maxinventoryspin_updateenter, this);
@@ -227,6 +247,7 @@ void ItemView::on_abbrtext_update( wxCommandEvent& event )
         strcpy( (char *) _item->_item->abr, abbr.c_str() );
         _abbr_text->Clear();
         _abbr_text->AppendText( wxString( _item->_item->abr));
+    }
 }
 void ItemView::on_nametext_update( wxCommandEvent& event )
 {
@@ -297,45 +318,120 @@ void ItemView::on_basepricespin_updateenter( wxCommandEvent& event)
 {
     _item->_item->baseprice = _baseprice_spin->GetValue();
 }
-void ItemView::on_animal_update( wxCommandEvent& event )
+// type IT_NORMAL, IT_ADVANCED, IT_TRADE, IT_MAGIC, IT_WEAPON, IT_ARMOR, IT_MOUNT
+//       IT_BATTLE, IT_SPECIAL, IT_TOOL, IT_FOOD, IT_SHIP, MAGEONLY, IT_NEVER_SPOIL
+void ItemView::on_normal_update( wxCommandEvent& event )
 {
-    if( _animal_check->GetValue() )
-        _monster->_item->type = _monster->_item->type | IT_ANIMAL;
+    if( _normal_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_NORMAL;
     else
-        _monster->_item->type = _monster->_item->type ^ IT_ANIMAL;
+        _item->_item->type = _item->_item->type ^ IT_NORMAL;
 }
-void ItemView::on_demon_update( wxCommandEvent& event )
+void ItemView::on_advanced_update( wxCommandEvent& event )
 {
-    if( _demon_check->GetValue() )
-        _monster->_item->type = _monster->_item->type | IT_DEMON;
+    if( _advanced_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_ADVANCED;
     else
-        _monster->_item->type = _monster->_item->type ^ IT_DEMON;
+        _item->_item->type = _item->_item->type ^ IT_ADVANCED;
 }
-void ItemView::on_illusion_update( wxCommandEvent& event )
+void ItemView::on_trade_update( wxCommandEvent& event )
 {
-    if( _illusion_check->GetValue() )
-        _monster->_item->type = _monster->_item->type | IT_ILLUSION;
+    if( _trade_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_TRADE;
     else
-        _monster->_item->type = _monster->_item->type ^ IT_ILLUSION;
-
-    std::string abbr(_monster->_item->abr);
-    if( _monster->_item->type & IT_ILLUSION ) {
-        abbr = "i"+abbr;
-        strcpy( (char *) _monster->_mtype->abbr, abbr.c_str() );
+        _item->_item->type = _item->_item->type ^ IT_TRADE;
+}
+void ItemView::on_magic_update( wxCommandEvent& event )
+{
+    if( _magic_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_MAGIC;
+    else
+        _item->_item->type = _item->_item->type ^ IT_MAGIC;
+}
+void ItemView::on_weapon_update( wxCommandEvent& event )
+{
+    if( _weapon_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_WEAPON;
+    else
+        _item->_item->type = _item->_item->type ^ IT_WEAPON;
+    _item->switch_weapon();
+    _armor_check->SetValue(false);
+    _mount_check->SetValue(false);
+}
+void ItemView::on_armor_update( wxCommandEvent& event )
+{
+    if( _armor_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_ARMOR;
+    else
+        _item->_item->type = _item->_item->type ^ IT_ARMOR;
+    _item->switch_armor();
+    _weapon_check->SetValue(false);
+    _mount_check->SetValue(false);
+}
+void ItemView::on_mount_update( wxCommandEvent& event )
+{
+    if( _mount_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_MOUNT;
+    else
+        _item->_item->type = _item->_item->type ^ IT_MOUNT;
+    _item->switch_mount();
+    _weapon_check->SetValue(false);
+    _armor_check->SetValue(false);
+}
+void ItemView::on_battle_update( wxCommandEvent& event )
+{
+    if( _battle_check->GetValue() ) {
+        _item->_item->type = _item->_item->type | IT_BATTLE;
+        _item->switch_battle( true );
     }
     else {
-        strcpy( (char *) _monster->_mtype->abbr, abbr.c_str() );
+        _item->_item->type = _item->_item->type ^ IT_BATTLE;
+        _item->switch_battle( false );
     }
-    _mdefabbr_text->Clear();
-    _mdefabbr_text->AppendText( wxString( _monster->_mtype->abbr));
 }
-void ItemView::on_undead_update( wxCommandEvent& event )
+void ItemView::on_special_update( wxCommandEvent& event )
 {
-    if( _undead_check->GetValue() )
-        _monster->_item->type = _monster->_item->type | IT_UNDEAD;
+    if( _special_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_SPECIAL;
     else
-        _monster->_item->type = _monster->_item->type ^ IT_UNDEAD;
+        _item->_item->type = _item->_item->type ^ IT_SPECIAL;
 }
+void ItemView::on_tool_update( wxCommandEvent& event )
+{
+    if( _tool_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_TOOL;
+    else
+        _item->_item->type = _item->_item->type ^ IT_TOOL;
+}
+void ItemView::on_food_update( wxCommandEvent& event )
+{
+    if( _food_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_FOOD;
+    else
+        _item->_item->type = _item->_item->type ^ IT_FOOD;
+}
+void ItemView::on_ship_update( wxCommandEvent& event )
+{
+    if( _ship_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_SHIP;
+    else
+        _item->_item->type = _item->_item->type ^ IT_SHIP;
+}
+void ItemView::on_mageonly_update( wxCommandEvent& event )
+{
+    if( _mageonly_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_MAGEONLY;
+    else
+        _item->_item->type = _item->_item->type ^ IT_MAGEONLY;
+}
+void ItemView::on_neverspoil_update( wxCommandEvent& event )
+{
+    if( _neverspoil_check->GetValue() )
+        _item->_item->type = _item->_item->type | IT_NEVER_SPOIL;
+    else
+        _item->_item->type = _item->_item->type ^ IT_NEVER_SPOIL;
+}
+
 void ItemView::on_walkspin_update( wxSpinEvent& event)
 {
     _item->_item->walk = _walk_spin->GetValue();
@@ -386,7 +482,7 @@ void ItemView::on_maxinventoryspin_updateenter( wxCommandEvent& event)
 }
 
 // ****************************************************************************
-void ItemView::set_monster( AItem* item )
+void ItemView::set_item( AItem* item )
 {
     _item = item;
     _edit_check->SetValue( false );
@@ -430,11 +526,22 @@ void ItemView::set_monster( AItem* item )
     _weight_spin->SetValue( item->_item->weight );
     _baseprice_spin->SetValue( item->_item->baseprice );
 
-    // type
-    _animal_check->SetValue( item->_item->type & IT_ANIMAL );
-    _demon_check->SetValue( item->_item->type & IT_DEMON );
-    _illusion_check->SetValue( item->_item->type & IT_ILLUSION );
-    _undead_check->SetValue( item->_item->type & IT_UNDEAD );
+    // type IT_NORMAL, IT_ADVANCED, IT_TRADE, IT_MAGIC, IT_WEAPON, IT_ARMOR, IT_MOUNT
+    //       IT_BATTLE, IT_SPECIAL, IT_TOOL, IT_FOOD, IT_SHIP, MAGEONLY, IT_NEVER_SPOIL
+    _normal_check->SetValue( item->_item->type & IT_NORMAL );
+    _advanced_check->SetValue( item->_item->type & IT_ADVANCED );
+    _trade_check->SetValue( item->_item->type & IT_TRADE );
+    _magic_check->SetValue( item->_item->type & IT_MAGIC );
+    _weapon_check->SetValue( item->_item->type & IT_WEAPON );
+    _armor_check->SetValue( item->_item->type & IT_ARMOR );
+    _mount_check->SetValue( item->_item->type & IT_MOUNT );
+    _battle_check->SetValue( item->_item->type & IT_BATTLE );
+    _special_check->SetValue( item->_item->type & IT_SPECIAL );
+    _tool_check->SetValue( item->_item->type & IT_TOOL );
+    _food_check->SetValue( item->_item->type & IT_FOOD );
+    _ship_check->SetValue( item->_item->type & IT_SHIP );
+    _mageonly_check->SetValue( item->_item->type & IT_MAGEONLY );
+    _neverspoil_check->SetValue( item->_item->type & IT_NEVER_SPOIL );
 
     // movements
     _walk_spin->SetValue( item->_item->walk );

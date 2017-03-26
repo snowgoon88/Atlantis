@@ -117,9 +117,9 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     if( path.IsEmpty() ) {
         exit(1);
     }
-    _monster_data.parse_gamedata( path.ToStdString() );
+    _all_data.parse_gamedata( path.ToStdString() );
 
-    _monster_view = new MonsterView( _panel, _monster_data );
+    _monster_view = new MonsterView( _panel, _all_data );
     vbox->Add( _monster_view );
 
     _panel->SetSizer( vbox );
@@ -136,7 +136,7 @@ void QuestEditorFrame::OnOpenFile(wxCommandEvent& event)
 {
     _textCtrl->AppendText( _("Hop, on ouvre un fichier\n"));
 
-    _monster_view->set_monster( _monster_data.find_monster("I_BALROG") );
+    _monster_view->set_monster( _all_data.find_monster("I_BALROG") );
 
     //_monster_view->parse_gamedata();
 }
@@ -161,7 +161,7 @@ void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
         }
         else {
             // look if already in
-            for( auto& monster : _monster_data._map_item ) {
+            for( auto& monster : _all_data._all_monsters ) {
                 if( monster.second._item_enum.compare(unique_str) == 0) {
                 unique_str = wxGetTextFromUser( wxString("Pas de chance : "+unique_str+" existe deja..."),
                                     wxString("Nouveau Monstre"),
@@ -174,7 +174,7 @@ void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
         }
     }
     std::cout << "ADD valid new monster" << std::endl;
-    AMonster* newmonster = _monster_data.make_new( unique_str.ToStdString() );
+    AMonster* newmonster = _all_data.make_new_monster( unique_str.ToStdString() );
     _monster_view->add_monster( newmonster );
 }
 void QuestEditorFrame::OnMonsterDebug(wxCommandEvent& event)
@@ -183,7 +183,7 @@ void QuestEditorFrame::OnMonsterDebug(wxCommandEvent& event)
 }
 void QuestEditorFrame::OnWriteMonster(wxCommandEvent& even)
 {
-    _monster_data.write_gamedata();
+    _all_data.write_gamedata();
 }
 void QuestEditorFrame::OnClose(wxCloseEvent &event)
 {

@@ -23,7 +23,7 @@ void read_itemtype_enum( const std::string& path)
   std::ifstream in( path+"items.h" );
 
   std::string line;
-  int idx_monster = 0;
+  //int idx_monster = 0;
   while( std::getline( in, line )) {
     //std::cout << "[" << line[0] << "] " << line << std::endl;
     if( line[0] == '\t' && line[1] == 'I' && line[2] == 'T' && line[3] == '_' ) {

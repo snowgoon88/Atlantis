@@ -27,7 +27,7 @@ class QuestEditorFrame: public wxFrame
         ~QuestEditorFrame();
 
 
-        MonsterData _monster_data;
+        AllData _all_data;
 
         wxPanel *_panel;
         wxTextCtrl *_textCtrl;
