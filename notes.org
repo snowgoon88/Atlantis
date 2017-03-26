@@ -155,7 +155,6 @@ Le Balrong utilise du "hellfire", il y a une entrée dans SpecialType
 
 ** Ajouter un OBJET
 
-   
 ** ITEM ItemType *ItemDefs
 // name, plural, abbr,
 // flags,
@@ -422,7 +421,7 @@ OUI si
 ** [1/1] parse_gamedata.cpp
 *** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-** [12/12] ITEMS => se fait dans QuestEditor/test
+** [12/14] ITEMS => se fait dans QuestEditor/test
 *** DONE nouvelle classe to build gamedata.h/cpp
 *** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
 *** DONE read items
@@ -435,6 +434,8 @@ IT_XXXX = Ox0972
 *** DONE read armors
 *** DONE read mount
 *** DONE read battle
+*** TODO check Granted Skills, mult_skills etc
+*** TODO display Item
 *** as ItemDefs
 **** CANTGIVE = False
 **** IT_MAN = False
