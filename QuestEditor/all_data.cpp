@@ -432,6 +432,7 @@ void AllData::write_gamedata( bool fg_debug )
   }
   cpp_out << monster_line << std::endl;
 
+  // ---------------------------------------------------------- WEAPON
   // copy to WeaponType
   if( fg_debug) cpp_out << "// DEBUG copy to WeaponType" << std::endl;
   std::string weapon_line = parse_to_next_item( cpp_in, cpp_out,
@@ -478,7 +479,9 @@ void AllData::write_gamedata( bool fg_debug )
   // New Weapons
   std::cout << "write_gamedata: copy new WeaponType " << std::endl;
   for( auto& item : _all_items ) {
-    if( item.second._wtype_id >= NUMWEAPONS ) {
+	// write if a NEW Weapon AND is really a weapon
+	if( (item.second._item->type & IT_WEAPON) &&
+		(item.second._wtype_id >= NUMWEAPONS) ) {
       std::cout << "Write new weapon " << item.second._wtype_id << std::endl;
       if( fg_debug) cpp_out << "// DEBUG new WeaponType" << std::endl;
       item.second.write_type_weapon( cpp_out );
@@ -486,6 +489,7 @@ void AllData::write_gamedata( bool fg_debug )
   }
   cpp_out << weapon_line << std::endl;
 
+  // ----------------------------------------------------------- ARMOR
   // copy to ArmorType
   if( fg_debug) cpp_out << "// DEBUG copy to ArmorType" << std::endl;
   std::string armor_line = parse_to_next_item( cpp_in, cpp_out,
@@ -532,7 +536,8 @@ void AllData::write_gamedata( bool fg_debug )
   // New Armors
   std::cout << "write_gamedata: copy new ArmorType " << std::endl;
   for( auto& item : _all_items ) {
-    if( item.second._atype_id >= NUMARMORS ) {
+    if( (item.second._item->type & IT_ARMOR) &&
+		(item.second._atype_id >= NUMARMORS) ) {
       std::cout << "Write new armor " << item.second._atype_id << std::endl;
       if( fg_debug) cpp_out << "// DEBUG new ArmorType" << std::endl;
       item.second.write_type_armor( cpp_out );
@@ -540,6 +545,7 @@ void AllData::write_gamedata( bool fg_debug )
   }
   cpp_out << armor_line << std::endl;
 
+  // ------------------------------------------------------------ MOUNT
   // copy to MountType
   if( fg_debug) cpp_out << "// DEBUG copy to MountType" << std::endl;
   std::string mount_line = parse_to_next_item( cpp_in, cpp_out,
@@ -586,7 +592,8 @@ void AllData::write_gamedata( bool fg_debug )
   // New Mounts
   std::cout << "write_gamedata: copy new MountType " << std::endl;
   for( auto& item : _all_items ) {
-    if( item.second._mtype_id >= NUMMOUNTS ) {
+    if( (item.second._item->type & IT_MOUNT) &&
+		(item.second._mtype_id >= NUMMOUNTS) ) {
       std::cout << "Write new mount " << item.second._mtype_id << std::endl;
       if( fg_debug) cpp_out << "// DEBUG new MountType" << std::endl;
       item.second.write_type_mount( cpp_out );
@@ -594,6 +601,7 @@ void AllData::write_gamedata( bool fg_debug )
   }
   cpp_out << mount_line << std::endl;
 
+  // ---------------------------------------------------------- BATTLE
   // copy to BattleItemType
   if( fg_debug) cpp_out << "// DEBUG copy to BattleItemType" << std::endl;
   std::string battle_line = parse_to_next_item( cpp_in, cpp_out,
@@ -640,7 +648,8 @@ void AllData::write_gamedata( bool fg_debug )
   // New BattleItems
   std::cout << "write_gamedata: copy new BattleItemType " << std::endl;
   for( auto& item : _all_items ) {
-    if( item.second._btype_id >= NUMBATTLEITEMS ) {
+    if( (item.second._item->type & IT_BATTLE) &&
+		(item.second._btype_id >= NUMBATTLEITEMS) ) {
       std::cout << "Write new battle " << item.second._btype_id << std::endl;
       if( fg_debug) cpp_out << "// DEBUG new BattleItemType" << std::endl;
       item.second.write_type_battle( cpp_out );

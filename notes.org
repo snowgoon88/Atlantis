@@ -303,25 +303,27 @@ NULL, "rng_portal",
 // EFFECT_FEAR
 	{"fear", -2,
 	 {{ATTACK_COMBAT, -2}, {ATTACK_RIDING, -2}, {-1, 0}, {-1, 0}},
-* QUEST
-** Types
-*** SLAY
+* [0/2] QuestEditor
+** TODO passer MonsterView et ItemView en all_data.h
+** QUEST
+*** Types
+**** SLAY
 int target (unit number)
-*** HARVEST
+**** HARVEST
 Item objective // produire cet objet
 int regionnum  // dans telle région
-*** BUILD
+**** BUILD
 int bulding    // type d'objet ObjectDefs[q->building] or NO_OBJECT
 AString regioname
-*** VISIT
+**** VISIT
 un type de building dans différentes régions ?
-*** DEMOLISH
+**** DEMOLISH
 int target    // num batiment à détruire
 int regionum  // dans quelle région
-*** TODO DELIVER 
+**** TODO DELIVER 
 
-** Check => various .cpp de engine (battle,monthorder,runorders)
-** Format
+*** Check => various .cpp de engine (battle,monthorder,runorders)
+*** Format
 class Quest : public AListElem
 {
 	public:
@@ -345,42 +347,42 @@ class Quest : public AListElem
 		set<string> destinations;
 		AList	rewards;
 };
-* MONSTER
-** [12/14] Item
-*** TODO Faire une doc pour expliquer
-*** DONE Lire ../gamedata.h/cpp et sauver dans gamedata.h/cpp_new
-*** DONE Pourquoi pas relu par Editor ???
+** MONSTER
+*** [12/14] Item
+**** TODO Faire une doc pour expliquer
+**** DONE Lire ../gamedata.h/cpp et sauver dans gamedata.h/cpp_new
+**** DONE Pourquoi pas relu par Editor ???
 => il faut recompiler
 => compile avec make clean ou rebuild
-*** DONE DJIN transformé en UNDEAD dans CRYPT !!
+**** DONE DJIN transformé en UNDEAD dans CRYPT !!
 => compile avec make clean ou rebuild
-*** TODO write with new escape
-*** Bizarrerie dans Write
-*** DONE str_enum : I_XXXX
-	Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
-*** name, names : pas d'incidence. Singulier et pluriel.
-*** DONE abr : 4 lettre max (3 existe). Pas de doublons
-*** DONE Production magique
+**** TODO write with new escape
+**** Bizarrerie dans Write
+**** DONE str_enum : I_XXXX
+	 Si c'est un monstre phantasmagorique (ILLUSION), XXXX est de la forme IYYYY où I_YYYY est l'indicatif du vrai monstre sans illusion. (ex I_BALROG et I_IBALROG)
+**** name, names : pas d'incidence. Singulier et pluriel.
+**** DONE abr : 4 lettre max (3 existe). Pas de doublons
+**** DONE Production magique
 mSkill, mLevel,
 Vérifier que c'est un skill (??) qui existe
 mLevel : le niveau du skill nécessaire pour l'invocation.
-**** DONE Vérifier que utilisable dans le programme
+***** DONE Vérifier que utilisable dans le programme
 => non! modifier/ajouter dans spell.cpp et skill.cpp
-*** Mouvement : encombrement maxi pour ce type de mouvement
-*** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
-*** DONE Escape => changer les widget quand on fait set monster
-*** DONE Escape => comment on write quand no-escape
-*** DONE Escape. => exclusif flags !!!!!!
+**** Mouvement : encombrement maxi pour ce type de mouvement
+**** max_inventory : combien on peut en avoir dans son inventaire ?? 0=infty
+**** DONE Escape => changer les widget quand on fait set monster
+**** DONE Escape => comment on write quand no-escape
+**** DONE Escape. => exclusif flags !!!!!!
 Voir items.h pour exclusif
 Voir game.cpp pour calcul de chances
 void Game::MonsterCheck(ARegion *r, Unit *u)
-**** DONE si LIN/SQUARE/.../ => pas les autres flags
-**** LOSS_CHANCE ( + HAS_SKILL)
+***** DONE si LIN/SQUARE/.../ => pas les autres flags
+***** LOSS_CHANCE ( + HAS_SKILL)
 losses = (monster->num + random(esc_val)) / esc_val => nb monstres perdus
 losses vaut 0 si a le bon skill au bon niveau
-**** HAS_SKILL
+***** HAS_SKILL
 losses all si n'a pas le skill
-**** ESC_LEV_*
+***** ESC_LEV_*
 si pas level, chance=10000
 si level :
    top=num (ou num*num si ESC_NUM_SQUARE)
@@ -390,61 +392,70 @@ si level :
 si LOSE_LINKED, peut perdre autres objets du même type (IT_UNDEAD), la chance sera la plus grande de tous ce genre d'objets
 perte si chance > random(10000)
 Ex Balrog: top=1, bottom=(5*5*5*5=125*5=625)*4, chance = 4 sur 10000
-**** DONE si choisi skill NULL alors que ESC_LEV_LINEAR (and level=0)
-**** DONE enable/disable LOSE_LINKED and NUM si pas esc_lev_xxx
-*** DONE special : list parmi ce qui existe
-*** DONE spoil : exclusif (??)
-*** DONE abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion
-** WANDERING Monster
+***** DONE si choisi skill NULL alors que ESC_LEV_LINEAR (and level=0)
+***** DONE enable/disable LOSE_LINKED and NUM si pas esc_lev_xxx
+**** DONE special : list parmi ce qui existe
+**** DONE spoil : exclusif (??)
+**** DONE abbr (de MonType) => raccord avec abr ?, iTRUC pour illusion
+*** WANDERING Monster
 unit->type = U_WMON.
-** Reading and Running the game
-*** Read Faction => OK
+*** Reading and Running the game
+**** Read Faction => OK
 
-* STEAL/ASSASS
-*** target != GUARD, WMONSTAR or GUARDMAGE
-*** 1 man unit
-*** personne peut voir de Faction(target), Ally or Guard
+** STEAL/ASSASS
+*** Faction::CanSee(ARegion* r, Unit* u, int practice)
+Est-ce que l'Unit u est visible. (par la Faction en cours, j'imagine)
+OUI si
+ - même faction
+ - REVEAL_FACTION ou REVEL_UNIT ou GUARD
+ - pour chaque UNITS de chaque OBJECT
+ - si Unit pas dans DUMMY
+ - si unit_temp de la faction this a OBSE suffisant
 
-** steal u vers tar
-* TODO Gerer la création/desruction de nouveaux ITEMS pour ses enums
+**** target != GUARD, WMONSTAR or GUARDMAGE
+**** 1 man unit
+**** personne peut voir de Faction(target), Ally or Guard
+
+*** steal u vers tar
+** TODO Gerer la création/desruction de nouveaux ITEMS pour ses enums
 => enum_data.h/cpp
-* [1/1] parse_gamedata.cpp
-** DONE split line pour lire itemtype
+** [1/1] parse_gamedata.cpp
+*** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-* [10/12] ITEMS
-** DONE nouvelle classe to build gamedata.h/cpp
-** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
-** DONE read items
-** DONE add item
-** DONE add_weapon to item if needed
-** DONE switch flag (weapon to armor)
-** TODO clean up item (del weapon if not flags)
-** TODO write items
-** DONE read weapons
-** DONE read armors
-** DONE read mount
-** DONE read battle
-** as ItemDefs
-*** CANTGIVE = False
-*** IT_MAN = False
-*** IT_MONSTER = False
-*** IT_ILLUSION = False
-*** IT_UNDEAD = False
-*** IT_DEMON = False
-*** IT_LEADER = False
-*** IT_MONEY = False
-*** IT_ANIMAL = False
-*** IT_ALWAYS_SPOIL = False
-*** LOSE_LINKED = False
-*** HAS_SKILL = False
-*** ESC_* = False
-*** esc_skill = NULL
-*** esc_val = 0
-** Table of Weapons : WeaponDefs
-** Table of Armor : ArmorDefs
-** MountDefs
-** BattleItemDefs
-** weapon XOR armor XOR mount
+** [12/12] ITEMS => se fait dans QuestEditor/test
+*** DONE nouvelle classe to build gamedata.h/cpp
+*** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
+*** DONE read items
+*** DONE add item
+*** DONE add_weapon to item if needed
+*** DONE switch flag (weapon to armor)
+*** DONE clean up item (del weapon if not flags)
+*** DONE write items
+*** DONE read weapons
+*** DONE read armors
+*** DONE read mount
+*** DONE read battle
+*** as ItemDefs
+**** CANTGIVE = False
+**** IT_MAN = False
+**** IT_MONSTER = False
+**** IT_ILLUSION = False
+**** IT_UNDEAD = False
+**** IT_DEMON = False
+**** IT_LEADER = False
+**** IT_MONEY = False
+**** IT_ANIMAL = False
+**** IT_ALWAYS_SPOIL = False
+**** LOSE_LINKED = False
+**** HAS_SKILL = False
+**** ESC_* = False
+**** esc_skill = NULL
+**** esc_val = 0
+*** Table of Weapons : WeaponDefs
+*** Table of Armor : ArmorDefs
+*** MountDefs
+*** BattleItemDefs
+*** weapon XOR armor XOR mount
 
 * [21/23] EDITOR
 ** DONE sauvegarde du nom dans l'éditeur d'unité

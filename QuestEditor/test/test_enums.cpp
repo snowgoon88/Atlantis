@@ -136,12 +136,17 @@ void test_write()
   // its a weapon
   i1->switch_weapon();
   auto i2 = _data.make_new_item( "I_ITEM2" );
-  // its a weapon
+  // its an armor (not weapon)
   i2->switch_weapon();
   i2->switch_armor();
   auto m2 = _data.make_new_monster( "I_MONSTRE2" );
   auto i3 = _data.make_new_item( "I_ITEM3" );
   // its a mount
+  i3->switch_armor();
+  i3->switch_weapon();
+  i3->switch_armor();
+  i3->switch_mount();
+  i3->switch_armor();
   i3->switch_armor();
   i3->switch_mount();
   i3->write_debug( std::cout );
