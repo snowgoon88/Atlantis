@@ -54,6 +54,12 @@
 		<Unit filename="QuestEditorApp.h" />
 		<Unit filename="QuestEditorMain.cpp" />
 		<Unit filename="QuestEditorMain.h" />
+		<Unit filename="all_data.cpp">
+			<Option target="Debug" />
+		</Unit>
+		<Unit filename="all_data.h">
+			<Option target="Debug" />
+		</Unit>
 		<Unit filename="item_data.cpp" />
 		<Unit filename="item_data.h" />
 		<Unit filename="monster_data.cpp" />

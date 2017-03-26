@@ -1,0 +1,119 @@
+#ifndef ITEMVIEW_H_INCLUDED
+#define ITEMVIEW_H_INCLUDED
+
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
+#include <wx_utils.h>
+//#include <wx/spinctrl.h>
+
+#include "gamedata.h"
+#include "items.h"
+#include <vector>
+#include <fstream>
+#include <string>
+#include <map>
+#include <item_data.h>
+
+
+/**
+ * View/edit an Item.
+ */
+ class ItemView : public wxPanel
+ {
+    public:
+        ItemView( wxWindow *parent, ItemData& data );
+
+        /** set to an existing Item */
+        void set_item( AItem* item );
+        void add_item( AItem* new_item );
+
+        ItemData& _data;
+        AItem* _item;
+        std::map<std::string,int> _map_abbr;
+        std::map<std::string,int> _map_mSkill;
+        std::map<std::string,int> _map_eSkill;
+        std::map<std::string,int> _map_special;
+        //std::map<std::string,int> _map_spoil;
+//        std::vector<wxString> _list_abbr;
+        // abr, name and names
+        wxComboBox *_abbr_combo;
+        wxCheckBox *_edit_check;
+
+        wxPanel* _item_panel;
+
+
+        wxTextCtrl *_abbr_text;
+        wxTextCtrl *_name_text;
+        wxTextCtrl *_names_text;
+        // flags
+        wxCheckBox *_disabled_check;
+        wxCheckBox *_cantgive_check;
+        // magic production
+        wxComboBox *_mSkill_combo;
+        //wxTextCtrl *_mSkill_text;
+        wxSpinCtrl *_mLevel_spin;
+        // weight, baseprice
+        wxSpinCtrl *_weight_spin, *_baseprice_spin;
+        // type
+        wxCheckBox *_weapon_check, *_armor_check, *_mount_check, *_battle_check;
+        // movements
+        wxSpinCtrl *_walk_spin, *_ride_spin, *_fly_spin, *_swim_spin, *_speed_spin;
+        // max inventory
+        wxSpinCtrl *_maxinventory_spin;
+
+
+        // Callbacks
+        void on_cbox_update( wxCommandEvent& event );
+        void on_edit_update( wxCommandEvent& event );
+        void on_abbrtext_update( wxCommandEvent& event );
+        void on_nametext_update( wxCommandEvent& event );
+        void on_namestext_update( wxCommandEvent& event );
+        void on_disabled_update( wxCommandEvent& event );
+        void on_cantgive_update( wxCommandEvent& event );
+        void on_mSkillcombo_update( wxCommandEvent& event);
+        void on_mLevelspin_update(wxSpinEvent& event);
+        void on_mLevelspin_updateenter(wxCommandEvent& event);
+        void on_weightspin_update( wxSpinEvent& event);
+        void on_weightspin_updateenter( wxCommandEvent& event);
+        void on_basepricespin_update( wxSpinEvent& event);
+        void on_basepricespin_updateenter( wxCommandEvent& event);
+        void on_weapon_update( wxCommandEvent& event );
+        void on_armor_update( wxCommandEvent& event );
+        void on_mount_update( wxCommandEvent& event );
+        void on_battle_update( wxCommandEvent& event );
+        void on_walkspin_update( wxSpinEvent& event);
+        void on_walkspin_updateenter( wxCommandEvent& event);
+        void on_ridespin_update( wxSpinEvent& event);
+        void on_ridespin_updateenter( wxCommandEvent& event);
+        void on_flyspin_update( wxSpinEvent& event);
+        void on_flyspin_updateenter( wxCommandEvent& event);
+        void on_swimspin_update( wxSpinEvent& event);
+        void on_swimspin_updateenter( wxCommandEvent& event);
+        void on_speedspin_update( wxSpinEvent& event);
+        void on_speedspin_updateenter( wxCommandEvent& event);
+        void on_maxinventoryspin_update( wxSpinEvent& event);
+        void on_maxinventoryspin_updateenter( wxCommandEvent& event);
+
+
+    private:
+        enum
+        {
+            idAbbrCombo = 100,
+            idAbbrText  = 101,
+            idWeightUpdate = 150,
+            idBasepriceUpdate = 151,
+            idEscLossChance = 200,
+            idEscHasSkill = 201,
+            idEscLinear = 202,
+            idEscSquare = 203,
+            idEscCube = 204,
+            idEscQuad = 205,
+            idEscNumSquare = 206,
+            idEscLinked = 207,
+        };
+        wxDECLARE_EVENT_TABLE();
+
+ }; // ItemView
+#endif // ITEMVIEW_H_INCLUDED
