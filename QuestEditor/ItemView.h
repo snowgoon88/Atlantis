@@ -67,6 +67,27 @@
         // max inventory
         wxSpinCtrl *_maxinventory_spin;
 
+        // WEAPON
+        std::map<std::string,int> _map_bSkill;
+        wxPanel *_weapon_panel;
+        wxCheckBox *_needskill_ch, *_alwaysready_ch, *_nodefense_ch, *_nofoot_ch, *_nomount_ch;
+        wxCheckBox *_short_ch, *_long_ch, *_ranged_ch, *_noattackerskill_ch, *_riding_bonus_ch;
+        wxCheckBox *_riding_bonus_defense_ch;
+
+        wxComboBox *_bSkill_combo, *_oSkil_combo;
+        wxSpinCtrl *_weap_class_combo; //, *_attack_type_combo; == ATTACK_COMBAT
+//     enum {
+//	ATTACK_COMBAT,
+//	ATTACK_ENERGY,
+//	ATTACK_SPIRIT,
+//	ATTACK_WEATHER,
+//	ATTACK_RIDING,
+//	ATTACK_RANGED,
+//	NUM_ATTACK_TYPES
+//};
+        wxSpinCtrl *_num_attack_spin;
+        wxSpinCtrl *_atk_bonus_spin, *_def_bonus_spin, *_mount_bonus_spin;
+
 
         // Callbacks
         void on_cbox_update( wxCommandEvent& event );

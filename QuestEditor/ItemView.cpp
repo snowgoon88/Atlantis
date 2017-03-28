@@ -170,6 +170,108 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     _maxinventory_spin->Bind( wxEVT_TEXT_ENTER, &ItemView::on_maxinventoryspin_updateenter, this);
     item_vbox->Add( inventory_hbox, 0, wxEXPAND, 0 );
 
+
+    // WEAPON
+    _weapon_panel = new wxPanel( _item_panel, wxID_ANY );
+    wxBoxSizer *weapon_vbox = new wxBoxSizer( wxVERTICAL );
+
+    wxBoxSizer *weapon_flag_hbox = new wxBoxSizer( wxHORIZONTAL );
+    weapon_flag_hbox->AddSpacer(30);
+    mk_check( _weapon_panel, idWeapNeedSkill, weapon_flag_hbox, "NeedSkill", _needskill_ch );
+    _needskill_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapAlwaysReady, weapon_flag_hbox, "AlwaysReady", _alwaysread_ch );
+    _alwaysready_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapNoDefense, weapon_flag_hbox, "NoDefense", _nodefense_ch );
+    _nodefense_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapNoFoot, weapon_flag_hbox, "NoFoot", _nofoot_ch );
+    _nofoot_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapNoMount, weapon_flag_hbox, "NoMount", _nomount_ch );
+    _nomount_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapShort, weapon_flag_hbox, "Short", _short_ch );
+    _short_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapLong, weapon_flag_hbox, "Long", _long_ch);
+    _long_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapRanged, weapon_flag_hbox, "Ranged", _ranged_ch );
+    _ranged_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapNoAttackerSkill, weapon_flag_hbox, "NoAttackerSkill", _noattackerskill_ch );
+    _noattackerskill_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapRidingBonus, weapon_flag_hbox, "RidingBonus", _riding_bonus_ch );
+    _riding_bonus_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+    mk_check( _weapon_panel, idWeapRidingBonusDefense, weapon_flag_hbox, "RidingBonusDefense", _riding_bonus_defense_ch );
+    _riding_bonus_defense_ch->Bind( wxEVT_CHECKBOX, &ItemView::on_weaponcheck_update, this);
+
+//    Skills with SkillType::BATTLEREP
+    wxBoxSizer *weapskill_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( _weapon_panel, weapskill_hbox, "Skill ");
+    _bSkill_combo = new wxComboBox(_weapon_panel, idAbbrCombo, _T(""), wxDefaultPosition, wxDefaultSize,
+                                    0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
+    _bSkill_combo->Append( wxString("NULL"));
+    _bSkill_combo->SetValue( wxString("NULL") );
+    _bSkill_combo->Bind( wxEVT_COMBOBOX, &ItemView::on_bSkillcombo_update, this);
+    weapskill_hbox->Add( _bSkill_combo, 0, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+    mk_title( _weapon_panel, weapskill_hbox, " or ");
+
+    _oSkill_combo = new wxComboBox(_weapon_panel, idAbbrCombo, _T(""), wxDefaultPosition, wxDefaultSize,
+                                    0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
+    _oSkill_combo->Append( wxString("NULL"));
+    _oSkill_combo->SetValue( wxString("NULL") );
+    _oSkill_combo->Bind( wxEVT_COMBOBOX, &ItemView::on_oSkillcombo_update, this);
+    weapskill_hbox->Add( _oSkill_combo, 0, wxEXPAND | wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+
+    for( int i=0; i<NSKILLS; ++i) {
+        if( SkillDefs[i].flags & SkillType::BATTLEREP ) {
+            std::string bLabel = std::string( SkillDefs[i].name);
+            bLabel += " [" + std::string( SkillDefs[i].abbr) + "]";
+            _map_bSkill[bLabel] = i;
+            _bSkill_combo->Append( wxString(bLabel));
+            _oSkill_combo->Append( wxString(bLabel));
+            //std::cout << mLabel << "=>" << i << std::endl;
+            }
+    }
+    _bSkill_combo->SetValue( wxString("NULL") );
+    _oSkill_combo->SetValue( wxString("NULL") );
+
+    weapon_vbox->Add( weapskill_hbox, 0, wxEXPAND, 0 );
+
+        // weight, baseprice
+    wxBoxSizer *attack_hbox = new wxBoxSizer( wxHORIZONTAL );
+
+enum {
+	SLASHING,		// e.g. sword attack (This is default)
+	PIERCING,		// e.g. spear or arrow attack
+	CRUSHING,		// e.g. mace attack
+	CLEAVING,		// e.g. axe attack
+	ARMORPIERCING,		// e.g. crossbow double bow
+	MAGIC_ENERGY,		// e.g. fire, dragon breath
+	MAGIC_SPIRIT,		// e.g. black wind
+	MAGIC_WEATHER,		// e.g. tornado
+	NUM_WEAPON_CLASSES
+};
+    wxSpinCtrl *_weap_class_combo;
+
+    // BEWARE WeaponType::NUM_ATTACKS_SKILL ===> see ???? (list ?)
+    // Add Panel with explanation
+    mk_spin( _item_panel, wxID_ANY, attack_hbox, "NumAttack:", _num_attack_spin, -150, 150, 200);
+    _num_attack_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_numattackspin_update, this);
+    _num_attack_spin->Bind( wxEVT_TEXT, &MonsterView::on_numattackspin_updateenter, this);
+    _num_attack_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_numattackspin_updateenter, this);
+    mk_spin( _item_panel, wxID_ANY, attack_hbox, "AttackBonus:", _atk_bonus_spin, 0, 20, 200);
+    _atk_bonus_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_atk_bonusspin_update, this);
+    _atk_bonus_spin->Bind( wxEVT_TEXT, &MonsterView::on_atk_bonusspin_updateenter, this);
+    _atk_bonus_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_atk_bonusspin_updateenter, this);
+    mk_spin( _item_panel, wxID_ANY, attack_hbox, "DefenseBonus:", _def_bonus_spin, 0, 20, 200);
+    _def_bonus_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_def_bonusspin_update, this);
+    _def_bonus_spin->Bind( wxEVT_TEXT, &MonsterView::on_def_bonusspin_updateenter, this);
+    _def_bonus_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_def_bonusspin_updateenter, this);
+    mk_spin( _item_panel, wxID_ANY, attack_hbox, "MountBonus:", _mount_bonus_spin, 0, 20, 200);
+    _mount_bonus_spin->Bind( wxEVT_SPINCTRL, &MonsterView::on_mount_bonusspin_update, this);
+    _mount_bonus_spin->Bind( wxEVT_TEXT, &MonsterView::on_mount_bonusspin_updateenter, this);
+    _mount_bonus_spin->Bind( wxEVT_TEXT_ENTER, &MonsterView::on_mount_bonusspin_updateenter, this);
+
+    _weapon_panel->Enable( false );
+    _weapon_panel->SetSizer( weapon_vbox );
+    item_vbox->Add( _weapon_panel, 0, wxEXPAND, 0 );
+
     _item_panel->SetSizer( item_vbox );
 
     main_vbox->Add( _item_panel, 0, wxEXPAND, 0);

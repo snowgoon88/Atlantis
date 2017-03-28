@@ -421,7 +421,7 @@ OUI si
 ** [1/1] parse_gamedata.cpp
 *** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-** [12/14] ITEMS => se fait dans QuestEditor/test
+** [12/15] ITEMS => se fait dans QuestEditor/test
 *** DONE nouvelle classe to build gamedata.h/cpp
 *** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
 *** DONE read items

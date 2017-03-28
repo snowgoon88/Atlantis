@@ -89,22 +89,8 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     SetStatusText(wxbuildinfo(short_f), 1);
 //#endif // wxUSE_STATUSBAR
 
-    _panel = new wxPanel( this );
-    wxBoxSizer *vbox = new wxBoxSizer( wxVERTICAL );
 
-    // And add a Text - multiline and readonlu
-//    _textCtrl = new wxTextCtrl( _panel, -1, _("exemple de texte"),
-//                               wxDefaultPosition, wxDefaultSize,
-//                               wxTE_MULTILINE | wxTE_READONLY );
-//    vbox->Add( _textCtrl, 1, wxEXPAND );
-//    vbox->Add( -1, 20); // Some space
-//    wxBoxSizer *hbox = new wxBoxSizer( wxHORIZONTAL );
-//    _label = new wxStaticText( _panel, -1, _("LABEL"));
-//    hbox->Add( _label, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 10 );
-//    hbox->Add( new wxTextCtrl(_panel, -1, _("A modifier")), 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
-//    vbox->Add( hbox );
-
-    // Read data about monsters
+    // Read data about monsters and items
     read_itemtype_enum();
     //parse_gamedata();
     wxString path = "..";
@@ -119,12 +105,22 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     }
     _all_data.parse_gamedata( path.ToStdString() );
 
-    _monster_view = new MonsterView( _panel, _all_data );
-    vbox->Add( _monster_view );
+    // NOTEBOOK
+    _notebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxNB_LEFT );
 
-    _panel->SetSizer( vbox );
+    _panel_monster = new wxPanel( _notebook );
+    wxBoxSizer *vbox_monster = new wxBoxSizer( wxVERTICAL );
+    _monster_view = new MonsterView( _panel_monster, _all_data );
+    vbox_monster->Add( _monster_view );
+    _panel_monster->SetSizer( vbox_monster );
+    _notebook->AddPage( _panel_monster, "Monstres" );
 
-
+    _panel_item = new wxPanel( _notebook );
+    wxBoxSizer *vbox_item = new wxBoxSizer( wxVERTICAL );
+    _item_view = new ItemView( _panel_item, _all_data );
+    vbox_item->Add( _item_view );
+    _panel_item->SetSizer( vbox_item );
+    _notebook->AddPage( _panel_item, "Items" );
 }
 
 

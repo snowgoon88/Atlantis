@@ -16,6 +16,8 @@
 
 #include "QuestEditorApp.h"
 #include "MonsterView.h"
+#include "ItemView.h"
+#include <wx/notebook.h>
 
 /**
  * Main Window
@@ -29,10 +31,12 @@ class QuestEditorFrame: public wxFrame
 
         AllData _all_data;
 
-        wxPanel *_panel;
+        wxNotebook* _notebook;
+        wxPanel *_panel_monster, *_panel_item;
         wxTextCtrl *_textCtrl;
         wxStaticText *_label;
         MonsterView *_monster_view;
+        ItemView *_item_view;
     private:
         enum
         {
