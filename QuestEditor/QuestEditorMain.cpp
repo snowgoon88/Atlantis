@@ -67,8 +67,8 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
     //fileMenu->Append(idMenuFileOpen, _("&Open\tCtrl-O"), _("Open a game file"));
-    fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     fileMenu->Append( idMenuSave, _("&Write All"), ("Sauvegarde les Monstres et Items dans gamedata.cpp.new") );
+    fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
     wxMenu* monsterMenu = new wxMenu(_T(""));

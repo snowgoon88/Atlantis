@@ -15,9 +15,9 @@
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
 					<Add directory=".." />
 					<Add directory="." />
-					<Add option="-D__WXDEBUG__" />
 					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
 				</Compiler>
 				<ResourceCompiler>
@@ -85,9 +85,9 @@
 		<Unit filename="monster_data.h" />
 		<Unit filename="utils.cpp" />
 		<Unit filename="utils.h" />
+		<Unit filename="wx_pch.h" />
 		<Unit filename="wx_utils.cpp" />
 		<Unit filename="wx_utils.h" />
-		<Unit filename="wx_pch.h" />
 		<Extensions>
 			<envvars />
 			<code_completion />

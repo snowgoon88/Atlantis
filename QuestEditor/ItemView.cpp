@@ -164,7 +164,7 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     _mLevel_spin->Bind( wxEVT_SPINCTRL, &ItemView::on_mLevelspin_update, this);
     _mLevel_spin->Bind( wxEVT_TEXT, &ItemView::on_mLevelspin_updateenter, this);
     _mLevel_spin->Bind( wxEVT_TEXT_ENTER, &ItemView::on_mLevelspin_updateenter, this);
-    mk_title( _item_panel, magic_hbox, "Materials: TODO");
+    //mk_title( _item_panel, magic_hbox, "Materials: TODO");
     item_vbox->Add( magic_hbox, 0, wxEXPAND, 0 );
 
     wxBoxSizer *mmat_hbox = new wxBoxSizer( wxHORIZONTAL );
@@ -581,9 +581,9 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     _battle_mageonly_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_mageonly_check_update, this);
     mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Special", _battle_special_check );
     _battle_special_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_special_check_update, this);
-    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Shiel", _battle_shield_check );
+    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Shield", _battle_shield_check );
     _battle_shield_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_shield_check_update, this);
-    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "MageOnly", _battle_exclusive_check );
+    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Exclusive", _battle_exclusive_check );
     _battle_exclusive_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_exclusive_check_update, this);
     battle_vbox->Add( battle_flag_hbox, 0, wxEXPAND, 0);
 
