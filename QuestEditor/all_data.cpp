@@ -6,6 +6,7 @@
 #include <all_data.h>
 #include <utils.h>
 #include <fstream>
+#include <stdlib.h>
 
 // ***************************************************************************
 // ************************************************* AllData::parse_gamedata()
