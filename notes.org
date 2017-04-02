@@ -302,8 +302,8 @@ NULL, "rng_portal",
 // EFFECT_FEAR
 	{"fear", -2,
 	 {{ATTACK_COMBAT, -2}, {ATTACK_RIDING, -2}, {-1, 0}, {-1, 0}},
-* [0/2] QuestEditor
-** TODO passer MonsterView et ItemView en all_data.h
+* [1/2] QuestEditor
+** DONE passer MonsterView et ItemView en all_data.h
 ** QUEST
 *** Types
 **** SLAY
@@ -421,7 +421,7 @@ OUI si
 ** [1/1] parse_gamedata.cpp
 *** DONE split line pour lire itemtype
 IT_XXXX = Ox0972
-** [12/15] ITEMS => se fait dans QuestEditor/test
+** [19/23] ITEMS => se fait dans QuestEditor/test
 *** DONE nouvelle classe to build gamedata.h/cpp
 *** DONE cette classe pourrait contenir toutes les structures : monstre, items, ...
 *** DONE read items
@@ -434,8 +434,17 @@ IT_XXXX = Ox0972
 *** DONE read armors
 *** DONE read mount
 *** DONE read battle
-*** TODO check Granted Skills, mult_skills etc
-*** TODO display Item
+*** DONE check Granted Skills, mult_skills etc
+*** DONE display Item : tous les champts
+*** TODO check flags
+*** TODO border around Panel or separator
+*** TODO changer le menu : Add Monster, Add Item, Write Everything
+*** DONE Faire CBK de Armor
+*** DONE Faire CBK de Battle
+*** DONE set item battle
+*** TODO Qu'est-ce qui est exclusif entre weapon, armor, battle et mount. ?
+*** DONE Mount
+*** DONE Materials Magiques pour Monstres ? => None
 *** as ItemDefs
 **** CANTGIVE = False
 **** IT_MAN = False
@@ -457,7 +466,6 @@ IT_XXXX = Ox0972
 *** MountDefs
 *** BattleItemDefs
 *** weapon XOR armor XOR mount
-
 * [21/23] EDITOR
 ** DONE sauvegarde du nom dans l'éditeur d'unité
 Spliter après la parenthèse...
