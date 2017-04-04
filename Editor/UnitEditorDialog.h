@@ -25,6 +25,9 @@ public:
     wxTextCtrl* _name;
     wxChoice* _faction;
     wxChoice* _type;
+    wxChoice* _guard, *_reveal;
+    wxCheckBox *_behind_cb, *_tax_cb, *_holding_cb, *_noaid_cb, *_invis_cb;
+    wxCheckBox *_cons_unit_cb, *cons_fact_cb;
     //wxButton* _reg_btn;
     ListChooser* _list_items;
     ListChooser* _list_skills;
@@ -38,6 +41,8 @@ private:
     std::string getUnitLocation(Unit* u);
     int find_selfaction_bynum( int fnum );
     int find_seltype_bynum( int tnum );
+    int find_selguard_bynum( int gnum );
+    int find_selreveal_bynum( int rnum );
 
     /** Make GUI building easier */
     void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)

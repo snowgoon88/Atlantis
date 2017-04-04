@@ -87,6 +87,19 @@ public:
         }
     }
 
+	// Guard Types
+	_guard_types.clear();
+	_guard_types.push_back( {"NONE", 0} );
+	_guard_types.push_back( {"GUARD", 1} );
+	_guard_types.push_back( {"AVOID", 2} );
+	_guard_types.push_back( {"SET", 3} );
+	_guard_types.push_back( {"ADVANCE", 4} );
+
+	// Reveal Types
+	_reveal_types.clear();
+	_reveal_types.push_back( {"NONE", 0} );
+	_reveal_types.push_back( {"UNIT", 1} );
+	_reveal_types.push_back( {"FACTION", 2} );
   }
   // **************************************************** MapAccess::Attributs
   std::vector<RefItem> _faction_enum;
@@ -94,6 +107,8 @@ public:
   std::vector<RefItem> _skill_names;
   std::vector<RefItem> _unit_types;
   std::vector<RefItem> _object_types;
+  std::vector<RefItem> _guard_types;
+  std::vector<RefItem> _reveal_types;
   // ************************************************ MapAccess::AddAbyssLevel
   void AddAbyssLevel( int level )
   {

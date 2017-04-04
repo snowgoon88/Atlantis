@@ -74,6 +74,39 @@ UnitEditorDialog::UnitEditorDialog( wxWindow* parent, Unit* unit, MapAccess* map
     //_type->SetSelection(0);
     type_hbox->Add( _type, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 0);
     main_vbox->Add( type_hbox, 0, wxALIGN_CENTER_VERTICAL, 2);
+
+    // Guard
+    wxBoxSizer* guard_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( this, guard_hbox, " Guarding: ");
+    _guard = new wxChoice( this, wxID_ANY );
+    for( auto& item : _map_access->_guard_types ) {
+        _guard->Append( item.first );
+    }
+    int gnum = find_selguard_bynum( _unit->guard );
+    if( gnum >= 0 ) {
+        _guard->SetSelection( gnum );
+    }
+    else {
+        wxMessageBox( "Oups, pas de guard connu pour cette unit. J'met 0...", "Edit Unit");
+    }
+    guard_hbox->Add( _guard, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 0);
+
+    mk_title( this, guard_hbox, " Reveal: ");
+    _reveal = new wxChoice( this, wxID_ANY );
+    for( auto& item : _map_access->_reveal_types ) {
+        _reveal->Append( item.first );
+    }
+    int rnum = find_selreveal_bynum( _unit->reveal );
+    if( rnum >= 0 ) {
+        _reveal->SetSelection( gnum );
+    }
+    else {
+        wxMessageBox( "Oups, pas de reveal connu pour cette unit. J'met 0...", "Edit Unit");
+    }
+    guard_hbox->Add( _reveal, 0, wxLEFT | wxALIGN_CENTER_VERTICAL, 0);
+
+    main_vbox->Add( guard_hbox, 0, wxALIGN_CENTER_VERTICAL, 2);
+
     // Items
     _list_items = new ListChooser(this, "Items x number", _map_access->_item_names);
     if( _unit->items.Num() > 0) {
@@ -136,6 +169,24 @@ int UnitEditorDialog::find_seltype_bynum( int tnum )
     }
     return -1;
 }
+int UnitEditorDialog::find_selguard_bynum( int gnum )
+{
+    for( int id=0; id < _map_access->_guard_types.size(); ++id ) {
+        if( _map_access->_guard_types[id].second == gnum ) {
+            return id;
+        }
+    }
+    return -1;
+}
+int UnitEditorDialog::find_selreveal_bynum( int rnum )
+{
+    for( int id=0; id < _map_access->_reveal_types.size(); ++id ) {
+        if( _map_access->_reveal_types[id].second == rnum ) {
+            return id;
+        }
+    }
+    return -1;
+}
 /*************************************************** UnitEditorDialog::Events */
 void UnitEditorDialog::OnSave( wxCommandEvent& event)
 {
@@ -153,6 +204,9 @@ void UnitEditorDialog::OnSave( wxCommandEvent& event)
     std::cout << "UNIT_type    : " << _map_access->_unit_types[_type->GetSelection()].first;
     std::cout << " num=" << _map_access->_unit_types[_type->GetSelection()].second << std::endl;
     _unit->type = _map_access->_unit_types[_type->GetSelection()].second;
+
+    _unit->guard = _map_access->_guard_types[_guard->GetSelection()].second;
+    _unit->reveal = _map_access->_reveal_types[_reveal->GetSelection()].second;
     //if (newtype<0 || newtype>NUNITTYPES-1) {
 	//					Awrite("Invalid Type");
 	//					break;
