@@ -126,6 +126,7 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     for( int k=0; k<4; ++k ) {
         _pMat_combo[k] = new wxComboBox(_item_panel, idProdMat+k, _T(""), wxDefaultPosition, wxSize(200,-1),
                                     0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
+        _pMat_combo[k]->Append( wxString( "NULL" ));
         for( auto& item : _data._all_enumitems ) {
             _pMat_combo[k]->Append( wxString( item.first ));
         }
@@ -163,7 +164,7 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     _mLevel_spin->Bind( wxEVT_SPINCTRL, &ItemView::on_mLevelspin_update, this);
     _mLevel_spin->Bind( wxEVT_TEXT, &ItemView::on_mLevelspin_updateenter, this);
     _mLevel_spin->Bind( wxEVT_TEXT_ENTER, &ItemView::on_mLevelspin_updateenter, this);
-    mk_title( _item_panel, magic_hbox, "Materials: TODO");
+    //mk_title( _item_panel, magic_hbox, "Materials: TODO");
     item_vbox->Add( magic_hbox, 0, wxEXPAND, 0 );
 
     wxBoxSizer *mmat_hbox = new wxBoxSizer( wxHORIZONTAL );
@@ -171,6 +172,7 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     for( int k=0; k<4; ++k ) {
         _mMat_combo[k] = new wxComboBox(_item_panel, idProdMat+k, _T(""), wxDefaultPosition, wxSize(200,-1),
                                     0, NULL, wxTE_PROCESS_ENTER | wxTE_PROCESS_TAB);
+        _mMat_combo[k]->Append( wxString( "NULL" ));
         for( auto& item : _data._all_enumitems ) {
             _mMat_combo[k]->Append( wxString( item.first ));
         }
@@ -579,9 +581,9 @@ ItemView::ItemView(wxWindow *parent, AllData& data)
     _battle_mageonly_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_mageonly_check_update, this);
     mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Special", _battle_special_check );
     _battle_special_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_special_check_update, this);
-    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Shiel", _battle_shield_check );
+    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Shield", _battle_shield_check );
     _battle_shield_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_shield_check_update, this);
-    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "MageOnly", _battle_exclusive_check );
+    mk_check( _battle_panel, wxID_ANY, battle_flag_hbox, "Exclusive", _battle_exclusive_check );
     _battle_exclusive_check->Bind( wxEVT_CHECKBOX, &ItemView::on_bat_exclusive_check_update, this);
     battle_vbox->Add( battle_flag_hbox, 0, wxEXPAND, 0);
 
@@ -950,13 +952,17 @@ void ItemView::on_armor_update( wxCommandEvent& event )
 }
 void ItemView::on_mount_update( wxCommandEvent& event )
 {
-    if( _mount_check->GetValue() )
+    if( _mount_check->GetValue() ) {
         _item->_item->type = _item->_item->type | IT_MOUNT;
-    else
+        _mount_panel->Enable( true );
+        _armor_check->SetValue(false);
+        _weapon_check->SetValue(false);
+    }
+    else {
         _item->_item->type = _item->_item->type ^ IT_MOUNT;
+        _mount_panel->Enable( false );
+    }
     _item->switch_mount();
-    _weapon_check->SetValue(false);
-    _armor_check->SetValue(false);
 }
 void ItemView::on_battle_update( wxCommandEvent& event )
 {
@@ -964,8 +970,6 @@ void ItemView::on_battle_update( wxCommandEvent& event )
         _item->_item->type = _item->_item->type | IT_BATTLE;
         _battle_panel->Enable( true );
         _item->switch_battle(true);
-        _weapon_check->SetValue(false);
-        _armor_check->SetValue(false);
     }
     else {
         _item->_item->type = _item->_item->type ^ IT_BATTLE;
@@ -1801,7 +1805,7 @@ void ItemView::set_item( AItem* item )
         _battle_lvl_spin->SetValue( item->_btype->skillLevel );
     }
     else { // No BATTLE
-        _armor_panel->Enable( false );
+        _battle_panel->Enable( false );
         _battle_mageonly_check->SetValue( false );
         _battle_special_check->SetValue( false );
         _battle_shield_check->SetValue( false );

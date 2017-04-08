@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="QuestEditor" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/QuestEditor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-D__WXDEBUG__" />
+					<Add directory=".." />
+					<Add directory="." />
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libwxmsw30ud_core.a" />
+					<Add library="libwxbase30ud.a" />
+					<Add library="libwxpngd.a" />
+					<Add library="libwxzlibd.a" />
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-pipe" />
+			<Add option="-mthreads" />
+			<Add option="-D__GNUWIN32__" />
+			<Add option="-D__WXMSW__" />
+			<Add option="-DwxUSE_UNICODE" />
+			<Add option="-Winvalid-pch" />
+			<Add option="-include wx_pch.h" />
+			<Add option="-DWX_PRECOMP" />
+			<Add option="-Wall" />
+			<Add directory="D:/Programmes/wxWidgets-3.0.2/include" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="D:/Programmes/wxWidgets-3.0.2/include" />
+		</ResourceCompiler>
+		<Linker>
+			<Add option="-mthreads" />
+			<Add library="libkernel32.a" />
+			<Add library="libuser32.a" />
+			<Add library="libgdi32.a" />
+			<Add library="libwinspool.a" />
+			<Add library="libcomdlg32.a" />
+			<Add library="libadvapi32.a" />
+			<Add library="libshell32.a" />
+			<Add library="libole32.a" />
+			<Add library="liboleaut32.a" />
+			<Add library="libuuid.a" />
+			<Add library="libcomctl32.a" />
+			<Add library="libwsock32.a" />
+			<Add library="libodbc32.a" />
+		</Linker>
+		<Unit filename="../aregion.h" />
+		<Unit filename="../gamedata.cpp" />
+		<Unit filename="../gamedata.h" />
+		<Unit filename="../items.h" />
+		<Unit filename="../object.h" />
+		<Unit filename="../skills.h" />
+		<Unit filename="ItemView.cpp" />
+		<Unit filename="ItemView.h" />
+		<Unit filename="MonsterView.cpp" />
+		<Unit filename="MonsterView.h" />
+		<Unit filename="QuestEditorApp.cpp" />
+		<Unit filename="QuestEditorApp.h" />
+		<Unit filename="QuestEditorMain.cpp" />
+		<Unit filename="QuestEditorMain.h" />
+		<Unit filename="all_data.cpp" />
+		<Unit filename="all_data.h" />
+		<Unit filename="item_data.cpp" />
+		<Unit filename="item_data.h" />
+		<Unit filename="monster_data.cpp" />
+		<Unit filename="monster_data.h" />
+		<Unit filename="utils.cpp" />
+		<Unit filename="utils.h" />
+		<Unit filename="wx_pch.h" />
+		<Unit filename="wx_utils.cpp" />
+		<Unit filename="wx_utils.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

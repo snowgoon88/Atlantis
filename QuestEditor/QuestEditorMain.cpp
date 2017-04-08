@@ -53,7 +53,8 @@ BEGIN_EVENT_TABLE(QuestEditorFrame, wxFrame)
     //EVT_MENU(idMenuFileOpen, QuestEditorFrame::OnOpenFile)
     EVT_MENU(idMenuMonsterAdd, QuestEditorFrame::OnMonsterAdd)
     //EVT_MENU(idMenuMonsterDebug, QuestEditorFrame::OnMonsterDebug)
-    EVT_MENU(idMenuMonsterSave, QuestEditorFrame::OnWriteMonster)
+    EVT_MENU(idMenuItemAdd, QuestEditorFrame::OnItemAdd)
+    EVT_MENU(idMenuSave, QuestEditorFrame::OnWriteAll)
     EVT_MENU(idMenuQuit, QuestEditorFrame::OnQuit)
     EVT_MENU(idMenuAbout, QuestEditorFrame::OnAbout)
 END_EVENT_TABLE()
@@ -66,14 +67,15 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
     wxMenuBar* mbar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu(_T(""));
     //fileMenu->Append(idMenuFileOpen, _("&Open\tCtrl-O"), _("Open a game file"));
+    fileMenu->Append( idMenuSave, _("&Write All"), ("Sauvegarde les Monstres et Items dans gamedata.cpp.new") );
     fileMenu->Append(idMenuQuit, _("&Quit\tAlt-F4"), _("Quit the application"));
     mbar->Append(fileMenu, _("&File"));
 
     wxMenu* monsterMenu = new wxMenu(_T(""));
     monsterMenu->Append( idMenuMonsterAdd, _("&Add Monster"), ("Ajoute un nouveau Monstre... brrrr....") );
     //monsterMenu->Append( idMenuMonsterDebug, _("&Debug Monster"), ("Denude le Monstre :o)") );
-    monsterMenu->Append( idMenuMonsterSave, _("&Write Monsters"), ("Sauvegarde les Monstres dans gamedata.cpp.new") );
-    mbar->Append(monsterMenu, _("&Monster"));
+    monsterMenu->Append( idMenuItemAdd, _("&Add Item"), ("Ajoute un nouvel Item... hehehe....") );
+    mbar->Append(monsterMenu, _("&Add"));
 
     wxMenu* helpMenu = new wxMenu(_T(""));
     helpMenu->Append(idMenuAbout, _("&About\tF1"), _("Show info about this application"));
@@ -85,7 +87,7 @@ QuestEditorFrame::QuestEditorFrame(wxFrame *frame, const wxString& title, const 
 //#if wxUSE_STATUSBAR
     // create a status bar with some information about the used wxWidgets version
     CreateStatusBar(2);
-    SetStatusText(_("Hello Code::Blocks user!"),0);
+    SetStatusText(_("Coucou Thanseep"),0);
     SetStatusText(wxbuildinfo(short_f), 1);
 //#endif // wxUSE_STATUSBAR
 
@@ -157,8 +159,8 @@ void QuestEditorFrame::OnMonsterAdd(wxCommandEvent& event)
         }
         else {
             // look if already in
-            for( auto& monster : _all_data._all_monsters ) {
-                if( monster.second._item_enum.compare(unique_str) == 0) {
+            for( auto& allitem : _all_data._all_enumitems ) {
+                if( allitem.first.compare(unique_str) == 0) {
                 unique_str = wxGetTextFromUser( wxString("Pas de chance : "+unique_str+" existe deja..."),
                                     wxString("Nouveau Monstre"),
                                     unique_str,
@@ -177,7 +179,44 @@ void QuestEditorFrame::OnMonsterDebug(wxCommandEvent& event)
 {
     _monster_view->_monster->write_debug();
 }
-void QuestEditorFrame::OnWriteMonster(wxCommandEvent& even)
+void QuestEditorFrame::OnItemAdd(wxCommandEvent& event)
+{
+
+    wxString unique_str = wxGetTextFromUser( wxString("Il faut un identifiant unique de la forme I_MACHIN"),
+                                wxString("Nouveau Item"),
+                                _("I_MACHIN"),
+                               this );
+    // detect Cancel
+    if( unique_str.IsEmpty() ) {
+        return;
+    }
+    bool fg_valid = false;
+    while( fg_valid == false ) {
+        if( unique_str.substr(0,2).compare("I_") != 0 ) {
+            unique_str = wxGetTextFromUser( wxString("Damn: "+unique_str+"', ca commence pas par 'I_', ok ?"),
+                                    wxString("Nouvel Item"),
+                                    unique_str,
+                                    this );
+        }
+        else {
+            // look if already in
+            for( auto& allitem : _all_data._all_enumitems ) {
+                if( allitem.first.compare(unique_str) == 0) {
+                unique_str = wxGetTextFromUser( wxString("Pas de chance : "+unique_str+" existe deja..."),
+                                    wxString("Nouvel Item"),
+                                    unique_str,
+                                    this );
+                break;
+                }
+            }
+            fg_valid = true;
+        }
+    }
+    std::cout << "ADD valid new Item" << std::endl;
+    AItem* newitem = _all_data.make_new_item( unique_str.ToStdString() );
+    _item_view->add_item( newitem );
+}
+void QuestEditorFrame::OnWriteAll(wxCommandEvent& even)
 {
     _all_data.write_gamedata();
 }
