@@ -100,6 +100,15 @@ public:
 	_reveal_types.push_back( {"NONE", 0} );
 	_reveal_types.push_back( {"UNIT", 1} );
 	_reveal_types.push_back( {"FACTION", 2} );
+
+	// UnitFlags Types
+	_unitflags_types.clear();
+	_unitflags_types.push_back( {"Behi", FLAG_BEHIND} );
+	_unitflags_types.push_back( {"Tax", FLAG_AUTOTAX} );
+	_unitflags_types.push_back( {"Hold", FLAG_HOLDING} );
+	_unitflags_types.push_back( {"NAid", FLAG_NOAID} );
+	_unitflags_types.push_back( {"Invi", FLAG_INVIS} );
+
   }
   // **************************************************** MapAccess::Attributs
   std::vector<RefItem> _faction_enum;
@@ -109,6 +118,7 @@ public:
   std::vector<RefItem> _object_types;
   std::vector<RefItem> _guard_types;
   std::vector<RefItem> _reveal_types;
+  std::vector<RefItem> _unitflags_types;
   // ************************************************ MapAccess::AddAbyssLevel
   void AddAbyssLevel( int level )
   {

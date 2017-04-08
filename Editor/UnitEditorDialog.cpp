@@ -107,6 +107,19 @@ UnitEditorDialog::UnitEditorDialog( wxWindow* parent, Unit* unit, MapAccess* map
 
     main_vbox->Add( guard_hbox, 0, wxALIGN_CENTER_VERTICAL, 2);
 
+    // Flags
+    wxBoxSizer *flags_hbox = new wxBoxSizer( wxHORIZONTAL );
+    mk_title( this, flags_hbox, "Flags: ");
+    int idf = 0;
+    for( auto& item : _map_access->_unitflags_types) {
+        mk_check( this, idUnitFlagBase+item.second, flags_hbox, item.first, _unitflags_cb[idf] );
+        _unitflags_cb[idf]->Bind( wxEVT_CHECKBOX, &UnitEditorDialog::on_unitflags_update, this);
+        _unitflags_cb[idf]->SetValue( _unit->GetFlag( item.second ));
+
+        idf ++;
+    }
+    main_vbox->Add( flags_hbox, 0, wxALIGN_CENTER_VERTICAL, 2);
+
     // Items
     _list_items = new ListChooser(this, "Items x number", _map_access->_item_names);
     if( _unit->items.Num() > 0) {
@@ -283,3 +296,13 @@ void UnitEditorDialog::OnClose( wxCloseEvent& event )
 }
 /****************************************** UnitEditorDialog::getUnitLocation */
 /****************************************** UnitEditorDialog::getUnitLocations */
+void UnitEditorDialog::on_unitflags_update( wxCommandEvent& event )
+{
+    int cbId = event.GetId() - idUnitFlagBase;
+    if( _unitflags_cb[cbId]->GetValue() ) {
+        _unit->SetFlag( _map_access->_unitflags_types[cbId].second, 1);
+    }
+    else {
+        _unit->SetFlag( _map_access->_unitflags_types[cbId].second, 0);
+    }
+}

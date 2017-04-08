@@ -26,8 +26,7 @@ public:
     wxChoice* _faction;
     wxChoice* _type;
     wxChoice* _guard, *_reveal;
-    wxCheckBox *_behind_cb, *_tax_cb, *_holding_cb, *_noaid_cb, *_invis_cb;
-    wxCheckBox *_cons_unit_cb, *cons_fact_cb;
+    wxCheckBox *_unitflags_cb[10];
     //wxButton* _reg_btn;
     ListChooser* _list_items;
     ListChooser* _list_skills;
@@ -43,6 +42,13 @@ private:
     int find_seltype_bynum( int tnum );
     int find_selguard_bynum( int gnum );
     int find_selreveal_bynum( int rnum );
+
+    void on_unitflags_update( wxCommandEvent& event );
+
+    enum
+        {
+            idUnitFlagBase = 100,
+        };
 
     /** Make GUI building easier */
     void mk_title(wxWindow *parent, wxBoxSizer *sizer, std::string title)
@@ -68,7 +74,12 @@ private:
         wxspin->SetValue( 0 );
         sizer->Add( wxspin, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
     }
-
+    void mk_check(wxWindow *parent, int id, wxBoxSizer *sizer, std::string title,
+              wxCheckBox*& wxcheck )
+    {
+        wxcheck = new wxCheckBox( parent, id, _(title));
+        sizer->Add( wxcheck, 0, wxRIGHT | wxALIGN_CENTER_VERTICAL, 20);
+    }
     // Events
     DECLARE_EVENT_TABLE()
 };
