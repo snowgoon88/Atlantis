@@ -16,12 +16,12 @@
 					<Add option="-std=c++11" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
 					<Add directory="../../AtlantisEdit" />
 					<Add directory="../Editor" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib/mswud" />
 				</ResourceCompiler>
 				<Linker>
 					<Add library="libwxmsw30ud_adv.a" />
@@ -29,7 +29,7 @@
 					<Add library="libwxbase30ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add directory="F:/Programmes/wxWidgets-3.0.2/lib/gcc_lib" />
+					<Add directory="D:/Programmes/wxWidgets-3.0.2/lib/gcc_lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -40,10 +40,10 @@
 			<Add option="-D__WXMSW__" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-Wall" />
-			<Add directory="F:/Programmes/wxWidgets-3.0.2/include" />
+			<Add directory="D:/Programmes/wxWidgets-3.0.2/include" />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="F:/Programmes/wxWidgets-3.0.2/include" />
+			<Add directory="D:/Programmes/wxWidgets-3.0.2/include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
@@ -128,12 +128,30 @@
 		<Unit filename="EditorApp.h" />
 		<Unit filename="EditorMain.cpp" />
 		<Unit filename="EditorMain.h" />
+		<Unit filename="ListChooser.cpp" />
+		<Unit filename="ListChooser.h" />
+		<Unit filename="ListElement.cpp" />
+		<Unit filename="ListElement.h" />
+		<Unit filename="LocalisationDialog.cpp" />
+		<Unit filename="LocalisationDialog.h" />
+		<Unit filename="LocalisationListener.h" />
 		<Unit filename="MapViewer.cpp" />
 		<Unit filename="MapViewer.h" />
+		<Unit filename="ObjectDialog.cpp" />
+		<Unit filename="ObjectDialog.h" />
+		<Unit filename="ObjectListener.h" />
+		<Unit filename="ProductDialog.cpp" />
+		<Unit filename="ProductDialog.h" />
 		<Unit filename="RegViewer.cpp" />
 		<Unit filename="RegViewer.h" />
 		<Unit filename="RegionData.cpp" />
 		<Unit filename="RegionData.h" />
+		<Unit filename="UnitDialog.cpp" />
+		<Unit filename="UnitDialog.h" />
+		<Unit filename="UnitEditListener.h" />
+		<Unit filename="UnitEditorDialog.cpp" />
+		<Unit filename="UnitEditorDialog.h" />
+		<Unit filename="UnitListener.h" />
 		<Unit filename="model.cpp" />
 		<Unit filename="model.h" />
 		<Unit filename="observer.h" />
