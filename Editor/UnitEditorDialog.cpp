@@ -112,7 +112,7 @@ UnitEditorDialog::UnitEditorDialog( wxWindow* parent, Unit* unit, MapAccess* map
     mk_title( this, flags_hbox, "Flags: ");
     int idf = 0;
     for( auto& item : _map_access->_unitflags_types) {
-        mk_check( this, idUnitFlagBase+item.second, flags_hbox, item.first, _unitflags_cb[idf] );
+        mk_check( this, idUnitFlagBase+idf, flags_hbox, item.first, _unitflags_cb[idf] );
         _unitflags_cb[idf]->Bind( wxEVT_CHECKBOX, &UnitEditorDialog::on_unitflags_update, this);
         _unitflags_cb[idf]->SetValue( _unit->GetFlag( item.second ));
 
@@ -299,10 +299,15 @@ void UnitEditorDialog::OnClose( wxCloseEvent& event )
 void UnitEditorDialog::on_unitflags_update( wxCommandEvent& event )
 {
     int cbId = event.GetId() - idUnitFlagBase;
+    std::cout << " FLAG, cbId=" << cbId << std::endl;
     if( _unitflags_cb[cbId]->GetValue() ) {
+        std::cout << "   Set " << _map_access->_unitflags_types[cbId].first << std::endl;
         _unit->SetFlag( _map_access->_unitflags_types[cbId].second, 1);
+        std::cout << "   Done " << std::endl;
     }
     else {
+        std::cout << "   UnSet " << _map_access->_unitflags_types[cbId].first << std::endl;
         _unit->SetFlag( _map_access->_unitflags_types[cbId].second, 0);
+        std::cout << "   Done " << std::endl;
     }
 }
